@@ -74,6 +74,71 @@ export class ProjectRepository {
     return fileIdByPath;
   }
 
+  public getExistingFilesByPath(projectId: string): Map<string, ScannedFile> {
+    const map = new Map<string, ScannedFile>();
+    for (const file of this.listProjectFiles(projectId)) {
+      map.set(file.path, file);
+    }
+    return map;
+  }
+
+  public applyIncrementalFiles(
+    projectId: string,
+    changedFiles: ReadonlyArray<ScannedFile>,
+    purgedPaths: ReadonlySet<string>,
+    existingFilesByPath: ReadonlyMap<string, ScannedFile>,
+  ): { fileIdByPath: Map<string, number>; changedFileIds: Set<number> } {
+    const fileIdByPath = new Map<string, number>();
+    const changedFileIds = new Set<number>();
+
+    for (const [p, existing] of existingFilesByPath.entries()) {
+      if (!purgedPaths.has(p) && existing.id !== undefined) {
+        fileIdByPath.set(p, existing.id);
+      }
+    }
+
+    const deleteStmt = this.store.db.prepare(
+      'DELETE FROM file WHERE project_id = ? AND path = ?',
+    );
+    for (const purgedPath of purgedPaths) {
+      deleteStmt.run(projectId, purgedPath);
+    }
+
+    const upsertStmt = this.store.db.prepare(
+      `INSERT INTO file (project_id, path, hash, mtime_ms, size_bytes, kind, scanned_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(project_id, path) DO UPDATE SET
+         hash = excluded.hash,
+         mtime_ms = excluded.mtime_ms,
+         size_bytes = excluded.size_bytes,
+         kind = excluded.kind,
+         scanned_at = excluded.scanned_at`,
+    );
+    const selectIdStmt = this.store.db.prepare(
+      'SELECT id FROM file WHERE project_id = ? AND path = ?',
+    );
+
+    for (const file of changedFiles) {
+      upsertStmt.run(
+        projectId,
+        file.path,
+        file.hash,
+        file.mtimeMs,
+        file.sizeBytes,
+        file.kind,
+        file.scannedAt,
+      );
+      const row = selectIdStmt.get(projectId, file.path) as { id: number } | undefined;
+      if (row) {
+        const fileId = Number(row.id);
+        fileIdByPath.set(file.path, fileId);
+        changedFileIds.add(fileId);
+      }
+    }
+
+    return { fileIdByPath, changedFileIds };
+  }
+
   public listProjectFiles(projectId: string): ReadonlyArray<ScannedFile> {
     const rows = this.store.db
       .prepare('SELECT * FROM file WHERE project_id = ? ORDER BY path ASC')
@@ -104,4 +169,3 @@ export class ProjectRepository {
     };
   }
 }
-

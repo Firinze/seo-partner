@@ -10,11 +10,15 @@ export interface WalkOptions {
   readonly scopeDir?: string;
   readonly maxFileSizeKb?: number;
   readonly extraExcludePatterns?: ReadonlyArray<string>;
+  readonly existingFilesByPath?: ReadonlyMap<string, ScannedFile>;
 }
 
 export interface WalkResult {
   readonly files: ReadonlyArray<ScannedFile>;
   readonly contentsByPath: ReadonlyMap<string, string>;
+  readonly changedPaths: ReadonlySet<string>;
+  readonly reusedPaths: ReadonlySet<string>;
+  readonly purgedPaths: ReadonlySet<string>;
   readonly skippedSecretOrIgnoredCount: number;
   readonly skippedOversizedCount: number;
 }
@@ -36,18 +40,32 @@ export function classifyFileKind(relativePathPosix: string): FileKind {
   }
   if (
     base === 'package.json' ||
+    base === 'composer.json' ||
+    base === 'artisan' ||
     base.startsWith('next.config.') ||
-    base === 'tsconfig.json'
+    base === 'tsconfig.json' ||
+    lower === 'routes/web.php' ||
+    lower === 'config/routes.yaml'
   ) {
     return 'config';
   }
-  if (/^(layout|root)\.(tsx|ts|jsx|js)$/.test(base)) {
+  if (
+    /^(layout|root)\.(tsx|ts|jsx|js)$/.test(base) ||
+    lower.includes('layouts/') ||
+    base === 'base.html.twig' ||
+    base === 'header.php' ||
+    base === 'head.php'
+  ) {
     return 'layout';
   }
   if (
-    /^(page|index)\.(tsx|ts|jsx|js|html|md|mdx)$/.test(base) ||
+    /^(page|index)\.(tsx|ts|jsx|js|html|md|mdx|php)$/.test(base) ||
     lower.startsWith('pages/') ||
     lower.startsWith('src/pages/') ||
+    lower.startsWith('src/controller/') ||
+    lower.endsWith('.blade.php') ||
+    lower.endsWith('.html.twig') ||
+    lower.endsWith('.php') ||
     lower.endsWith('.html') ||
     lower.endsWith('.md') ||
     lower.endsWith('.mdx')
@@ -70,9 +88,13 @@ export async function walkProjectFiles(options: WalkOptions): Promise<WalkResult
     ...loadGitignorePatterns(rootResolved),
     ...(options.extraExcludePatterns ?? []),
   ];
+  const existingMap = options.existingFilesByPath;
 
   const files: ScannedFile[] = [];
   const contentsByPath = new Map<string, string>();
+  const changedPaths = new Set<string>();
+  const reusedPaths = new Set<string>();
+  const seenPaths = new Set<string>();
   let skippedSecretOrIgnoredCount = 0;
   let skippedOversizedCount = 0;
   const scannedAt = new Date().toISOString();
@@ -90,19 +112,61 @@ export async function walkProjectFiles(options: WalkOptions): Promise<WalkResult
       return;
     }
 
+    seenPaths.add(relPosix);
+    const mtimeMs = Math.floor(stat.mtimeMs);
+    const sizeBytes = stat.size;
+    const kind = classifyFileKind(relPosix);
+    const prev = existingMap?.get(relPosix);
+
+    // Fast path for non-SEO-extracted files ('other' / 'static') when mtime and size are identical
+    if (
+      prev &&
+      prev.mtimeMs === mtimeMs &&
+      prev.sizeBytes === sizeBytes &&
+      (kind === 'other' || kind === 'static')
+    ) {
+      reusedPaths.add(relPosix);
+      files.push({
+        id: prev.id,
+        projectId: options.projectId,
+        path: relPosix,
+        hash: prev.hash,
+        mtimeMs,
+        sizeBytes,
+        kind,
+        scannedAt: prev.scannedAt,
+      });
+      return;
+    }
+
     const rawBuffer = await fs.promises.readFile(fullPath);
     const hash = crypto.createHash('sha256').update(rawBuffer).digest('hex');
-    const kind = classifyFileKind(relPosix);
 
-    files.push({
-      projectId: options.projectId,
-      path: relPosix,
-      hash,
-      mtimeMs: Math.floor(stat.mtimeMs),
-      sizeBytes: stat.size,
-      kind,
-      scannedAt,
-    });
+    if (prev && prev.hash === hash) {
+      reusedPaths.add(relPosix);
+      files.push({
+        id: prev.id,
+        projectId: options.projectId,
+        path: relPosix,
+        hash,
+        mtimeMs,
+        sizeBytes,
+        kind,
+        scannedAt: prev.scannedAt,
+      });
+    } else {
+      changedPaths.add(relPosix);
+      files.push({
+        id: prev?.id,
+        projectId: options.projectId,
+        path: relPosix,
+        hash,
+        mtimeMs,
+        sizeBytes,
+        kind,
+        scannedAt,
+      });
+    }
 
     if (kind !== 'other') {
       contentsByPath.set(relPosix, rawBuffer.toString('utf-8'));
@@ -140,17 +204,30 @@ export async function walkProjectFiles(options: WalkOptions): Promise<WalkResult
     if (fileTasks.length > 0) {
       await Promise.all(fileTasks);
     }
-    for (const subDir of subDirs) {
-      await walkDirectory(subDir);
+    const DIR_BATCH_SIZE = 16;
+    for (let i = 0; i < subDirs.length; i += DIR_BATCH_SIZE) {
+      await Promise.all(subDirs.slice(i, i + DIR_BATCH_SIZE).map((sd) => walkDirectory(sd)));
     }
   }
 
   await walkDirectory(startDir);
   files.sort((a, b) => a.path.localeCompare(b.path));
 
+  const purgedPaths = new Set<string>();
+  if (existingMap) {
+    for (const oldPath of existingMap.keys()) {
+      if (!seenPaths.has(oldPath)) {
+        purgedPaths.add(oldPath);
+      }
+    }
+  }
+
   return {
     files,
     contentsByPath,
+    changedPaths,
+    reusedPaths,
+    purgedPaths,
     skippedSecretOrIgnoredCount,
     skippedOversizedCount,
   };

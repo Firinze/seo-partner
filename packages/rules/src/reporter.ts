@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type {
+  CrawlRun,
   Finding,
   PrioritizedAction,
   ProjectRecord,
@@ -16,10 +17,11 @@ export interface GenerateReportOptions {
   readonly lang: SupportedLanguage;
   readonly reportType: ReportType;
   readonly customOutputPath?: string;
+  readonly crawlRun?: CrawlRun | null;
 }
 
 export function generateMarkdownReportContent(options: GenerateReportOptions): string {
-  const { project, findings, actions, lang, reportType } = options;
+  const { project, findings, actions, lang, reportType, crawlRun } = options;
   const today = new Date().toISOString().slice(0, 10);
   const reviewDate = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().slice(0, 10);
   const blockingCount = findings.filter((f) => f.blocksIndexing).length;
@@ -27,18 +29,24 @@ export function generateMarkdownReportContent(options: GenerateReportOptions): s
     (f) => f.severity === 'critical' || f.severity === 'high',
   ).length;
 
-  const top3Actions = actions
-    .slice(0, 3)
-    .map((a) => `${a.ruleId} (${a.subjectRef})`)
-    .join(', ') || (lang === 'fr' ? 'Aucune anomalie critique' : 'No critical issues');
+  const top3Actions =
+    actions
+      .slice(0, 3)
+      .map((a) => `${a.ruleId} (${a.subjectRef})`)
+      .join(', ') || (lang === 'fr' ? 'Aucune anomalie critique' : 'No critical issues');
 
   if (lang === 'fr') {
     const summaryLines = [
       `**Projet** : \`${project.name}\` (${project.frameworks.join(', ') || 'statique'}) — Audit \`${reportType}\` du ${today}.`,
       `**Situation** : ${findings.length} constat(s) détecté(s), dont **${blockingCount} bloquant(s) pour l'indexation** et ${criticalOrHighCount} de sévérité critique/haute.`,
+      ...(crawlRun
+        ? [
+            `**Crawl HTTP** : Run \`${crawlRun.id}\` sur \`${crawlRun.startUrl}\` (${crawlRun.pagesCrawled} pages explorées, ${crawlRun.errorsCount} erreurs).`,
+          ]
+        : []),
       `**3 Priorités immédiates** : ${top3Actions}.`,
       `**Impact attendu** : Déblocage complet de l'indexation et amélioration du CTR organique sous 30 à 90 jours (sans garantie de position).`,
-      `**Méthode** : Constats déterministes vérifiés avec preuves (fichier + ligne) et priorisation ICE.`,
+      `**Méthode** : Constats déterministes vérifiés avec preuves (fichier + ligne ou URL + statut HTTP) et priorisation ICE.`,
     ];
 
     const findingsRows =
@@ -94,9 +102,14 @@ export function generateMarkdownReportContent(options: GenerateReportOptions): s
   const summaryLinesEn = [
     `**Project**: \`${project.name}\` (${project.frameworks.join(', ') || 'static'}) — \`${reportType}\` report generated on ${today}.`,
     `**Situation**: ${findings.length} finding(s) detected, including **${blockingCount} indexing blocker(s)** and ${criticalOrHighCount} critical/high severity issue(s).`,
+    ...(crawlRun
+      ? [
+          `**HTTP Crawl**: Run \`${crawlRun.id}\` on \`${crawlRun.startUrl}\` (${crawlRun.pagesCrawled} pages crawled, ${crawlRun.errorsCount} errors).`,
+        ]
+      : []),
     `**Top 3 Immediate Priorities**: ${top3Actions}.`,
     `**Expected Impact**: Full indexing recovery and organic CTR lift within 30 to 90 days (no guaranteed rankings).`,
-    `**Method**: Deterministic static scan with mandatory file+line evidence and ICE prioritization.`,
+    `**Method**: Deterministic static scan and HTTP crawl with mandatory evidence and ICE prioritization.`,
   ];
 
   const findingsRowsEn =
@@ -165,4 +178,3 @@ export function writeMarkdownReport(options: GenerateReportOptions): {
 
   return { filePath: targetPath, markdown };
 }
-

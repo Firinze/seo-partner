@@ -1,6 +1,7 @@
 import type {
   DiscoveredRoute,
   ExtractedRouteData,
+  FtsSearchResult,
   HeadingItem,
   ImageItem,
   JsonLdItem,
@@ -17,7 +18,84 @@ export class RouteRepository {
     extractedList: ReadonlyArray<ExtractedRouteData>,
   ): void {
     this.store.db.prepare('DELETE FROM route WHERE project_id = ?').run(projectId);
+    this.cleanOrphanedFtsEntries();
+    this.insertExtractedRoutesBatch(projectId, fileIdByPath, extractedList);
+  }
 
+  public saveIncrementalScanResults(
+    projectId: string,
+    fileIdByPath: ReadonlyMap<string, number>,
+    changedFileIds: ReadonlySet<number>,
+    extractedForChangedFiles: ReadonlyArray<ExtractedRouteData>,
+  ): void {
+    const deleteRouteByFileStmt = this.store.db.prepare(
+      'DELETE FROM route WHERE project_id = ? AND file_id = ?',
+    );
+    for (const fileId of changedFileIds) {
+      deleteRouteByFileStmt.run(projectId, fileId);
+    }
+
+    this.cleanOrphanedFtsEntries();
+    this.insertExtractedRoutesBatch(projectId, fileIdByPath, extractedForChangedFiles);
+  }
+
+  public countProjectRoutes(projectId: string): number {
+    const row = this.store.db
+      .prepare('SELECT COUNT(*) AS cnt FROM route WHERE project_id = ?')
+      .get(projectId) as { cnt: number } | undefined;
+    return Number(row?.cnt ?? 0);
+  }
+
+  public searchFts(
+    projectId: string,
+    rawQuery: string,
+    limit = 20,
+  ): ReadonlyArray<FtsSearchResult> {
+    const cleaned = rawQuery.trim();
+    if (!cleaned) return [];
+
+    const tokens = cleaned
+      .split(/\s+/)
+      .map((t) => t.replace(/"/g, '').trim())
+      .filter((t) => t.length > 0);
+    if (tokens.length === 0) return [];
+
+    const ftsQuery = tokens.map((t) => `"${t}"*`).join(' OR ');
+
+    const rows = this.store.db
+      .prepare(
+        `SELECT fts.route_id, fts.route_pattern, fts.title, fts.description, fts.headings_text, fts.rank
+         FROM fts_page_index fts
+         JOIN route r ON r.id = CAST(fts.route_id AS INTEGER)
+         WHERE r.project_id = ? AND fts_page_index MATCH ?
+         ORDER BY fts.rank ASC
+         LIMIT ?`,
+      )
+      .all(projectId, ftsQuery, limit) as Array<Record<string, unknown>>;
+
+    return rows.map((row) => ({
+      routeId: Number(row['route_id']),
+      routePattern: String(row['route_pattern']),
+      title: row['title'] ? String(row['title']) : null,
+      description: row['description'] ? String(row['description']) : null,
+      headingsText: row['headings_text'] ? String(row['headings_text']) : null,
+      rank: Number(row['rank'] ?? 0),
+    }));
+  }
+
+  private cleanOrphanedFtsEntries(): void {
+    this.store.db
+      .prepare(
+        'DELETE FROM fts_page_index WHERE CAST(route_id AS INTEGER) NOT IN (SELECT id FROM route)',
+      )
+      .run();
+  }
+
+  private insertExtractedRoutesBatch(
+    projectId: string,
+    fileIdByPath: ReadonlyMap<string, number>,
+    extractedList: ReadonlyArray<ExtractedRouteData>,
+  ): void {
     const insertRouteStmt = this.store.db.prepare(
       `INSERT INTO route (project_id, file_id, pattern, router_kind, rendering_mode, is_private, in_sitemap)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -27,8 +105,14 @@ export class RouteRepository {
       `INSERT INTO page_meta (
         route_id, title, title_line, description, description_line,
         canonical, canonical_line, robots, robots_line,
+        html_lang, html_lang_line,
         h1_count, h1_first_text, h1_line, headings_json, og_json, hreflang_json, images_json
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    );
+
+    const insertFtsStmt = this.store.db.prepare(
+      `INSERT INTO fts_page_index (route_id, route_pattern, title, description, headings_text)
+       VALUES (?, ?, ?, ?, ?)`,
     );
 
     const insertLinkStmt = this.store.db.prepare(
@@ -69,6 +153,8 @@ export class RouteRepository {
         item.canonical?.line ?? null,
         item.robots?.value ?? null,
         item.robots?.line ?? null,
+        item.htmlLang?.value ?? null,
+        item.htmlLang?.line ?? null,
         h1s.length,
         firstH1?.text ?? null,
         firstH1?.line ?? null,
@@ -76,6 +162,15 @@ export class RouteRepository {
         JSON.stringify(item.openGraph),
         JSON.stringify(item.hreflang),
         JSON.stringify(item.images),
+      );
+
+      const headingsText = item.headings.map((h) => h.text).join(' ');
+      insertFtsStmt.run(
+        String(routeId),
+        item.route.pattern,
+        item.title?.value ?? '',
+        item.description?.value ?? '',
+        headingsText,
       );
 
       for (const link of item.links) {
@@ -108,6 +203,7 @@ export class RouteRepository {
         `SELECT r.*, f.path AS file_path,
                 pm.title, pm.title_line, pm.description, pm.description_line,
                 pm.canonical, pm.canonical_line, pm.robots, pm.robots_line,
+                pm.html_lang, pm.html_lang_line,
                 pm.headings_json, pm.og_json, pm.hreflang_json, pm.images_json
          FROM route r
          JOIN file f ON f.id = r.file_id
@@ -172,6 +268,10 @@ export class RouteRepository {
           row['robots'] !== null && row['robots'] !== undefined
             ? { value: String(row['robots']), line: Number(row['robots_line'] ?? 1) }
             : null,
+        htmlLang:
+          row['html_lang'] !== null && row['html_lang'] !== undefined
+            ? { value: String(row['html_lang']), line: Number(row['html_lang_line'] ?? 1) }
+            : undefined,
         headings: JSON.parse(String(row['headings_json'] ?? '[]')) as HeadingItem[],
         openGraph: JSON.parse(String(row['og_json'] ?? '{}')) as Record<string, string>,
         hreflang: JSON.parse(String(row['hreflang_json'] ?? '[]')) as Array<{
@@ -185,4 +285,3 @@ export class RouteRepository {
     });
   }
 }
-

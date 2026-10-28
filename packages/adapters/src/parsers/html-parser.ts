@@ -29,6 +29,7 @@ export function parseStaticHtmlOrMarkdown(
   let description: { value: string; line: number } | null = null;
   let canonical: { value: string; line: number } | null = null;
   let robots: { value: string; line: number } | null = null;
+  let htmlLang: { value: string; line: number } | null | undefined = undefined;
   const openGraph: Record<string, string> = {};
   const hreflang: Array<{ lang: string; url: string }> = [];
   const headings: HeadingItem[] = [];
@@ -67,6 +68,15 @@ export function parseStaticHtmlOrMarkdown(
       images,
       links,
       jsonLdItems,
+    };
+  }
+
+  const htmlTagMatch = /<html\b([^>]*?)>/i.exec(fileContent);
+  if (htmlTagMatch) {
+    const langVal = getAttr(htmlTagMatch[1] ?? '', 'lang') ?? '';
+    htmlLang = {
+      value: langVal.trim(),
+      line: lineNumberAtOffset(fileContent, htmlTagMatch.index),
     };
   }
 
@@ -192,6 +202,7 @@ export function parseStaticHtmlOrMarkdown(
     description,
     canonical,
     robots,
+    ...(htmlLang !== undefined ? { htmlLang } : {}),
     headings,
     openGraph,
     hreflang,

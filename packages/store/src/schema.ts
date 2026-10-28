@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const INITIAL_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS schema_migration (
@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS page_meta (
   canonical_line INTEGER,
   robots TEXT,
   robots_line INTEGER,
+  html_lang TEXT,
+  html_lang_line INTEGER,
   h1_count INTEGER NOT NULL DEFAULT 0,
   h1_first_text TEXT,
   h1_line INTEGER,
@@ -57,6 +59,14 @@ CREATE TABLE IF NOT EXISTS page_meta (
   og_json TEXT NOT NULL DEFAULT '{}',
   hreflang_json TEXT NOT NULL DEFAULT '[]',
   images_json TEXT NOT NULL DEFAULT '[]'
+);
+
+CREATE VIRTUAL TABLE IF NOT EXISTS fts_page_index USING fts5(
+  route_id UNINDEXED,
+  route_pattern,
+  title,
+  description,
+  headings_text
 );
 
 CREATE TABLE IF NOT EXISTS link (
@@ -77,6 +87,44 @@ CREATE TABLE IF NOT EXISTS schema_item (
   is_valid INTEGER NOT NULL DEFAULT 1,
   validation_error TEXT,
   line INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS crawl_run (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  start_url TEXT NOT NULL,
+  config_json TEXT NOT NULL DEFAULT '{}',
+  status TEXT NOT NULL DEFAULT 'running',
+  pages_crawled INTEGER NOT NULL DEFAULT 0,
+  errors_count INTEGER NOT NULL DEFAULT 0,
+  started_at TEXT NOT NULL,
+  completed_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS crawl_page (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  crawl_run_id TEXT NOT NULL REFERENCES crawl_run(id) ON DELETE CASCADE,
+  url TEXT NOT NULL,
+  route_pattern TEXT NOT NULL,
+  status_code INTEGER NOT NULL,
+  redirect_chain_json TEXT NOT NULL DEFAULT '[]',
+  response_time_ms INTEGER NOT NULL DEFAULT 0,
+  depth INTEGER NOT NULL DEFAULT 0,
+  x_robots_tag TEXT,
+  http_canonical TEXT,
+  title TEXT,
+  description TEXT,
+  canonical TEXT,
+  robots_meta TEXT,
+  h1 TEXT,
+  html_lang TEXT,
+  og_json TEXT NOT NULL DEFAULT '{}',
+  hreflang_json TEXT NOT NULL DEFAULT '[]',
+  internal_links_json TEXT NOT NULL DEFAULT '[]',
+  broken_links_json TEXT NOT NULL DEFAULT '[]',
+  untrusted_external INTEGER NOT NULL DEFAULT 1,
+  crawled_at TEXT NOT NULL,
+  UNIQUE(crawl_run_id, url)
 );
 
 CREATE TABLE IF NOT EXISTS rule (
@@ -139,7 +187,8 @@ CREATE TABLE IF NOT EXISTS decision (
 
 CREATE INDEX IF NOT EXISTS idx_file_project ON file(project_id);
 CREATE INDEX IF NOT EXISTS idx_route_project ON route(project_id);
+CREATE INDEX IF NOT EXISTS idx_crawl_run_project ON crawl_run(project_id, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_crawl_page_run ON crawl_page(crawl_run_id);
 CREATE INDEX IF NOT EXISTS idx_finding_status ON finding(status);
 CREATE INDEX IF NOT EXISTS idx_action_priority ON action(blocks_indexing DESC, ice_score DESC);
 `;
-

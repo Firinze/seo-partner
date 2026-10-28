@@ -1,15 +1,18 @@
 import { parseArgs } from 'node:util';
 import type {
   CliEnvelope,
+  ReportFormat,
   ReportType,
   RuleCategory,
   SeverityLevel,
   SupportedLanguage,
 } from '@seo-partner/core';
+import { SsrfBlockedError } from '@seo-partner/crawler';
 import { runInitCommand } from './commands/init.js';
 import { runDoctorCommand } from './commands/doctor.js';
 import { runUninstallCommand } from './commands/uninstall.js';
 import { runScanCommand } from './commands/scan.js';
+import { runCrawlCommand } from './commands/crawl.js';
 import { runAuditCommand } from './commands/audit.js';
 import { runBacklogCommand } from './commands/backlog.js';
 import { runReportCommand } from './commands/report.js';
@@ -20,6 +23,7 @@ export * from './commands/init.js';
 export * from './commands/doctor.js';
 export * from './commands/uninstall.js';
 export * from './commands/scan.js';
+export * from './commands/crawl.js';
 export * from './commands/audit.js';
 export * from './commands/backlog.js';
 export * from './commands/report.js';
@@ -61,10 +65,20 @@ export async function executeCli(
       scope: { type: 'string' },
       rebuild: { type: 'boolean' },
       'max-size': { type: 'string' },
+      'max-pages': { type: 'string' },
+      'max-depth': { type: 'string' },
+      concurrency: { type: 'string' },
+      'rate-limit-ms': { type: 'string' },
+      'max-redirects': { type: 'string' },
+      'allow-local': { type: 'boolean' },
+      js: { type: 'boolean' },
+      resume: { type: 'string' },
+      'crawl-run': { type: 'string' },
       category: { type: 'string' },
       severity: { type: 'string' },
       'quick-wins': { type: 'boolean' },
       type: { type: 'string' },
+      format: { type: 'string' },
       output: { type: 'string' },
       title: { type: 'string' },
       rationale: { type: 'string' },
@@ -86,15 +100,16 @@ export async function executeCli(
   try {
     if (command === 'help' || parsed.values['help']) {
       const helpText = [
-        'seo-partner v0.1.0 — Deterministic Local SEO Partner',
+        'seo-partner v0.2.0 — Deterministic Local SEO Partner',
         '',
         'Commands:',
         '  seo-partner init [--here] [--ide agy|claude|cursor|gemini|codex] [--lang en|fr] [--ignore-agent-tools] [--dry-run]',
         '  seo-partner doctor [--json]',
         '  seo-partner scan [--scope <dir>] [--rebuild] [--max-size <kb>] [--json]',
-        '  seo-partner audit [--category technical|on-page|schema] [--severity critical|high|medium|low] [--json]',
+        '  seo-partner crawl <url> [--allow-local] [--max-pages <n>] [--max-depth <n>] [--concurrency <n>] [--rate-limit-ms <ms>] [--js] [--resume <runId>] [--offline] [--json]',
+        '  seo-partner audit [--category technical|on-page|schema|local|geo] [--severity critical|high|medium|low] [--crawl-run <id>] [--json]',
         '  seo-partner backlog [--quick-wins] [--json]',
-        '  seo-partner report [--type audit-complet|audit-technique|backlog] [--output <path>] [--json]',
+        '  seo-partner report [--type audit-complet|audit-technique|backlog] [--format md|html|json] [--output <path>] [--json]',
         '  seo-partner memory list | add --title "..." --rationale "..." [--finding <id>] [--json]',
         '  seo-partner uninstall [--purge-data] [--dry-run] [--json]',
       ].join('\n');
@@ -165,7 +180,48 @@ export async function executeCli(
         rebuild: Boolean(parsed.values['rebuild']),
         maxFileSizeKb: maxSizeVal,
       });
-      const text = `Scanned ${res.filesScanned} file(s), discovered ${res.routesDiscovered} route(s) in ${res.durationMs}ms.`;
+      const text = `Scanned ${res.filesScanned} file(s) (parsed: ${res.filesParsed}, reused: ${res.filesReused}, purged: ${res.filesPurged}), discovered ${res.routesDiscovered} route(s) in ${res.durationMs}ms.`;
+      return {
+        exitCode: 0,
+        stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(res), null, 2) : text,
+        stderr: '',
+      };
+    }
+
+    if (command === 'crawl') {
+      if (!subcommand) {
+        throw new Error('Missing target URL for crawl command (usage: seo-partner crawl <url>)');
+      }
+      const res = await runCrawlCommand({
+        projectRoot,
+        startUrl: subcommand,
+        resumeRunId:
+          typeof parsed.values['resume'] === 'string' ? parsed.values['resume'] : undefined,
+        offline: Boolean(parsed.values['offline']),
+        maxPages:
+          typeof parsed.values['max-pages'] === 'string'
+            ? Number(parsed.values['max-pages'])
+            : undefined,
+        maxDepth:
+          typeof parsed.values['max-depth'] === 'string'
+            ? Number(parsed.values['max-depth'])
+            : undefined,
+        concurrency:
+          typeof parsed.values['concurrency'] === 'string'
+            ? Number(parsed.values['concurrency'])
+            : undefined,
+        rateLimitMs:
+          typeof parsed.values['rate-limit-ms'] === 'string'
+            ? Number(parsed.values['rate-limit-ms'])
+            : undefined,
+        maxRedirects:
+          typeof parsed.values['max-redirects'] === 'string'
+            ? Number(parsed.values['max-redirects'])
+            : undefined,
+        allowLocal: Boolean(parsed.values['allow-local']),
+        js: Boolean(parsed.values['js']),
+      });
+      const text = `Crawl ${res.crawlRunId} completed: ${res.pagesCrawled} page(s) crawled, ${res.errorsCount} error(s) in ${res.durationMs}ms.`;
       return {
         exitCode: 0,
         stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(res), null, 2) : text,
@@ -183,6 +239,10 @@ export async function executeCli(
         severity:
           typeof parsed.values['severity'] === 'string'
             ? (parsed.values['severity'] as SeverityLevel)
+            : undefined,
+        crawlRunId:
+          typeof parsed.values['crawl-run'] === 'string'
+            ? parsed.values['crawl-run']
             : undefined,
       });
       const text = `Audit complete: ${res.totalFindings} finding(s) (${res.blockingIndexingCount} blocking indexing).`;
@@ -218,6 +278,10 @@ export async function executeCli(
           typeof parsed.values['type'] === 'string'
             ? (parsed.values['type'] as ReportType)
             : undefined,
+        format:
+          typeof parsed.values['format'] === 'string'
+            ? (parsed.values['format'] as ReportFormat)
+            : undefined,
         outputPath:
           typeof parsed.values['output'] === 'string'
             ? parsed.values['output']
@@ -225,6 +289,10 @@ export async function executeCli(
         lang:
           typeof parsed.values['lang'] === 'string'
             ? (parsed.values['lang'] as SupportedLanguage)
+            : undefined,
+        crawlRunId:
+          typeof parsed.values['crawl-run'] === 'string'
+            ? parsed.values['crawl-run']
             : undefined,
       });
       const text = `Report written to ${res.filePath} (${res.totalFindings} findings).`;
@@ -271,18 +339,21 @@ export async function executeCli(
     throw new Error(`Unknown command: ${command}`);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+    const isSecurityOrOfflineBlock =
+      err instanceof SsrfBlockedError || message.includes('--offline');
+    const exitCode = isSecurityOrOfflineBlock ? 3 : 1;
+
     if (jsonMode) {
       return {
-        exitCode: 1,
+        exitCode,
         stdout: JSON.stringify(wrapCliError(message), null, 2),
         stderr: '',
       };
     }
     return {
-      exitCode: 1,
+      exitCode,
       stdout: '',
       stderr: `Error: ${message}`,
     };
   }
 }
-

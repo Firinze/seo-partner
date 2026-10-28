@@ -1,6 +1,13 @@
 export type SupportedLanguage = 'en' | 'fr';
 export type IdeTarget = 'agy' | 'claude' | 'cursor' | 'gemini' | 'codex';
-export type RouterKind = 'nextjs-app' | 'nextjs-pages' | 'static-html' | 'markdown';
+export type RouterKind =
+  | 'nextjs-app'
+  | 'nextjs-pages'
+  | 'static-html'
+  | 'markdown'
+  | 'laravel'
+  | 'symfony'
+  | 'php';
 export type RenderingMode = 'ssr-ssg' | 'client-only' | 'dynamic' | 'static';
 export type FileKind = 'route' | 'layout' | 'robots' | 'sitemap' | 'config' | 'static' | 'other';
 export type RuleCategory = 'technical' | 'on-page' | 'schema' | 'local' | 'geo';
@@ -9,6 +16,8 @@ export type FindingStatus = 'open' | 'acknowledged' | 'resolved';
 export type OwnerRole = 'dev' | 'content' | 'outreach';
 export type TargetTimeframe = 'immediate' | '30-days' | '90-days';
 export type ReportType = 'audit-complet' | 'audit-technique' | 'backlog';
+export type ReportFormat = 'md' | 'json' | 'html';
+export type CrawlRunStatus = 'running' | 'completed' | 'interrupted' | 'failed';
 
 export interface CliEnvelope<T> {
   readonly success: boolean;
@@ -96,12 +105,84 @@ export interface ExtractedRouteData {
   readonly description: { readonly value: string; readonly line: number } | null;
   readonly canonical: { readonly value: string; readonly line: number } | null;
   readonly robots: { readonly value: string; readonly line: number } | null;
+  readonly htmlLang?: { readonly value: string; readonly line: number } | null;
   readonly headings: ReadonlyArray<HeadingItem>;
   readonly openGraph: Record<string, string>;
   readonly hreflang: ReadonlyArray<{ readonly lang: string; readonly url: string }>;
   readonly images: ReadonlyArray<ImageItem>;
   readonly links: ReadonlyArray<LinkItem>;
   readonly jsonLdItems: ReadonlyArray<JsonLdItem>;
+}
+
+export interface IncrementalScanStats {
+  readonly incremental: boolean;
+  readonly filesScanned: number;
+  readonly filesParsed: number;
+  readonly filesReused: number;
+  readonly filesPurged: number;
+}
+
+export interface FtsSearchResult {
+  readonly routeId: number;
+  readonly routePattern: string;
+  readonly title: string | null;
+  readonly description: string | null;
+  readonly headingsText: string | null;
+  readonly rank: number;
+}
+
+export interface CrawlConfig {
+  readonly maxPages: number;
+  readonly maxDepth: number;
+  readonly concurrency: number;
+  readonly rateLimitMs: number;
+  readonly maxRedirects: number;
+  readonly allowLocal: boolean;
+  readonly js: boolean;
+  readonly userAgent: string;
+}
+
+export interface CrawlRedirectHop {
+  readonly from: string;
+  readonly to: string;
+  readonly status: number;
+}
+
+export interface CrawlRun {
+  readonly id: string;
+  readonly projectId: string;
+  readonly startUrl: string;
+  readonly config: CrawlConfig;
+  readonly status: CrawlRunStatus;
+  readonly pagesCrawled: number;
+  readonly errorsCount: number;
+  readonly startedAt: string;
+  readonly completedAt: string | null;
+}
+
+export interface CrawlPage {
+  readonly id?: number;
+  readonly crawlRunId: string;
+  readonly url: string;
+  readonly routePattern: string;
+  readonly statusCode: number;
+  readonly redirectChain: ReadonlyArray<CrawlRedirectHop>;
+  readonly responseTimeMs: number;
+  readonly depth: number;
+  readonly xRobotsTag: string | null;
+  readonly httpCanonical: string | null;
+  readonly title: string | null;
+  readonly description: string | null;
+  readonly canonical: string | null;
+  readonly robotsMeta: string | null;
+  readonly h1: string | null;
+  readonly htmlLang: string | null;
+  readonly openGraph: Record<string, string>;
+  readonly hreflang: ReadonlyArray<{ readonly lang: string; readonly url: string }>;
+  readonly internalLinks: ReadonlyArray<string>;
+  readonly brokenLinks: ReadonlyArray<string>;
+  readonly untrustedExternal: boolean;
+  readonly crawledAt: string;
 }
 
 export interface IceBreakdown {
@@ -116,9 +197,11 @@ export interface IceBreakdown {
 }
 
 export interface FindingEvidence {
-  readonly source: 'code-scan';
+  readonly source: 'code-scan' | 'http-crawl' | 'code-vs-crawl';
   readonly filePath: string;
   readonly lineNumber: number;
+  readonly url?: string;
+  readonly statusCode?: number;
   readonly observed: string;
   readonly expected: string;
 }

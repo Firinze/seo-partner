@@ -6,7 +6,7 @@ Version 1.0 (brouillon à valider) | 28 octobre 2026 | Auteur : Firinze Gbènito
 
 Transformer le skill SEO actuel en produit open source complet : un index local déterministe du projet (10 000 fichiers et plus), un crawl du site en ligne, un moteur d'audit avec priorisation ICE, un serveur MCP pour les agents des IDE (ou un mode autonome avec clé API), une CLI d'installation et un dashboard web local.
 
-Trois priorités : (1) socle Next.js + crawl générique, puis WordPress ; (2) installation en une commande sur au moins 3 IDE ; (3) mémoire persistante dans `.seo/` au lieu du contexte du modèle.
+Trois priorités : (1) socle Next.js + crawl générique, puis écosystème PHP (Laravel, Symfony, PHP natif / Laragon) ; (2) installation en une commande sur au moins 3 IDE ; (3) mémoire persistante dans `.seo/` au lieu du contexte du modèle.
 
 Impact attendu : premier audit exploitable moins de 10 minutes après l'installation. Le succès se mesure en installations réussies et retours d'utilisateurs, jamais en promesses de positionnement.
 
@@ -308,7 +308,7 @@ Principe : local-first. L'outil n'envoie jamais de contenu du projet à un tiers
 | Version | Contenu | Critère de sortie |
 | --- | --- | --- |
 | v0.1 (2 à 3 semaines) | Skill généralisé, `init` sur 5 cibles, `doctor`, scan Next.js, rapport JSON/MD, 15 règles | US1 et US2, premier rapport sous 10 min sur 3 projets |
-| v0.2 (2 à 3 semaines) | SQLite, incrémental, crawl, rapports HTML, WordPress, 40 règles | US3 et US5, cibles de performance tenues |
+| v0.2 (2 à 3 semaines) | SQLite, incrémental, crawl, rapports HTML, PHP (Laravel, Symfony, Laragon), 40 règles | US3 et US5, cibles de performance tenues |
 | v0.3 (2 semaines) | Dashboard lecture seule, OpenAPI | US7, accessibilité AA vérifiée |
 | v0.4 (2 à 3 semaines) | MCP, Search Console, PageSpeed Insights, `watch` | US4, US9, US10 |
 | v0.5 (2 semaines) | Astro, Nuxt, SvelteKit, SPA Vite, GitHub Action | Adapters validés sur projets réels |

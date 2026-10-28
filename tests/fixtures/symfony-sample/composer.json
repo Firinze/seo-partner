@@ -1,0 +1,10 @@
+{
+  "name": "acme/symfony-sample",
+  "type": "project",
+  "require": {
+    "php": ">=8.2",
+    "symfony/framework-bundle": "^7.0",
+    "symfony/twig-bundle": "^7.0"
+  }
+}
+

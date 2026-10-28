@@ -1,22 +1,27 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import type { Finding, RuleCategory, SeverityLevel } from '@seo-partner/core';
 import {
+  CrawlRepository,
   FindingRepository,
   ProjectRepository,
   RouteRepository,
   SeoDatabase,
 } from '@seo-partner/store';
-import { ALL_V01_RULES, runRulesEngine } from '@seo-partner/rules';
+import { ALL_V02_RULES, runRulesEngine } from '@seo-partner/rules';
 import { runScanCommand } from './scan.js';
 
 export interface AuditCommandOptions {
   readonly projectRoot: string;
   readonly category?: RuleCategory;
   readonly severity?: SeverityLevel;
+  readonly crawlRunId?: string;
 }
 
 export interface AuditCommandResult {
   readonly projectId: string;
+  readonly crawlRunId: string | null;
+  readonly activeRulesCount: number;
   readonly totalFindings: number;
   readonly blockingIndexingCount: number;
   readonly bySeverity: Record<SeverityLevel, number>;
@@ -47,20 +52,38 @@ export async function runAuditCommand(
   try {
     const projectRepo = new ProjectRepository(store);
     const routeRepo = new RouteRepository(store);
+    const crawlRepo = new CrawlRepository(store);
     const findingRepo = new FindingRepository(store);
 
     const files = projectRepo.listProjectFiles(project.id);
     const sitemapFile = files.find((f) => f.kind === 'sitemap')?.path ?? null;
+    const robotsFile = files.find((f) => f.kind === 'robots')?.path ?? null;
+    let robotsTxtContent: string | null = null;
+    if (robotsFile && robotsFile.endsWith('.txt')) {
+      try {
+        robotsTxtContent = fs.readFileSync(path.join(projectRoot, robotsFile), 'utf-8');
+      } catch {
+        robotsTxtContent = null;
+      }
+    }
+
     const routes = routeRepo.loadExtractedRoutes(project.id);
+    const activeCrawlRun = options.crawlRunId
+      ? crawlRepo.getCrawlRunById(options.crawlRunId)
+      : crawlRepo.getLatestCompletedCrawlRun(project.id);
+    const crawlPages = activeCrawlRun ? crawlRepo.getCrawlPages(activeCrawlRun.id) : [];
 
     const evaluatedFindings = runRulesEngine({
       project,
       routes,
       sitemapFilePath: sitemapFile,
+      crawlPages,
+      robotsTxtContent,
+      robotsFilePath: robotsFile,
     });
 
     store.runInTransaction(() => {
-      findingRepo.syncRulesCatalog(ALL_V01_RULES);
+      findingRepo.syncRulesCatalog(ALL_V02_RULES);
       findingRepo.syncFindingsAndActions(evaluatedFindings);
     });
 
@@ -84,6 +107,8 @@ export async function runAuditCommand(
 
     return {
       projectId: project.id,
+      crawlRunId: activeCrawlRun?.id ?? null,
+      activeRulesCount: ALL_V02_RULES.length,
       totalFindings: filteredFindings.length,
       blockingIndexingCount,
       bySeverity,
@@ -93,4 +118,3 @@ export async function runAuditCommand(
     store.close();
   }
 }
-

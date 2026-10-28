@@ -34,16 +34,48 @@ export class SeoDatabase {
   }
 
   public migrate(): void {
+    // Check if schema_migration already exists before running INITIAL_SCHEMA_SQL
+    const hasMigrationTable = this.db
+      .prepare(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'schema_migration'",
+      )
+      .get() as { name?: string } | undefined;
+
+    let currentVersion = 0;
+    if (hasMigrationTable?.name) {
+      const row = this.db
+        .prepare('SELECT MAX(version) AS max_v FROM schema_migration')
+        .get() as { max_v: number | null } | undefined;
+      currentVersion = row?.max_v ?? 0;
+    }
+
+    if (currentVersion > 0 && currentVersion < SCHEMA_VERSION && fs.existsSync(this.dbPath)) {
+      // Checkpoint WAL so the backup file contains all committed pages
+      try {
+        this.db.exec('PRAGMA wal_checkpoint(TRUNCATE);');
+      } catch {
+        // Ignore if checkpoint not needed
+      }
+      fs.copyFileSync(this.dbPath, `${this.dbPath}.v${currentVersion}.bak`);
+    }
+
     this.db.exec(INITIAL_SCHEMA_SQL);
-    const row = this.db
-      .prepare('SELECT MAX(version) AS max_v FROM schema_migration')
-      .get() as { max_v: number | null } | undefined;
-    const currentVersion = row?.max_v ?? 0;
+
+    // Ensure v1 -> v2 columns on page_meta exist when upgrading from v1
+    if (currentVersion === 1) {
+      const cols = this.db.prepare('PRAGMA table_info(page_meta);').all() as Array<{
+        name: string;
+      }>;
+      const colNames = new Set(cols.map((c) => c.name));
+      if (!colNames.has('html_lang')) {
+        this.db.exec('ALTER TABLE page_meta ADD COLUMN html_lang TEXT;');
+      }
+      if (!colNames.has('html_lang_line')) {
+        this.db.exec('ALTER TABLE page_meta ADD COLUMN html_lang_line INTEGER;');
+      }
+    }
 
     if (currentVersion < SCHEMA_VERSION) {
-      if (currentVersion > 0 && fs.existsSync(this.dbPath)) {
-        fs.copyFileSync(this.dbPath, `${this.dbPath}.bak-v${currentVersion}`);
-      }
       this.db
         .prepare('INSERT OR REPLACE INTO schema_migration (version, applied_at) VALUES (?, ?)')
         .run(SCHEMA_VERSION, new Date().toISOString());
@@ -71,4 +103,3 @@ export class SeoDatabase {
     this.db.close();
   }
 }
-

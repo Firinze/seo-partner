@@ -1,8 +1,8 @@
 {
   "name": "seo-partner-monorepo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Deterministic local SEO scanner, 15 Must rules engine with ICE prioritization, and multi-IDE skill installer",
+  "description": "Deterministic local SEO scanner, anti-SSRF HTTP crawler, PHP/Next.js adapters, 40 rules engine with ICE prioritization, and multi-IDE skill installer",
   "license": "MIT",
   "author": "Firinze Gbènito Dossou",
   "type": "module",
@@ -19,6 +19,7 @@
   "devDependencies": {
     "@seo-partner/adapters": "workspace:*",
     "@seo-partner/core": "workspace:*",
+    "@seo-partner/crawler": "workspace:*",
     "@seo-partner/rules": "workspace:*",
     "@seo-partner/store": "workspace:*",
     "@types/node": "^22.10.0",

@@ -142,6 +142,7 @@ export function parseTsxRouteFile(
   let description: { value: string; line: number } | null = null;
   let canonical: { value: string; line: number } | null = null;
   let robots: { value: string; line: number } | null = null;
+  let htmlLang: { value: string; line: number } | null | undefined = undefined;
   const openGraph: Record<string, string> = {};
   const hreflang: Array<{ lang: string; url: string }> = [];
   const headings: HeadingItem[] = [];
@@ -279,7 +280,10 @@ export function parseTsxRouteFile(
       const line = getLineNumber(sourceFile, opening.getStart(sourceFile));
       const attrs = getJsxAttributeMap(opening.attributes);
 
-      if (/^h[1-6]$/i.test(tagName)) {
+      if (tagName === 'html') {
+        const langAttr = attrs.get('lang');
+        htmlLang = { value: langAttr?.value ?? '', line };
+      } else if (/^h[1-6]$/i.test(tagName)) {
         const level = Number(tagName.slice(1)) as 1 | 2 | 3 | 4 | 5 | 6;
         const text = extractJsxText(node);
         headings.push({ level, text, line });
@@ -388,6 +392,7 @@ export function parseTsxRouteFile(
     description,
     canonical,
     robots,
+    ...(htmlLang !== undefined ? { htmlLang } : {}),
     headings,
     openGraph,
     hreflang,

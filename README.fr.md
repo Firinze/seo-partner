@@ -4,16 +4,16 @@
 
 <br />
 
-[![Version](https://img.shields.io/badge/version-0.1.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
+[![Version](https://img.shields.io/badge/version-0.2.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-059669?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7_Strict-047857?style=for-the-badge&logo=typescript&logoColor=white)](./tsconfig.base.json)
-[![SQLite WAL](https://img.shields.io/badge/SQLite-Native_WAL-34d399?style=for-the-badge&logo=sqlite&logoColor=022c22)](./packages/store/src/db.ts)
-[![Coverage](https://img.shields.io/badge/Coverage-88.76%25-10b981?style=for-the-badge&logo=vitest&logoColor=white)](./vitest.config.ts)
+[![SQLite WAL + FTS5](https://img.shields.io/badge/SQLite-WAL_%2B_FTS5-34d399?style=for-the-badge&logo=sqlite&logoColor=022c22)](./packages/store/src/db.ts)
+[![Rules](https://img.shields.io/badge/SEO_Rules-40_Verified-10b981?style=for-the-badge&logoColor=white)](./packages/rules/src/engine.ts)
 [![License](https://img.shields.io/badge/License-MIT-065f46?style=for-the-badge)](./LICENSE)
 
 <p align="center">
-  <strong>Scanner SEO local déterministe, moteur des 15 règles <code>Must</code> avec priorisation ICE et pack méthodologique bilingue multi-IDE.</strong><br />
-  <em>Conçu pour Antigravity (<code>agy</code>), Claude Code, Cursor, Gemini CLI et Codex — sans exécution de code et sans piège d'installation.</em>
+  <strong>Scanner SEO incrémental (<code>&lt; 5 s</code>), Crawler HTTP anti-SSRF, Adapters Next.js &amp; PHP (Laravel, Symfony, Laragon), moteur de 40 règles déterministes avec priorisation ICE, rapports HTML5 autonomes et pack méthodologique bilingue multi-IDE.</strong><br />
+  <em>Conçu pour Antigravity (<code>agy</code>), Claude Code, Cursor, Gemini CLI et Codex — sans exécution de code (<code>F-S5</code>) et sans piège d'installation.</em>
 </p>
 
 <p align="center">
@@ -26,44 +26,37 @@
 
 ## Table des Matières
 
-1. [Vision et Proposition de Valeur](#1-vision-et-proposition-de-valeur)
-2. [Architecture Système et Flux de Données](#2-architecture-système-et-flux-de-données)
+1. [Vision et Proposition de Valeur (`v0.2`)](#1-vision-et-proposition-de-valeur-v02)
+2. [Architecture Système, Flux de Données et Schéma ERD (`SQLite v2`)](#2-architecture-système-flux-de-données-et-schéma-erd-sqlite-v2)
 3. [Démarrage Rapide (Getting Started)](#3-démarrage-rapide-getting-started)
-4. [Référence Complète de la CLI (8 Commandes)](#4-référence-complète-de-la-cli-8-commandes)
-5. [Catalogue des 15 Règles `Must` et Méthodologie ICE](#5-catalogue-des-15-règles-must-et-méthodologie-ice)
-6. [Skill Pack Bilingue (`11/11` Références) et Intégration Multi-IDE](#6-skill-pack-bilingue-1111-références-et-intégration-multi-ide)
-7. [Guide Développeur et Référence SDK TypeScript](#7-guide-développeur-et-référence-sdk-typescript)
-8. [Sécurité, Confidentialité et Garde-Fous `.gitignore`](#8-sécurité-confidentialité-et-garde-fous-gitignore)
-9. [Guide de Dépannage (Troubleshooting) et FAQ](#9-guide-de-dépannage-troubleshooting-et-faq)
-10. [Feuille de Route (`v0.1` à `v1.0`) et Gouvernance Documentaire](#10-feuille-de-route-v01-à-v10-et-gouvernance-documentaire)
+4. [Référence Complète de la CLI (9 Commandes)](#4-référence-complète-de-la-cli-9-commandes)
+5. [Catalogue des 40 Règles SEO Vérifiées et Méthodologie ICE](#5-catalogue-des-40-règles-seo-vérifiées-et-méthodologie-ice)
+6. [Support Multi-Frameworks : Next.js, Laravel, Symfony, PHP/Laragon et Statique](#6-support-multi-frameworks--nextjs-laravel-symfony-phplaragon-et-statique)
+7. [Skill Pack Bilingue (`11/11` Références) et Intégration Multi-IDE](#7-skill-pack-bilingue-1111-références-et-intégration-multi-ide)
+8. [Guide Développeur et Référence SDK TypeScript](#8-guide-développeur-et-référence-sdk-typescript)
+9. [Sécurité, Anti-SSRF, Confidentialité et Garde-Fous `.gitignore`](#9-sécurité-anti-ssrf-confidentialité-et-garde-fous-gitignore)
+10. [Guide de Dépannage (Troubleshooting) et FAQ](#10-guide-de-dépannage-troubleshooting-et-faq)
+11. [Feuille de Route (`v0.1` à `v1.0`) et Gouvernance Documentaire](#11-feuille-de-route-v01-à-v10-et-gouvernance-documentaire)
 
 ---
 
-## 1. Vision et Proposition de Valeur
+## 1. Vision et Proposition de Valeur (`v0.2`)
 
-### Le problème des approches SEO actuelles
+`seo-partner` sépare strictement **ce qui doit être exact à 100 %** (exécuté par un moteur déterministe local en TypeScript et SQLite WAL + `FTS5`) de **ce qui relève du conseil éditorial et stratégique** (guidé par le pack méthodologique de 11 références dans votre IDE) :
 
-Les développeurs et équipes produit font face à deux extrêmes lorsqu'ils auditent le référencement d'une application moderne (Next.js, React, sites statiques) :
-
-- **Les simples prompts / skills textuels** obligent l'agent IA à relire les fichiers un par un dans sa fenêtre de contexte, produisent des résultats variables d'une session à l'autre, oublient des routes et ne conservent aucune mémoire structurée des décisions prises.
-- **Les crawlers SaaS externes** nécessitent un déploiement préalable, ignorent l'emplacement exact dans le code source (`fichier:ligne`) et ne s'intègrent pas nativement au flux de travail de l'IDE.
-
-### La réponse `seo-partner` : Cœur Déterministe + Intelligence Agentique
-
-`seo-partner` sépare strictement **ce qui doit être exact à 100 %** (exécuté par un moteur déterministe local en TypeScript/SQLite) de **ce qui relève du conseil éditorial et stratégique** (guidé par le pack méthodologique de 11 références dans votre IDE) :
-
-| Capacité | Prompt / Skill classique | Crawler Cloud SaaS | **`seo-partner` (`v0.1`)** |
+| Capacité | Prompt / Skill classique | Crawler Cloud SaaS | **`seo-partner` (`v0.2`)** |
 | :--- | :--- | :--- | :--- |
-| **Découverte exhaustive des routes (App & Pages Router)** | Non (limité par le contexte) | Partiel (URLs publiées uniquement) | **Oui — 100 % déterministe (AST statique)** |
-| **Preuve obligatoire (`filePath` + `lineNumber >= 1`)** | Non (approximative) | Non (HTML compilé uniquement) | **Oui — Ligne exacte du fichier source (`SC-003`)** |
-| **Exécution du code du projet analysé (`F-S5`)** | Variable selon l'agent | N/A | **Zéro exécution (`eval`/`build` interdits)** |
-| **Mémoire inter-sessions et transitions de statut** | Non (perdue entre sessions) | Cloud propriétaire | **SQLite WAL local (`.seo/index.db`) + `.seo/decisions.md`** |
-| **Priorisation mathématique ICE et Arbitrage `F-R3`** | Non (subjective) | Générique | **Score `ICE = (I+C+E)/3` + Blocages en tête** |
-| **Installation Windows sans binaire IDE dans le `PATH`** | Échoue souvent | N/A | **Philosophie Spec Kit (`--ignore-agent-tools`)** |
+| **Découverte des routes (Next.js, Laravel, Symfony, PHP/Laragon)** | Non (limité par le contexte) | Partiel (URLs publiées uniquement) | **Oui — 100 % déterministe (AST & parseurs statiques)** |
+| **Scan incrémental en boucle courte IDE (`< 5 s`)** | Non (relecture intégrale) | Non | **Oui — Diff `(mtimeMs, sizeBytes, sha256)` + `FTS5` `< 100 ms`** |
+| **Crawler HTTP sécurisé & Croisement Code vs. Rendu** | Non | Sans lien avec le code source | **Oui — `seo-partner crawl` (anti-SSRF + `--allow-local` Laragon)** |
+| **Preuve obligatoire (`filePath:lineNumber` ou `url + statusCode`)** | Non (approximative) | HTML compilé uniquement | **Oui — Ligne exacte du fichier ou statut HTTP crawlé** |
+| **Exécution du code du projet analysé (`F-S5`)** | Variable selon l'agent | N/A | **Zéro exécution (`php`/`eval`/`build` interdits)** |
+| **Catalogue de règles & Priorisation mathématique ICE (`F-R3`)** | Non (subjective) | Générique | **40 règles vérifiées (`ICE = (I+C+E)/3` + Blocages en tête)** |
+| **Livrables exécutifs (Markdown, JSON, HTML5 autonome)** | Texte brut éphémère | Export propriétaire | **Rapports 5 parties `.md`, `.json` et `.html` 100 % hors ligne** |
 
 ---
 
-## 2. Architecture Système et Flux de Données
+## 2. Architecture Système, Flux de Données et Schéma ERD (`SQLite v2`)
 
 ### 2.1 Architecture Modulaire du Monorepo (`pnpm workspaces`)
 
@@ -74,21 +67,23 @@ flowchart TB
     DEV["Developpeur / Agent IA"]
   end
 
-  subgraph CLI_LAYER["@seo-partner/cli (Binaire seo-partner)"]
+  subgraph CLI_LAYER["@seo-partner/cli (Binaire seo-partner — 9 Commandes)"]
     CMD_INIT["init / doctor / uninstall"]
-    CMD_SCAN["scan"]
-    CMD_AUDIT["audit / backlog / report"]
+    CMD_SCAN["scan (Incremental < 5s)"]
+    CMD_CRAWL["crawl (Anti-SSRF / --allow-local)"]
+    CMD_AUDIT["audit / backlog / report (md | html | json)"]
     CMD_MEM["memory (list / add)"]
   end
 
   subgraph ENGINE_LAYER["Couche Metier Deterministe"]
-    ADAPTERS["@seo-partner/adapters\nNextJsAdapter (App & Pages)\nStaticAdapter + Parseurs AST"]
-    RULES["@seo-partner/rules\n15 Regles Must + Calculateur ICE\nGenerateur Markdown & JSON"]
+    ADAPTERS["@seo-partner/adapters\nNextJsAdapter (App & Pages)\nPhpAdapter (Laravel, Symfony, Laragon)\nStaticAdapter"]
+    CRAWLER["@seo-partner/crawler\nGarde Anti-SSRF (DNS par saut)\nRespect robots.txt & Rate-Limiter\nPlaywright dynamique optionnel (--js)"]
+    RULES["@seo-partner/rules\n40 Regles (Tech, On-Page, Schema, Local, GEO)\nCalculateur ICE + Rapports MD / HTML5 / JSON"]
   end
 
   subgraph FOUNDATION_LAYER["Socle Local-First"]
-    CORE["@seo-partner/core\nWalker en flux | Garde .gitignore & Secrets\nConfig Zod | Journal Outbound (--offline)"]
-    STORE["@seo-partner/store\nSQLite Natif (node:sqlite en mode WAL)\n.seo/index.db | Transitions open/resolved"]
+    CORE["@seo-partner/core\nWalker Incremental | Garde .gitignore & Secrets\nConfig Zod | Journal Outbound (--offline)"]
+    STORE["@seo-partner/store\nSQLite Natif v2 (WAL + FTS5 + Backup .v1.bak)\n.seo/index.db | CrawlRun / CrawlPage"]
   end
 
   DEV --> CLI_LAYER
@@ -97,37 +92,132 @@ flowchart TB
   CMD_SCAN --> CORE
   CMD_SCAN --> ADAPTERS
   CMD_SCAN --> STORE
+  CMD_CRAWL --> CRAWLER
+  CMD_CRAWL --> STORE
   CMD_AUDIT --> RULES
   CMD_AUDIT --> STORE
   CMD_MEM --> CORE
   CMD_MEM --> STORE
   ADAPTERS --> CORE
+  CRAWLER --> CORE
+  CRAWLER --> STORE
   RULES --> CORE
 ```
 
-### 2.2 Pipeline d'Exécution de Bout en Bout
+### 2.2 Diagramme Entité-Relation (`ERD` — Schéma SQLite `v2`)
 
 ```mermaid
-sequenceDiagram
-  autonumber
-  actor U as Developpeur / Agent IA
-  participant CLI as seo-partner CLI
-  participant FS as Walker & AST Parser
-  participant DB as SQLite WAL (.seo/index.db)
-  participant RE as Moteur 15 Regles & ICE
+erDiagram
+    PROJECT ||--o{ FILE : "contient"
+    PROJECT ||--o{ ROUTE : "expose"
+    PROJECT ||--o{ CRAWL_RUN : "historise"
+    FILE ||--o{ ROUTE : "definit"
+    ROUTE ||--o| PAGE_META : "possede"
+    ROUTE ||--o{ LINK : "emet"
+    ROUTE ||--o{ SCHEMA_ITEM : "declare"
+    ROUTE ||--o| FTS_PAGE_INDEX : "indexe (FTS5)"
+    CRAWL_RUN ||--o{ CRAWL_PAGE : "explore"
+    RULE ||--o{ FINDING : "declenche"
+    FINDING ||--o| ACTION : "priorise (ICE)"
+    FINDING ||--o{ DECISION : "justifie"
 
-  U->>CLI: seo-partner init --here --ide agy --lang fr
-  CLI->>FS: Copie le Skill Pack FR (11 ref.) + securise .gitignore
-  U->>CLI: seo-partner doctor
-  CLI-->>U: Diagnostic complet < 5 s (Node, Config, .gitignore, 11/11 ref., SQLite WAL)
-  U->>CLI: seo-partner scan
-  CLI->>FS: Parcours en flux (ignore .env*, cles privees, .gitignore)
-  FS->>DB: Transaction atomique (routes, page_meta, links, schema_items)
-  U->>CLI: seo-partner audit
-  CLI->>RE: Evalue les 15 regles Must sur l index SQLite
-  RE->>DB: Synchronise findings & actions (open / resolved) + tri ICE (F-R3)
-  U->>CLI: seo-partner report --type audit-complet
-  CLI-->>U: Genere docs/seo/AAAA-MM-JJ-audit-complet.md (5 sections normalisees)
+    PROJECT {
+        text id PK
+        text root_path
+        text name
+        text frameworks_json
+        integer has_robots_txt
+        integer has_sitemap
+        text last_scanned_at
+    }
+    FILE {
+        integer id PK
+        text project_id FK
+        text path
+        text hash
+        integer mtime_ms
+        integer size_bytes
+        text kind
+    }
+    ROUTE {
+        integer id PK
+        text project_id FK
+        integer file_id FK
+        text pattern
+        text router_kind
+        text rendering_mode
+        integer is_private
+        integer in_sitemap
+    }
+    PAGE_META {
+        integer route_id PK,FK
+        text title
+        text description
+        text canonical
+        text robots
+        text html_lang
+        text headings_json
+        text og_json
+        text hreflang_json
+        text images_json
+    }
+    FTS_PAGE_INDEX {
+        integer route_id
+        text route_pattern
+        text title
+        text description
+        text headings_text
+    }
+    CRAWL_RUN {
+        text id PK
+        text project_id FK
+        text start_url
+        text status
+        integer pages_crawled
+        integer errors_count
+        text started_at
+        text completed_at
+    }
+    CRAWL_PAGE {
+        integer id PK
+        text crawl_run_id FK
+        text url
+        text route_pattern
+        integer status_code
+        text redirect_chain_json
+        integer depth
+        text x_robots_tag
+        text http_canonical
+        text title
+        text h1
+        text html_lang
+        text broken_links_json
+        integer untrusted_external
+    }
+    RULE {
+        text id PK
+        text category
+        text severity
+        integer blocks_indexing
+        text source_url
+    }
+    FINDING {
+        text id PK
+        text rule_id FK
+        text subject_ref
+        text file_path
+        integer line_number
+        text evidence_json
+        text status
+    }
+    ACTION {
+        text id PK
+        text finding_id FK
+        integer blocks_indexing
+        real ice_score
+        text owner_role
+        text target_timeframe
+    }
 ```
 
 ---
@@ -136,384 +226,274 @@ sequenceDiagram
 
 ### 3.1 Prérequis
 
-- **Node.js** : `>= 22.5.0` (requis pour le moteur SQLite natif `node:sqlite` sans compilation C++ `node-gyp`).
+- **Node.js** : `>= 22.5.0` (requis pour le moteur SQLite natif `node:sqlite` avec `FTS5` intégré).
 - **Gestionnaire de paquets** : `pnpm >= 9.x` (recommandé) ou `npm`.
-- **Système d'exploitation** : Windows (PowerShell), macOS ou Linux.
+- **Système d'exploitation** : Windows (PowerShell, Laragon), macOS ou Linux.
 
-### 3.2 Installation (Philosophie Spec Kit)
-
-#### Option A — Depuis le dépôt source (Développement / Monorepo)
+### 3.2 Installation
 
 ```powershell
 # 1. Cloner le dépôt et installer les dépendances
-git clone https://github.com/leadbooster/seo-partner.git
+git clone https://github.com/Firinze/seo-partner.git
 cd seo-partner
 pnpm install
 
-# 2. Compiler tous les packages du monorepo
+# 2. Compiler tous les packages du monorepo (core, store, adapters, crawler, rules, cli)
 pnpm run build
 
 # 3. (Optionnel) Lier globalement la commande seo-partner sur votre machine
 pnpm --filter seo-partner link --global
 ```
 
-#### Option B — Installation globale dans un projet hôte
-
-```powershell
-# Installer une seule fois globalement
-pnpm add -g seo-partner
-
-# Puis dans n'importe quel projet Next.js ou web existant :
-cd /chemin/vers/mon-projet
-seo-partner init --here --ide agy --lang fr --ignore-agent-tools
-```
-
-### 3.3 Vos 5 premières commandes (moins de 2 minutes)
+### 3.3 Workflow Complet en 6 Commandes (Next.js, Laravel, Symfony ou Laragon)
 
 ```powershell
 # 1. Initialiser seo-partner en français pour Antigravity (agy) dans le projet courant
 seo-partner init --here --ide agy --lang fr --ignore-agent-tools
 
-# 2. Vérifier la santé de l'installation (6 contrôles déterministes en < 5 s)
+# 2. Vérifier la santé de l'installation (< 5 s)
 seo-partner doctor
 
-# 3. Scanner le code source (AST Next.js / HTML / robots.txt / sitemap.xml)
+# 3. Scanner le code source (incrémental automatique en < 5 s après le 1er scan)
 seo-partner scan
 
-# 4. Auditer les 15 règles Must et afficher le backlog priorisé par score ICE
+# 4. (Optionnel) Crawler votre serveur local Laragon / artisan / symfony / next dev
+seo-partner crawl http://mon-projet.test --allow-local
+
+# 5. Auditer les 40 règles SEO (croisement Code + Crawl) et afficher le backlog ICE
 seo-partner audit
 seo-partner backlog
 
-# 5. Générer le rapport exécutif en 5 parties dans docs/seo/AAAA-MM-JJ-audit-complet.md
-seo-partner report --type audit-complet
+# 6. Générer le rapport HTML5 autonome (sans dépendance réseau) et/ou Markdown
+seo-partner report --type audit-complet --format html
+seo-partner report --type audit-complet --format md
 ```
 
 ---
 
-## 4. Référence Complète de la CLI (8 Commandes)
+## 4. Référence Complète de la CLI (9 Commandes)
 
 ### 4.1 Options Globales et Codes de Sortie
-
-Toutes les commandes de `seo-partner` acceptent les drapeaux globaux suivants :
 
 | Option Globale | Type | Défaut | Description |
 | :--- | :--- | :--- | :--- |
 | `--cwd <dir>` | `string` | `process.cwd()` | Dossier racine du projet cible à analyser. |
-| `--json` | `boolean` | `false` | Retourne une enveloppe JSON déterministe sur `stdout` (conçu pour les agents IA et la CI/CD). |
-| `--offline` | `boolean` | `false` | Interdit strictement tout appel réseau sortant et journalise toute tentative bloquée dans `.seo/logs/outbound.jsonl`. |
-
-#### Enveloppe JSON Standardisée (`--json`)
-
-```json
-{
-  "success": true,
-  "command": "audit",
-  "timestamp": "2026-10-28T14:00:00.000Z",
-  "durationMs": 42,
-  "data": {},
-  "error": null
-}
-```
-
-#### Codes de Sortie (`Exit Codes`)
+| `--json` | `boolean` | `false` | Retourne une enveloppe JSON déterministe `{ success, data, error }` sur `stdout`. |
+| `--offline` | `boolean` | `false` | Interdit strictement tout appel réseau sortant et journalise tout blocage dans `.seo/logs/outbound.jsonl`. |
 
 | Code | Signification | Cas d'usage |
 | :---: | :--- | :--- |
-| `0` | **Succès** | Commande exécutée sans erreur (et sans anomalie bloquante si `--fail-on-error`). |
-| `1` | **Échec Métier / Santé** | `doctor` a détecté un contrôle en erreur, ou `audit --fail-on-error` a trouvé au moins un constat `error`. |
-| `2` | **Arguments Invalides** | Option CLI manquante ou valeur non reconnue (ex. `--ide inconnu`). |
-| `3` | **Erreur Externe / Sécurité** | Violation du mode `--offline` ou erreur d'accès disque/SQLite. |
+| `0` | **Succès** | Commande exécutée sans erreur. |
+| `1` | **Échec Métier / Santé** | `doctor` a détecté un contrôle en erreur ou paramètre manquant. |
+| `3` | **Blocage Sécurité Anti-SSRF / Offline** | Tentative de crawl vers une IP privée/locale sans `--allow-local`, ou appel réseau en mode `--offline`. |
+
+### 4.2 Détail des 9 Commandes
+
+1. **`seo-partner init`** : Initialise `.seo/config.json`, `.seo/decisions.md`, installe le skill pack bilingue (`en` ou `fr`) pour l'IDE choisi (`agy`, `claude`, `cursor`, `gemini`, `codex`) et sécurise `.gitignore`.
+   ```powershell
+   seo-partner init [--here] [--ide agy|claude|cursor|gemini|codex] [--lang en|fr] [--ignore-agent-tools] [--dry-run] [--json]
+   ```
+2. **`seo-partner doctor`** : Exécute 6 contrôles de santé déterministes (`node-version`, `seo-config`, `gitignore-security`, `ide-skill-integrity` `11/11`, `watch-freshness` `<= 90` jours, `sqlite-wal`).
+   ```powershell
+   seo-partner doctor [--json]
+   ```
+3. **`seo-partner scan`** : Exécute par défaut un **scan incrémental (`< 5 s`)** réutilisant les fichiers inchangés `(mtimeMs, sizeBytes, sha256)`, purgeant les routes supprimées et mettant à jour l'index plein texte `SQLite FTS5`.
+   ```powershell
+   seo-partner scan [--scope <dir>] [--rebuild] [--max-size <kb>] [--json]
+   ```
+4. **`seo-partner crawl <url>`** : Explore un site en ligne ou un serveur local (Laragon `http://app.test`, `http://127.0.0.1:8000`) en respectant `robots.txt` et la protection anti-SSRF à chaque saut de redirection.
+   ```powershell
+   seo-partner crawl <url> [--allow-local] [--max-pages 200] [--max-depth 4] [--concurrency 4] [--rate-limit-ms 200] [--js] [--resume <runId>] [--offline] [--json]
+   ```
+   - `--allow-local` : Autorise explicitement le crawl d'adresses locales (`127.0.0.1`, `localhost`, domaines virtuels Laragon `*.test`) tout en maintenant le blocage absolu de `169.254.169.254`.
+   - `--js` : Charge dynamiquement `playwright` à la demande (`import('playwright')`) uniquement lorsque le rendu JavaScript est requis.
+   - `--resume <runId>` : Reprend une session de crawl interrompue depuis `.seo/index.db`.
+5. **`seo-partner audit`** : Évalue les **40 règles SEO déterministes** en croisant le scan statique du code et le dernier `CrawlRun` terminé (ou `--crawl-run <id>`).
+   ```powershell
+   seo-partner audit [--category technical|on-page|schema|local|geo] [--severity critical|high|medium|low] [--crawl-run <id>] [--json]
+   ```
+6. **`seo-partner backlog`** : Affiche les actions priorisées avec les **blocages d'indexation (`F-R3`) toujours en tête**, suivis du score `ICE` décroissant.
+   ```powershell
+   seo-partner backlog [--quick-wins] [--json]
+   ```
+7. **`seo-partner report`** : Génère le rapport exécutif en 5 sections normalisées aux formats **Markdown (`md`)**, **HTML5 autonome hors ligne (`html`)** ou **JSON (`json`)**.
+   ```powershell
+   seo-partner report [--type audit-complet|audit-technique|backlog] [--format md|html|json] [--output <path>] [--crawl-run <id>] [--json]
+   ```
+8. **`seo-partner memory`** : Consulte ou enregistre une décision d'arbitrage SEO dans `.seo/decisions.md` et SQLite.
+   ```powershell
+   seo-partner memory list | add --title "..." --rationale "..." [--finding <id>] [--json]
+   ```
+9. **`seo-partner uninstall`** : Supprime proprement les fichiers du skill installés dans l'IDE tout en préservant `.seo/decisions.md` (sauf si `--purge-data` est activé).
+   ```powershell
+   seo-partner uninstall [--purge-data] [--dry-run] [--json]
+   ```
 
 ---
 
-### 4.2 Détail des 8 Commandes
-
-#### 4.2.1 `seo-partner init`
-Initialise `.seo/config.json`, crée le journal `.seo/decisions.md`, installe le skill pack dans la langue choisie (`en` ou `fr`) pour le(s) IDE cible(s) sans jamais écraser les fichiers existants, et sécurise le `.gitignore`.
-
-```powershell
-seo-partner init [--here] [--ide <agy|claude|cursor|gemini|codex|all>] [--lang <en|fr>] [--ignore-agent-tools] [--terminal-only] [--dry-run] [--json]
-```
-- `--here` : Cible le répertoire courant.
-- `--ide <cible>` : Cible un IDE spécifique ou `all`. Si omis, détecte automatiquement les dossiers `.agents`, `.claude`, `.cursor`, `.gemini`, `.codex` existants (défaut : `agy`).
-- `--lang <en|fr>` : Installe la variante linguistique choisie et configure la langue des rapports dans `.seo/config.json`.
-- `--ignore-agent-tools` : Ne vérifie jamais la présence du binaire de l'IDE dans le `PATH` système (évite le piège classique sous Windows).
-- `--terminal-only` : Initialise uniquement `.seo/` et `.gitignore` sans copier de fichiers IDE.
-- `--dry-run` : Simule l'opération et affiche la liste exacte des fichiers qui seraient créés.
-
-#### 4.2.2 `seo-partner doctor`
-Exécute **6 contrôles de santé** en moins de 5 secondes :
-1. `node-version` : Vérifie que Node.js supporte `node:sqlite` (`>= 20.0.0` / recommandé `>= 22.5.0`).
-2. `seo-config` : Valide `.seo/config.json` via Zod.
-3. `gitignore-security` : Vérifie que `.agents/` et `.seo/index.db` sont protégés dans `.gitignore`.
-4. `ide-skill-integrity` : Vérifie la présence de `SKILL.md` et des **11 guides de référence** dans chaque IDE configuré.
-5. `watch-freshness` : Vérifie la date `last_verified` dans `01-veille-mises-a-jour.md` (alerte `warn` si `> 90` jours).
-6. `sqlite-wal` : Vérifie l'ouverture de `.seo/index.db` en mode `journal_mode = WAL`.
-
-```powershell
-seo-partner doctor [--json]
-```
-
-#### 4.2.3 `seo-partner scan`
-Parcourt l'arborescence en flux (`opendir`), ignore strictement les secrets (`.env*`, `*.pem`, `*.key`) et les motifs `.gitignore`, détecte les frameworks (`NextJsAdapter`, `StaticAdapter`) et indexe les routes, balises meta, titres `H1`-`H6`, images, liens et blocs `JSON-LD` dans `.seo/index.db`.
-
-```powershell
-seo-partner scan [--scope <subpath>] [--rebuild] [--max-size <kb>] [--json]
-```
-- `--rebuild` : Purge et reconstruit intégralement l'index SQLite avant le scan.
-- `--max-size <kb>` : Taille maximale d'un fichier texte analysé (défaut : `2048` Ko).
-
-#### 4.2.4 `seo-partner audit`
-Évalue les **15 règles `Must`** sur l'index SQLite, met à jour les statuts des constats (`open` vers `resolved` pour les anomalies corrigées, préservation de `acknowledged`), calcule les scores ICE et persiste le backlog.
-
-```powershell
-seo-partner audit [--category <technical|onpage|schema|all>] [--severity <error|warning|info>] [--fail-on-error] [--json]
-```
-
-#### 4.2.5 `seo-partner backlog`
-Affiche les actions priorisées du projet : **les problèmes bloquant l'indexation (`F-R3`) apparaissent toujours en tête**, suivis des autres actions triées par score `ICE` décroissant.
-
-```powershell
-seo-partner backlog [--status <open|acknowledged|resolved|all>] [--limit <n>] [--json]
-```
-
-#### 4.2.6 `seo-partner report`
-Génère un livrable normalisé en **5 sections obligatoires** dans `docs/seo/AAAA-MM-JJ-<type>.md` (ou en `.json`), rédigé dans la langue configurée du projet (`fr` ou `en`) :
-1. *Résumé décisionnel*
-2. *Constats avec preuves (`filePath:lineNumber` et source officielle)*
-3. *Actions priorisées (Score ICE)*
-4. *Impact attendu (sans promesse de position ni de délai garanti)*
-5. *Suivi et Décisions enregistrées*
-
-```powershell
-seo-partner report [--type <type>] [--format <md|json>] [--out <filepath>] [--json]
-```
-
-#### 4.2.7 `seo-partner memory`
-Consulte ou ajoute une décision d'arbitrage SEO persistée simultanément dans `.seo/decisions.md` (lisible et versionnable dans Git) et dans la table `decision` de `.seo/index.db`.
-
-```powershell
-# Ajouter une décision
-seo-partner memory add --title "Conserver /dashboard hors index" --rationale "Espace client authentifié" [--finding-id <id>]
-
-# Lister l'historique des décisions
-seo-partner memory list [--json]
-```
-
-#### 4.2.8 `seo-partner uninstall`
-Supprime proprement les fichiers du skill installés dans les dossiers IDE du projet hôte. Par défaut, conserve `.seo/decisions.md` sauf si `--purge-data` est spécifié.
-
-```powershell
-seo-partner uninstall [--ide <cible|all>] [--purge-data] [--dry-run] [--json]
-```
-
----
-
-## 5. Catalogue des 15 Règles `Must` et Méthodologie ICE
-
-### 5.1 Formule du Score ICE et Règle d'Arbitrage Absolue (`F-R3`)
-
-Chaque constat génère une action notée sur 3 critères de `1` à `10` :
-- **Impact (`I`)** : Effet potentiel sur la découvrabilité, l'indexation ou le taux de clic organique.
-- **Confiance (`C`)** : Certitude de la preuve statique et du consensus officiel Google Search Central.
-- **Effort (`E`)** : Facilité de mise en œuvre technique (`10` = très rapide/facile à corriger, `1` = refonte lourde).
+## 5. Catalogue des 40 Règles SEO Vérifiées et Méthodologie ICE
 
 $$\text{ICE} = \text{round}\left(\frac{\text{Impact} + \text{Confiance} + \text{Effort}}{3}, 2\right)$$
 
 > [!IMPORTANT]
-> **Règle d'Arbitrage Absolue (`F-R3`)** : Tout constat ayant `blocksIndexing = true` (`R-TECH-01`, `R-TECH-02`, `R-TECH-03`, `R-TECH-06`) passe **systématiquement en tête du backlog**, avant toute action non bloquante, même si cette dernière possède un score ICE facialement supérieur.
+> **Règle d'Arbitrage Absolue (`F-R3`)** : Tout constat ayant `blocksIndexing = true` (`R-TECH-01`, `R-TECH-02`, `R-TECH-03`, `R-TECH-06`, `R-TECH-07`, `R-TECH-09`) passe **systématiquement en tête du backlog**, quel que soit son score ICE.
 
-### 5.2 Référentiel des 15 Règles `Must` (`v0.1`)
+### 5.1 Famille `technical` (14 Règles : `R-TECH-01` à `R-TECH-14`)
 
-| ID Règle | Catégorie | Sévérité | Bloque l'indexation (`F-R3`) | Notes par défaut `(I, C, E)` | Score ICE | Condition détectée et Preuve |
-| :--- | :--- | :---: | :---: | :---: | :---: | :--- |
-| **`R-TECH-01`** | `technical` | `error` | **Oui (Priorité 1)** | `(9, 10, 9)` | **9.33** | Absence de `public/robots.txt` ou `app/robots.(ts\|js)`. |
-| **`R-TECH-02`** | `technical` | `error` | **Oui (Priorité 1)** | `(9, 10, 8)` | **9.00** | Absence de `public/sitemap.xml` ou `app/sitemap.(ts\|js)`. |
-| **`R-TECH-03`** | `technical` | `error` | **Oui (Priorité 1)** | `(10, 10, 9)` | **9.67** | Directive `noindex` présente sur une route publique. |
-| **`R-TECH-04`** | `technical` | `error` | Non | `(8, 9, 8)` | **8.33** | Route privée (`/admin`, `/dashboard`, `/auth`) listée dans le `sitemap.xml`. |
-| **`R-TECH-05`** | `technical` | `warning` | Non | `(7, 9, 8)` | **8.00** | URL canonique (`alternates.canonical` ou `<link rel="canonical">`) absente sur une route publique. |
-| **`R-TECH-06`** | `technical` | `error` | **Oui (Priorité 1)** | `(9, 8, 6)` | **7.67** | Page publique en rendu client exclusif (`'use client'`) sans export serveur de métadonnées. |
-| **`R-ONPAGE-01`** | `onpage` | `error` | Non | `(9, 10, 9)` | **9.33** | Balise `<title>` ou `metadata.title` absente ou vide. |
-| **`R-ONPAGE-02`** | `onpage` | `error` | Non | `(8, 10, 8)` | **8.67** | `<title>` en doublon exact sur plusieurs routes publiques. |
-| **`R-ONPAGE-03`** | `onpage` | `warning` | Non | `(6, 8, 9)` | **7.67** | Longueur du `<title>` hors de la plage optimale (`< 30` ou `> 60` caractères). |
-| **`R-ONPAGE-04`** | `onpage` | `error` | Non | `(8, 10, 9)` | **9.00** | Meta `description` absente ou vide sur une route publique. |
-| **`R-ONPAGE-05`** | `onpage` | `warning` | Non | `(7, 10, 8)` | **8.33** | Meta `description` en doublon exact sur plusieurs routes publiques. |
-| **`R-ONPAGE-06`** | `onpage` | `info` | Non | `(5, 8, 9)` | **7.33** | Longueur de la meta `description` hors de la plage optimale (`< 70` ou `> 160` caractères). |
-| **`R-ONPAGE-07`** | `onpage` | `error` | Non | `(8, 9, 8)` | **8.33** | Absence de `<h1>` ou présence de plusieurs `<h1>` sur une même route publique. |
-| **`R-ONPAGE-08`** | `onpage` | `warning` | Non | `(6, 10, 8)` | **8.00** | Balise `<img>` ou composant `<Image>` dépourvu d'attribut `alt`. |
-| **`R-SCHEMA-01`** | `schema` | `error` | Non | `(7, 10, 8)` | **8.33** | Bloc `<script type="application/ld+json">` au JSON invalide ou sans `@context: "https://schema.org"` / `@type`. |
+| ID | Sévérité | Bloque l'indexation | `(I, C, E)` | Condition détectée et Preuve |
+| :--- | :---: | :---: | :---: | :--- |
+| **`R-TECH-01`** | `critical` | **Oui** | `(8, 10, 9)` | Fichier `robots.txt` absent. |
+| **`R-TECH-02`** | `high` | **Oui** | `(9, 10, 8)` | Fichier `sitemap.xml` ou générateur de sitemap absent. |
+| **`R-TECH-03`** | `critical` | **Oui** | `(10, 10, 10)` | Directive `noindex` dans le code d'une route publique. |
+| **`R-TECH-04`** | `high` | Non | `(7, 9, 9)` | Route privée (`/admin`, `/dashboard`, `/login`) incluse dans `sitemap.xml`. |
+| **`R-TECH-05`** | `high` | Non | `(8, 9, 8)` | URL canonique absente sur une route publique. |
+| **`R-TECH-06`** | `high` | **Oui** | `(9, 9, 7)` | Page publique `'use client'` sans métadonnées serveur. |
+| **`R-TECH-07`** | `critical` | **Oui** | `(10, 10, 8)` | Page publique retournant une erreur HTTP `4xx` ou `5xx` lors du crawl. |
+| **`R-TECH-08`** | `high` | Non | `(8, 10, 8)` | Chaîne de redirections excessive (`>= 2` sauts) ou boucle de redirection. |
+| **`R-TECH-09`** | `critical` | **Oui** | `(10, 10, 9)` | En-tête HTTP `X-Robots-Tag: noindex` servi sur une page publique. |
+| **`R-TECH-10`** | `high` | Non | `(8, 9, 7)` | Contradiction d'URL `canonical` entre le code source et le HTML/en-tête crawlé. |
+| **`R-TECH-11`** | `high` | Non | `(8, 10, 8)` | Lien interne cassé pointant vers une URL en erreur `4xx`/`5xx`. |
+| **`R-TECH-12`** | `medium` | Non | `(7, 9, 7)` | Page publique orpheline (aucun lien interne entrant et absente du sitemap). |
+| **`R-TECH-13`** | `medium` | Non | `(6, 9, 6)` | Profondeur de clic excessive (`> 3` clics depuis la page d'accueil). |
+| **`R-TECH-14`** | `medium` | Non | `(6, 10, 9)` | Attribut `lang` manquant ou vide sur la balise `<html>`. |
+
+### 5.2 Famille `on-page` (14 Règles : `R-ONPAGE-01` à `R-ONPAGE-14`)
+
+| ID | Sévérité | `(I, C, E)` | Condition détectée et Preuve |
+| :--- | :---: | :---: | :--- |
+| **`R-ONPAGE-01`** | `high` | `(9, 10, 9)` | Balise `<title>` absente ou vide sur une page publique. |
+| **`R-ONPAGE-02`** | `high` | `(8, 9, 8)` | `<title>` dupliqué entre plusieurs pages publiques. |
+| **`R-ONPAGE-03`** | `low` | `(5, 7, 9)` | Longueur du `<title>` hors de la plage recommandée (`50–60` caractères). |
+| **`R-ONPAGE-04`** | `medium` | `(7, 9, 9)` | Meta `description` absente ou vide sur une page publique. |
+| **`R-ONPAGE-05`** | `medium` | `(6, 8, 8)` | Meta `description` dupliquée entre plusieurs pages publiques. |
+| **`R-ONPAGE-06`** | `low` | `(4, 7, 9)` | Longueur de la meta `description` hors de la plage recommandée (`150–160` caractères). |
+| **`R-ONPAGE-07`** | `high` | `(8, 9, 9)` | Absence de `<h1>` ou présence de plusieurs `<h1>` sur une même page. |
+| **`R-ONPAGE-08`** | `medium` | `(6, 9, 9)` | Image dépourvue d'attribut `alt` descriptif. |
+| **`R-ONPAGE-09`** | `low` | `(5, 9, 8)` | Saut de niveau dans la hiérarchie des titres (ex. `H1 -> H3` sans `H2`). |
+| **`R-ONPAGE-10`** | `medium` | `(7, 9, 8)` | Contenu de `<h1>` dupliqué à l'identique sur plusieurs pages publiques. |
+| **`R-ONPAGE-11`** | `medium` | `(6, 9, 8)` | Image sans attributs `width` et `height` explicites (prévention du `CLS`). |
+| **`R-ONPAGE-12`** | `low` | `(6, 9, 8)` | Lien interne avec texte d'ancre vide ou générique (`cliquez ici`, `lire la suite`, `here`). |
+| **`R-ONPAGE-13`** | `low` | `(5, 9, 8)` | Balises Open Graph incomplètes (`og:title`, `og:description`, `og:image`). |
+| **`R-ONPAGE-14`** | `medium` | `(7, 9, 7)` | Divergence du `<title>` ou du `<h1>` entre le code source et le HTML crawlé. |
+
+### 5.3 Familles `schema` (5 Règles), `local` (4 Règles) et `geo` (3 Règles)
+
+| ID | Catégorie | Sévérité | `(I, C, E)` | Condition détectée et Preuve |
+| :--- | :---: | :---: | :---: | :--- |
+| **`R-SCHEMA-01`** | `schema` | `high` | `(8, 9, 8)` | Bloc `JSON-LD` syntaxiquement invalide ou dépourvu de `@context` / `@type`. |
+| **`R-SCHEMA-02`** | `schema` | `medium` | `(6, 9, 8)` | Schéma `Organization` ou `WebSite` incomplet (`name` ou `url` manquant). |
+| **`R-SCHEMA-03`** | `schema` | `medium` | `(7, 9, 8)` | Schéma `Article` / `BlogPosting` incomplet (`headline`, `datePublished` ou `author` manquant). |
+| **`R-SCHEMA-04`** | `schema` | `high` | `(8, 10, 7)` | Schéma `Product` incomplet (`name` ou `offers`/`review`/`aggregateRating` manquant). |
+| **`R-SCHEMA-05`** | `schema` | `medium` | `(7, 9, 8)` | Schéma `FAQPage` ou `BreadcrumbList` avec `mainEntity` ou `itemListElement` vide. |
+| **`R-LOCAL-01`** | `local` | `high` | `(8, 10, 8)` | Schéma `LocalBusiness` dépourvu d'adresse postale structurée (`address`). |
+| **`R-LOCAL-02`** | `local` | `medium` | `(7, 10, 9)` | Schéma `LocalBusiness` dépourvu de numéro de téléphone (`telephone` / `NAP`). |
+| **`R-LOCAL-03`** | `local` | `low` | `(6, 9, 9)` | Numéro de téléphone `LocalBusiness` non formaté en international E.164 (`+...`). |
+| **`R-LOCAL-04`** | `local` | `low` | `(6, 8, 8)` | Schéma `LocalBusiness` sans horaires (`openingHoursSpecification`) ni coordonnées (`geo`). |
+| **`R-GEO-01`** | `geo` | `high` | `(8, 10, 8)` | Code de langue ou de région `hreflang` invalide (ex. `en-UK` au lieu de `en-GB`). |
+| **`R-GEO-02`** | `geo` | `medium` | `(7, 9, 8)` | Grappe `hreflang` sans lien auto-référent ou sans entrée `x-default`. |
+| **`R-GEO-03`** | `geo` | `low` | `(6, 8, 8)` | Directive `robots.txt` bloquant globalement l'indexation (`Disallow: /` sur `*`). |
 
 ---
 
-## 6. Skill Pack Bilingue (`11/11` Références) et Intégration Multi-IDE
+## 6. Support Multi-Frameworks : Next.js, Laravel, Symfony, PHP/Laragon et Statique
 
-### 6.1 Matrice des 5 IDE Supportés
+Conformément à l'exigence constitutionnelle `F-S5`, **aucun interpréteur externe (`php`, `node`, `eval`) n'est jamais exécuté sur le code cible**.
 
-Lors de `seo-partner init`, l'outil installe automatiquement la variante linguistique choisie (`fr` ou `en`) dans l'emplacement natif de votre assistant de code, **sans jamais dépendre du `PATH` système** :
-
-| Identifiant `--ide` | Assistant / IDE Cible | Emplacement des Fichiers Installés | Particularités |
+| Adapter | Environnements Détectés | Fichiers & Routes Analysés Statiquement | Résolution d'Héritage de Layouts |
 | :--- | :--- | :--- | :--- |
-| **`agy`** | **Google Antigravity** | `.agents/skills/seo-partner/SKILL.md` + `references/` | Détection native par le système de skills Antigravity. |
-| **`claude`** | **Claude Code** | `.claude/skills/seo-partner/SKILL.md` + `references/` | Compatible avec les workflows Claude Code locaux. |
-| **`cursor`** | **Cursor** | `.cursor/rules/seo-partner.mdc` + `.cursor/skills/seo-partner/` | Génère automatiquement la règle `.mdc` avec frontmatter Cursor. |
-| **`gemini`** | **Gemini CLI** | `.gemini/skills/seo-partner/SKILL.md` + `references/` | Chargement contextuel des 11 références. |
-| **`codex`** | **OpenAI Codex CLI** | `.codex/skills/seo-partner/SKILL.md` + `references/` | Compatible avec la structure locale `.codex/`. |
-
-### 6.2 Les 11 Guides de Référence Méthodologiques (`skills/seo-partner/<lang>/references/`)
-
-Contrairement aux skills incomplets dont les liens internes pointent vers des fichiers inexistants, `seo-partner` livre et vérifie via `doctor` l'intégralité des **11 guides de référence** en français et en anglais :
-
-| N° | Fichier de Référence | Domaine Couvert |
-| :---: | :--- | :--- |
-| `01` | `01-veille-mises-a-jour.md` | Protocole de veille officielle (< 90 jours), Core Updates Google, Search Central et Bing. |
-| `02` | `02-audit-technique.md` | Exploration, budget de crawl, indexation, canoniques, redirections, Core Web Vitals (`LCP`, `INP`, `CLS`). |
-| `03` | `03-implementation-nextjs.md` | Patterns Next.js App Router et Pages Router (`generateMetadata`, `robots.ts`, `sitemap.ts`, `next/image`). |
-| `04` | `04-strategie-mots-cles.md` | Recherche d'intentions (`Informationnelle`, `Commerciale`, `Transactionnelle`), cocons sémantiques, anti-cannibalisation. |
-| `05` | `05-on-page-et-contenu.md` | Optimisation `<title>`, meta `description`, hiérarchie `H1`-`H6`, `E-E-A-T`, maillage interne. |
-| `06` | `06-schema-donnees-structurees.md` | Implémentation et validation `JSON-LD` (`Organization`, `WebSite`, `Article`, `Product`, `FAQPage`, `LocalBusiness`). |
-| `07` | `07-seo-local.md` | Google Business Profile, cohérence `NAP` (Nom, Adresse, Téléphone), pages locales, gestion des avis. |
-| `08` | `08-geo-geographique-et-generatif.md` | SEO international (`hreflang`, architecture multi-pays) et **GEO** (*Generative Engine Optimization* pour moteurs IA). |
-| `09` | `09-netlinking-autorite.md` | Acquisition éthique de backlinks, Digital PR, actifs « linkables », désaveu prudent. |
-| `10` | `10-mesure-dashboard-roi.md` | Cadre de mesure Google Search Console / GA4, suivi des conversions organiques et calcul de ROI réaliste. |
-| `11` | `11-roadmap-12-mois.md` | Planification trimestrielle (`M1-M3` Fondations, `M4-M6` Contenu, `M7-M9` Autorité, `M10-M12` Industrialisation). |
+| **`NextJsAdapter`** | Next.js App Router & Pages Router | `app/**/page.(tsx\|jsx)`, `pages/**/*.(tsx\|jsx)`, `metadata` / `generateMetadata` | Extraction AST TypeScript (`ts.createSourceFile`). |
+| **`PhpAdapter` (`laravel`)** | Laravel (`composer.json` + `artisan`) | `routes/web.php` (`Route::view`, `Route::get`) + `resources/views/**/*.blade.php` | Fusion de `@extends('layouts.app')`, `@yield('title')` et `@section('title', ...)`. |
+| **`PhpAdapter` (`symfony`)** | Symfony (`symfony/framework-bundle`) | Attributs PHP 8 `#[Route('/...')]` dans `src/Controller/*.php`, `config/routes.yaml` + `templates/**/*.html.twig` | Fusion de `{% extends 'base.html.twig' %}` et `{% block title %}`. |
+| **`PhpAdapter` (`php`)** | PHP Natif & Laragon (`*.test`) | `public/*.php` ou `*.php` à la racine | Résolution des `require` / `include` d'en-têtes (`includes/header.php`). |
+| **`StaticAdapter`** | Sites HTML5 & Markdown | `**/*.html`, `**/*.md`, `**/*.mdx` | Extraction directe HTML et Frontmatter YAML. |
 
 ---
 
-## 7. Guide Développeur et Référence SDK TypeScript
+## 7. Skill Pack Bilingue (`11/11` Références) et Intégration Multi-IDE
 
-### 7.1 Organisation des Packages du Monorepo
+Lors de `seo-partner init`, l'outil installe automatiquement la variante linguistique choisie (`fr` ou `en`) dans l'emplacement natif de votre assistant de code (`.agents/skills/seo-partner/`, `.claude/skills/seo-partner/`, `.cursor/rules/`, `.gemini/skills/seo-partner/`, `.codex/skills/seo-partner/`) avec ses **11 guides de référence méthodologiques** vérifiés par `seo-partner doctor`.
+
+---
+
+## 8. Guide Développeur et Référence SDK TypeScript
+
+### 8.1 Organisation des 6 Packages du Monorepo
 
 ```text
 seo-partner/
 ├── assets/
 │   └── seo-partner-hero.svg        # Banniere vectorielle emeraude scintillante (zero glassmorphisme)
 ├── packages/
-│   ├── core/                       # @seo-partner/core : Types, Config Zod, Walker, Garde .gitignore & Offline
-│   ├── store/                      # @seo-partner/store : SQLite WAL natif (node:sqlite) & Repositories
-│   ├── adapters/                   # @seo-partner/adapters : NextJsAdapter, StaticAdapter & Parseurs AST
-│   ├── rules/                      # @seo-partner/rules : 15 Regles Must, Score ICE & Generateur de Rapports
-│   └── cli/                        # seo-partner : Binaire CLI (8 commandes) & 5 Installeurs d IDE
+│   ├── core/                       # @seo-partner/core : Types v0.2, Config Zod, Walker Incremental, Garde .gitignore
+│   ├── store/                      # @seo-partner/store : SQLite WAL v2 (FTS5, CrawlRepository, backup .v1.bak)
+│   ├── adapters/                   # @seo-partner/adapters : NextJsAdapter, PhpAdapter (Laravel/Symfony/Laragon), StaticAdapter
+│   ├── crawler/                    # @seo-partner/crawler : Crawler HTTP, Garde Anti-SSRF, robots.txt, Playwright optionnel
+│   ├── rules/                      # @seo-partner/rules : 40 Regles SEO, Score ICE, Rapports Markdown / HTML5 / JSON
+│   └── cli/                        # seo-partner : Binaire CLI (9 commandes) & 5 Installeurs d IDE
 ├── skills/
-│   └── seo-partner/
-│       ├── en/                     # Skill Pack Anglais (SKILL.md + 11 references)
-│       └── fr/                     # Skill Pack Francais (SKILL.md + 11 references)
+│   └── seo-partner/                # Skill Pack Bilingue EN & FR (SKILL.md + 11 references)
 └── tests/
-    ├── fixtures/                   # Projets temoins Next.js App Router & Pages Router
-    ├── unit/                       # Tests unitaires (walker, store, adapters, ICE, 15 regles, IDEs)
-    └── integration/                # Workflow E2E complet & Benchmark 10 000 fichiers
+    ├── fixtures/                   # Projets temoins Next.js, Laravel, Symfony et PHP/Laragon
+    ├── unit/                       # Suites unitaires (scan incremental, FTS5, anti-SSRF, PhpAdapter, 40 regles, HTML)
+    └── integration/                # Workflows E2E v0.1 & v0.2 + Benchmark 10 000 fichiers
 ```
 
-### 7.2 Exemple d'Utilisation Programmatique (SDK Node.js / TypeScript)
-
-Vous pouvez utiliser les commandes ou les briques de `seo-partner` directement dans vos scripts d'intégration continue ou outils internes :
-
-```typescript
-import {
-  runInitCommand,
-  runScanCommand,
-  runAuditCommand,
-  runReportCommand,
-} from 'seo-partner';
-
-async function runAutomatedSeoGate(projectRoot: string): Promise<void> {
-  // 1. Initialisation non-interactive en français pour Antigravity
-  runInitCommand({
-    projectRoot,
-    ide: 'agy',
-    lang: 'fr',
-    ignoreAgentTools: true,
-  });
-
-  // 2. Scan statique déterministe vers .seo/index.db
-  const scanStats = await runScanCommand({ projectRoot });
-  console.log(`Routes analysées : ${scanStats.routesDiscovered} en ${scanStats.durationMs} ms`);
-
-  // 3. Audit des 15 règles Must avec priorisation ICE
-  const audit = await runAuditCommand({ projectRoot, category: 'all' });
-  console.log(`Constats : ${audit.totalFindings} (dont ${audit.blockingIndexingCount} bloquants)`);
-
-  // 4. Génération du rapport Markdown normalisé en 5 sections
-  const report = await runReportCommand({
-    projectRoot,
-    type: 'ci-gate',
-    format: 'md',
-  });
-  console.log(`Rapport généré : ${report.filePath}`);
-}
-```
-
-### 7.3 Commandes de Développement et de Test
+### 8.2 Commandes de Build et de Vérification
 
 ```powershell
-# Compiler tous les packages TypeScript
-pnpm run build
-
-# Vérifier le typage strict sur l'ensemble du monorepo (packages + tests + fixtures)
-pnpm exec tsc --noEmit
-
-# Lancer les tests unitaires rapides
-pnpm exec vitest run tests/unit
-
-# Lancer la suite complète (incluant le benchmark 10 000 fichiers) avec couverture V8 (>= 80 %)
-pnpm run test:coverage
+pnpm run build                        # Compiler les 6 packages TypeScript
+pnpm exec tsc --noEmit                # Verifier le typage strict (0 erreur sur tout le depot)
+pnpm exec vitest run tests/unit       # Executer les suites unitaires rapides
+pnpm run test:coverage                # Executer toutes les suites + benchmark 10k fichiers + couverture V8 (>= 80 %)
 ```
 
 ---
 
-## 8. Sécurité, Confidentialité et Garde-Fous `.gitignore`
+## 9. Sécurité, Anti-SSRF, Confidentialité et Garde-Fous `.gitignore`
 
-`seo-partner` applique par conception la **Constitution Principe II (*Local-First, Sécurité et Zéro Exécution*)** :
-
-1. **Zéro Exécution du Code Cible (`F-S5`)** : Le scanner lit les fichiers en flux et construit l'arbre syntaxique via `ts.createSourceFile` sans jamais importer, compiler ni exécuter le code du projet hôte.
-2. **Exclusion Stricte des Secrets (`SC-005`)** : Les fichiers `.env`, `.env.*` (à l'exception de `.env.example` / `.env.template`), `*.pem`, `*.key`, `*.p12`, `*.pfx`, `id_rsa`, `.npmrc` et `credentials.json` sont rejetés **avant toute ouverture de descripteur de fichier**.
-3. **Mode `--offline` et Journal d'Audit Réseau** : Avec `--offline`, toute tentative de requête sortante est immédiatement bloquée (`exit code 3`) et consignée dans `.seo/logs/outbound.jsonl`.
-4. **Protection Automatique du `.gitignore`** : Tant dans ce dépôt que lors d'un `seo-partner init` chez l'utilisateur, les dossiers d'agents (`.agents/`, `.claude/`, `.cursor/`, `.gemini/`, `.codex/`, `.specify/`, `specs/`) et les fichiers SQLite reconstructibles (`.seo/index.db*`, `.seo/logs/`, `.seo/cache/`) sont automatiquement inscrits dans `.gitignore`.
+1. **Zéro Exécution du Code Cible (`F-S5`)** : Ni Node.js ni PHP ne sont exécutés sur les fichiers du projet audité.
+2. **Protection Anti-SSRF Stricte par Résolution DNS à Chaque Saut (`FR-004`)** : Par défaut, `seo-partner crawl` résout les adresses IP avant chaque requête et chaque saut de redirection (`redirect: 'manual'`) et bloque `127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `169.254.0.0/16`, `::1`, `fc00::/7`, `fe80::/10` ainsi que `localhost` et `*.test`. Le drapeau explicite `--allow-local` permet d'auditer un serveur local (Laragon, `artisan serve`, `symfony server`, `next dev`) tout en maintenant le blocage inconditionnel de l'IP de métadonnées cloud `169.254.169.254`.
+3. **Marquage des Contenus Externes & Échappement HTML** : Toute donnée extraite par le crawler est marquée `untrustedExternal: true` et intégralement échappée dans les rapports HTML5 et Markdown.
+4. **Sauvegarde Automatique lors des Migrations SQLite** : Lors du passage du schéma `v1` à `v2`, `.seo/index.db.v1.bak` est créé automatiquement avant migration.
 
 ---
 
-## 9. Guide de Dépannage (Troubleshooting) et FAQ
+## 10. Guide de Dépannage (Troubleshooting) et FAQ
 
 <details>
-<summary><strong>Question : Mon IDE (Antigravity / Cursor / Claude) n'est pas reconnu dans mon terminal Windows PowerShell</strong></summary>
+<summary><strong>Question : Comment auditer mon projet PHP / Laravel hébergé localement sous Laragon (ex. <code>http://mon-app.test</code>) ?</strong></summary>
 
-C'est un comportement fréquent sous Windows lorsque le binaire CLI de l'IDE n'est pas ajouté au `PATH` système. `seo-partner` est conçu pour ne **jamais** dépendre du binaire de l'IDE : il écrit directement la structure de fichiers attendue par l'assistant dans votre projet (`.agents/skills/seo-partner/`, `.cursor/rules/`, etc.). Utilisez simplement :
+Lancez d'abord `seo-partner scan` à la racine de votre projet PHP/Laravel, puis lancez le crawler avec le drapeau explicite `--allow-local` :
 ```powershell
-seo-partner init --here --ide agy --lang fr --ignore-agent-tools
+seo-partner scan
+seo-partner crawl http://mon-app.test --allow-local
+seo-partner audit
+seo-partner report --format html
 ```
 </details>
 
 <details>
-<summary><strong>Question : <code>seo-partner doctor</code> affiche un avertissement sur <code>watch-freshness</code> (&gt; 90 jours)</strong></summary>
+<summary><strong>Question : Comment utiliser le rendu navigateur JavaScript (<code>--js</code>) lors d'un crawl ?</strong></summary>
 
-Conformément au Principe I de la Constitution, la référence `01-veille-mises-a-jour.md` comporte une date `last_verified` qui doit dater de moins de 90 jours. Mettez à jour la veille officielle des Core Updates Google et actualisez la date `last_verified: AAAA-MM-JJ` en haut du fichier `01-veille-mises-a-jour.md`, puis relancez `seo-partner init --here`.
-</details>
-
-<details>
-<summary><strong>Question : Comment repartir d'un index SQLite vierge après un changement massif de branches Git ?</strong></summary>
-
-La base `.seo/index.db` est 100 % reconstructible à tout moment sans perdre vos décisions enregistrées dans `.seo/decisions.md`. Exécutez :
+Afin de garder une installation légère par défaut, Playwright n'est chargé qu'à la demande lorsque `--js` est passé. Installez-le uniquement si vous en avez besoin :
 ```powershell
-seo-partner scan --rebuild
+pnpm add -D playwright
+npx playwright install chromium
+seo-partner crawl https://example.com --js
 ```
-</details>
-
-<details>
-<summary><strong>Question : L'IDE affiche encore des erreurs TypeScript en cache sur d'anciens onglets ouverts</strong></summary>
-
-Si le serveur TypeScript de VS Code (`tsserver`) avait ouvert un fichier de test avant la génération des builds ou du `tsconfig.json` racine, ouvrez la palette de commandes (`Ctrl+Shift+P` / `Cmd+Shift+P`) et exécutez **`TypeScript: Restart TS Server`**.
 </details>
 
 ---
 
-## 10. Feuille de Route (`v0.1` à `v1.0`) et Gouvernance Documentaire
+## 11. Feuille de Route (`v0.1` à `v1.0`) et Gouvernance Documentaire
 
 | Jalon | Statut | Périmètre Fonctionnel |
 | :--- | :---: | :--- |
 | **`v0.1` — Socle Fondamental** | **Livré** | Skill Pack bilingue (`11/11` réf. EN/FR), CLI 8 commandes, 5 installeurs IDE sans dépendance `PATH`, Scanner AST Next.js et Statique, SQLite WAL natif, 15 règles `Must`, score ICE (`F-R3`) et rapports 5 parties. |
-| **`v0.2` — Crawl Local et Règles Étendues** | Planifié | Crawler HTTP local respectant `robots.txt` (anti-SSRF), détection des chaînes de redirections, statuts `4xx`/`5xx`, maillage interne profond et passage à 30 règles. |
+| **`v0.2` — Scan Incrémental, Crawler Anti-SSRF, PHP & 40 Règles** | **Livré** | Scan incrémental (`< 5 s`) + recherche plein texte `SQLite FTS5` (`< 100 ms`), Crawler HTTP anti-SSRF (`seo-partner crawl` + `--allow-local` Laragon), `PhpAdapter` (Laravel/Blade, Symfony/Twig, PHP natif/Laragon), extension à **40 règles SEO vérifiées** et export de rapports **HTML5 autonomes** (`--format html`). |
 | **`v0.3` — Dashboard Local et API OpenAPI 3.1** | Planifié | Serveur local `127.0.0.1` (Hono + Zod + erreurs RFC 9457) et interface SPA React/TailwindCSS WCAG 2.2 AA. |
 | **`v0.4` — Serveur MCP et Mode `propose-patch`** | Planifié | Exposition des outils `packages/tools` via Model Context Protocol (`stdio`) et génération de correctifs Git sécurisés. |
-| **`v0.5` — Adapters Multi-Frameworks** | Planifié | Support Astro, Nuxt, Remix / React Router v7, SvelteKit, Django/Jinja et WordPress. |
+| **`v0.5` — Adapters Multi-Frameworks Additionnels** | Planifié | Support Astro, Nuxt, Remix / React Router v7, SvelteKit et Django/Jinja. |
 | **`v0.6`–`v1.0` — Mode Autonome et Release** | Planifié | Boucle d'agent interne multi-fournisseurs (Anthropic, OpenAI, Gemini), connecteurs GSC/CWV opt-in et binaires autonomes multi-OS. |
 
 > [!NOTE]
@@ -526,5 +506,5 @@ Si le serveur TypeScript de VS Code (`tsserver`) avait ouvert un fichier de test
 Distribué sous licence **MIT**. Voir le fichier [LICENSE](./LICENSE) pour plus d'informations.
 
 <div align="center">
-  <sub>Conçu et développé par <strong>Firinze Gbènito Dossou (Leadbooster)</strong></sub>
+  <sub>Conçu et développé par <strong><a href="https://github.com/Firinze/seo-partner">Firinze Gbènito Dossou</a></strong></sub>
 </div>

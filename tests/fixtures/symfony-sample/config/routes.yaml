@@ -1,0 +1,4 @@
+legacy_pricing:
+  path: /tarifs
+  controller: App\Controller\PricingController::index
+
