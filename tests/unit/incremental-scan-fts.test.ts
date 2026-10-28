@@ -48,7 +48,7 @@ describe('Incremental Scan (< 5s), SQLite v1->v2 Migration & FTS5 Search (< 100m
       const versionRow = store.db
         .prepare('SELECT MAX(version) AS max_v FROM schema_migration')
         .get() as { max_v: number };
-      expect(versionRow.max_v).toBe(2);
+      expect(versionRow.max_v).toBeGreaterThanOrEqual(2);
 
       const cols = store.db.prepare('PRAGMA table_info(page_meta);').all() as Array<{
         name: string;
@@ -56,6 +56,7 @@ describe('Incremental Scan (< 5s), SQLite v1->v2 Migration & FTS5 Search (< 100m
       const colNames = cols.map((c) => c.name);
       expect(colNames).toContain('html_lang');
       expect(colNames).toContain('html_lang_line');
+      expect(colNames).toContain('is_dynamic');
     } finally {
       store.close();
     }

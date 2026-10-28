@@ -75,6 +75,25 @@ export class SeoDatabase {
       }
     }
 
+    // Ensure v2 -> v3 columns on route and page_meta exist when upgrading
+    if (currentVersion > 0 && currentVersion < 3) {
+      const routeCols = this.db.prepare('PRAGMA table_info(route);').all() as Array<{
+        name: string;
+      }>;
+      const routeColNames = new Set(routeCols.map((c) => c.name));
+      if (!routeColNames.has('is_dynamic')) {
+        this.db.exec('ALTER TABLE route ADD COLUMN is_dynamic INTEGER NOT NULL DEFAULT 0;');
+      }
+
+      const metaCols = this.db.prepare('PRAGMA table_info(page_meta);').all() as Array<{
+        name: string;
+      }>;
+      const metaColNames = new Set(metaCols.map((c) => c.name));
+      if (!metaColNames.has('is_dynamic')) {
+        this.db.exec('ALTER TABLE page_meta ADD COLUMN is_dynamic INTEGER NOT NULL DEFAULT 0;');
+      }
+    }
+
     if (currentVersion < SCHEMA_VERSION) {
       this.db
         .prepare('INSERT OR REPLACE INTO schema_migration (version, applied_at) VALUES (?, ?)')

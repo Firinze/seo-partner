@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const { slug } = Astro.params;
+---
+<BaseLayout title={`Article ${slug} - Astro Blog`}>
+  <h1>Détail de l'article</h1>
+  <p>Contenu dynamique du post de blog.</p>
+</BaseLayout>
+

@@ -232,3 +232,34 @@ export function getDashboardDictionary(lang: SupportedLanguage): DashboardDictio
   return lang === 'fr' ? FR_DICT : EN_DICT;
 }
 
+export function getRouterKindLabel(kind: string): string {
+  switch (kind) {
+    case 'astro':
+      return 'Astro';
+    case 'nuxt':
+      return 'Nuxt 3';
+    case 'sveltekit':
+      return 'SvelteKit';
+    case 'remix':
+      return 'Remix / RRv7';
+    case 'django':
+      return 'Django';
+    case 'nextjs-app':
+      return 'Next.js App';
+    case 'nextjs-pages':
+      return 'Next.js Pages';
+    case 'laravel':
+      return 'Laravel';
+    case 'symfony':
+      return 'Symfony';
+    case 'php':
+      return 'PHP';
+    case 'static-html':
+      return 'Static HTML';
+    case 'markdown':
+      return 'Markdown';
+    default:
+      return kind;
+  }
+}
+

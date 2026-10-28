@@ -3,7 +3,7 @@ import type {
   FtsSearchResult,
   SupportedLanguage,
 } from '@seo-partner/core';
-import { getDashboardDictionary } from '../../lib/i18n.js';
+import { getDashboardDictionary, getRouterKindLabel } from '../../lib/i18n.js';
 import {
   escapeHtml,
   renderBadge,
@@ -61,7 +61,7 @@ export function renderRoutesSearchFeature(
       : renderBadge({ label: 'NO', variant: 'neutral' });
     return `<tr>
       <td><code>${escapeHtml(item.route.pattern)}</code><div class="cell-subtext">${escapeHtml(item.route.filePath)}</div></td>
-      <td>${renderBadge({ label: item.route.routerKind, variant: 'neutral' })}</td>
+      <td>${renderBadge({ label: getRouterKindLabel(item.route.routerKind), variant: 'neutral' })}</td>
       <td>${escapeHtml(item.title?.value ?? '—')}</td>
       <td>${escapeHtml(firstH1)}</td>
       <td class="mono-cell">${escapeHtml(langVal)}</td>

@@ -1,0 +1,8 @@
+{
+  "name": "sveltekit-sample",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@sveltejs/kit": "^2.5.0"
+  }
+}
+

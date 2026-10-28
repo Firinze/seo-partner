@@ -97,8 +97,8 @@ export class RouteRepository {
     extractedList: ReadonlyArray<ExtractedRouteData>,
   ): void {
     const insertRouteStmt = this.store.db.prepare(
-      `INSERT INTO route (project_id, file_id, pattern, router_kind, rendering_mode, is_private, in_sitemap)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO route (project_id, file_id, pattern, router_kind, rendering_mode, is_private, in_sitemap, is_dynamic)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     );
 
     const insertMetaStmt = this.store.db.prepare(
@@ -106,8 +106,8 @@ export class RouteRepository {
         route_id, title, title_line, description, description_line,
         canonical, canonical_line, robots, robots_line,
         html_lang, html_lang_line,
-        h1_count, h1_first_text, h1_line, headings_json, og_json, hreflang_json, images_json
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        h1_count, h1_first_text, h1_line, headings_json, og_json, hreflang_json, images_json, is_dynamic
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
 
     const insertFtsStmt = this.store.db.prepare(
@@ -137,6 +137,7 @@ export class RouteRepository {
         item.route.renderingMode,
         item.route.isPrivate ? 1 : 0,
         item.route.inSitemap ? 1 : 0,
+        item.route.isDynamic || item.isDynamic ? 1 : 0,
       );
       const routeId = Number(routeRes.lastInsertRowid);
 
@@ -162,6 +163,7 @@ export class RouteRepository {
         JSON.stringify(item.openGraph),
         JSON.stringify(item.hreflang),
         JSON.stringify(item.images),
+        item.isDynamic || item.route.isDynamic ? 1 : 0,
       );
 
       const headingsText = item.headings.map((h) => h.text).join(' ');
@@ -200,11 +202,12 @@ export class RouteRepository {
   public loadExtractedRoutes(projectId: string): ReadonlyArray<ExtractedRouteData> {
     const routeRows = this.store.db
       .prepare(
-        `SELECT r.*, f.path AS file_path,
+        `SELECT r.*, r.is_dynamic AS route_is_dynamic, f.path AS file_path,
                 pm.title, pm.title_line, pm.description, pm.description_line,
                 pm.canonical, pm.canonical_line, pm.robots, pm.robots_line,
                 pm.html_lang, pm.html_lang_line,
-                pm.headings_json, pm.og_json, pm.hreflang_json, pm.images_json
+                pm.headings_json, pm.og_json, pm.hreflang_json, pm.images_json,
+                pm.is_dynamic AS meta_is_dynamic
          FROM route r
          JOIN file f ON f.id = r.file_id
          LEFT JOIN page_meta pm ON pm.route_id = r.id
@@ -222,6 +225,8 @@ export class RouteRepository {
 
     return routeRows.map((row) => {
       const routeId = Number(row['id']);
+      const isDynamic =
+        Number(row['meta_is_dynamic'] ?? 0) === 1 || Number(row['route_is_dynamic'] ?? 0) === 1;
       const route: DiscoveredRoute = {
         id: routeId,
         pattern: String(row['pattern']),
@@ -230,6 +235,7 @@ export class RouteRepository {
         renderingMode: String(row['rendering_mode']) as DiscoveredRoute['renderingMode'],
         isPrivate: Number(row['is_private']) === 1,
         inSitemap: Number(row['in_sitemap']) === 1,
+        isDynamic,
       };
 
       const linkRows = linkStmt.all(routeId) as Array<Record<string, unknown>>;
@@ -281,6 +287,7 @@ export class RouteRepository {
         images: JSON.parse(String(row['images_json'] ?? '[]')) as ImageItem[],
         links,
         jsonLdItems,
+        isDynamic,
       };
     });
   }

@@ -4,7 +4,7 @@
 
 <br />
 
-[![Version](https://img.shields.io/badge/version-0.4.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
+[![Version](https://img.shields.io/badge/version-0.5.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-059669?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7_Strict-047857?style=for-the-badge&logo=typescript&logoColor=white)](./tsconfig.base.json)
 [![Packages](https://img.shields.io/badge/Workspaces-10_Packages-34d399?style=for-the-badge)](./package.json)
@@ -15,7 +15,7 @@
 [![License](https://img.shields.io/badge/License-MIT-065f46?style=for-the-badge)](./LICENSE)
 
 <p align="center">
-  <strong>Local-First Deterministic SEO Tools Registry, Standard stdio MCP Server (7 Tools), Git Unified Diff Remediation Engine (<code>seo-partner patch</code>), Anti-SSRF Crawler, 40 Rules Engine with ICE Scoring, Local REST API, and WCAG 2.2 AA Dashboard.</strong><br />
+  <strong>Local-First Deterministic SEO Tools Registry, Standard stdio MCP Server (7 Tools), Git Unified Diff Remediation Engine (<code>seo-partner patch</code>), Multi-Framework Adapters (Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP, Static), Anti-SSRF Crawler, 40 Rules Engine with ICE Scoring, Local REST API, and WCAG 2.2 AA Dashboard.</strong><br />
   <em>Engineered for Antigravity (<code>agy</code>), Claude Code, Cursor, Windsurf, Codex, Gemini Code Assist, and Cline — zero LLM repairs, zero code execution (<code>F-S5</code>), and verifiable backups.</em>
 </p>
 
@@ -29,7 +29,7 @@
 
 ## Table of Contents
 
-1. [Vision and Value Proposition (`v0.4`)](#1-vision-and-value-proposition-v04)
+1. [Vision and Value Proposition (`v0.5`)](#1-vision-and-value-proposition-v05)
 2. [System Architecture and Data Flow (`10 Packages`)](#2-system-architecture-and-data-flow-10-packages)
 3. [Quick Start Guide](#3-quick-start-guide)
 4. [Complete CLI Reference (12 Commands)](#4-complete-cli-reference-12-commands)
@@ -37,7 +37,7 @@
 6. [Deterministic Remediation Engine (`seo-partner patch`)](#6-deterministic-remediation-engine-seo-partner-patch)
 7. [Local REST API (`127.0.0.1`, OpenAPI 3.1, RFC 9457) & Web Dashboard](#7-local-rest-api-127001-openapi-31-rfc-9457--web-dashboard)
 8. [The 40 Verified SEO Rules Catalog and ICE Methodology](#8-the-40-verified-seo-rules-catalog-and-ice-methodology)
-9. [Multi-Framework Support: Next.js, Laravel, Symfony, PHP/Laragon & Static](#9-multi-framework-support-nextjs-laravel-symfony-phplaragon--static)
+9. [Multi-Framework Support: Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP/Laragon & Static](#9-multi-framework-support-nextjs-astro-nuxt-3-sveltekit-remix-django-laravel-symfony-phplaragon--static)
 10. [Developer Guide and Workspace Architecture](#10-developer-guide-and-workspace-architecture)
 11. [Security, Git Guard, Safe Backups, and Anti-SSRF](#11-security-git-guard-safe-backups-and-anti-ssrf)
 12. [Troubleshooting Guide and FAQ](#12-troubleshooting-guide-and-faq)
@@ -45,19 +45,19 @@
 
 ---
 
-## 1. Vision and Value Proposition (`v0.4`)
+## 1. Vision and Value Proposition (`v0.5`)
 
 `seo-partner` separates **what must be 100% deterministic** (local TypeScript scanning, standard stdio MCP tools, anti-SSRF crawling, native SQLite WAL + `FTS5`, deterministic AST diff repairs, and local `127.0.0.1` OpenAPI server) from **creative, architectural, and editorial guidance** (AI coding agents in host IDEs):
 
-| Capability | Generic AI Coding Agent | Cloud SaaS Crawler | **`seo-partner` (`v0.4`)** |
+| Capability | Generic AI Coding Agent | Cloud SaaS Crawler | **`seo-partner` (`v0.5`)** |
 | :--- | :--- | :--- | :--- |
 | **Model Context Protocol (MCP)** | Manual copy-paste prompts | Proprietary APIs | **Yes — Standard JSON-RPC 2.0 stdio Server (7 Shared Tools)** |
 | **Code Remediation & Safe Patches** | Hallucinated code edits | Read-only audit | **Yes — Verifiable Unified Diffs + Safe Atomic `--apply` + Backups** |
-| **Route Discovery (Next.js, Laravel, Symfony, PHP/Laragon)** | Context window limits | Deployed URLs only | **Yes — 100% Deterministic (AST & Template Parsers)** |
+| **Multi-Framework Route Discovery** | Context window limits | Deployed URLs only | **Yes — Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP, Static** |
 | **Incremental Scan in Fast IDE Loops (`< 5s`)** | Re-reads files | N/A | **Yes — `(mtimeMs, sizeBytes, sha256)` diff + `FTS5` `< 100ms`** |
 | **Anti-SSRF HTTP Crawler & Code vs. Crawl Comparator** | No | Disconnected from code | **Yes — `seo-partner crawl` + Side-by-Side Code vs. Crawl Diff** |
 | **Local Web Dashboard & OpenAPI 3.1 Server (`127.0.0.1`)** | No | Paid external SaaS | **Yes — `seo-partner serve` (Port Auto-Fallback, RFC 9457, WCAG 2.2 AA)** |
-| **Target Code Execution (`F-S5`)** | Unsafe shell calls | N/A | **Zero Execution (`php`/`eval`/`build` strictly forbidden)** |
+| **Target Code Execution (`F-S5`)** | Unsafe shell calls | N/A | **Zero Execution (`php`/`python`/`eval`/`build` strictly forbidden)** |
 | **Rules Catalog & Mathematical ICE Prioritization (`F-R3`)** | Subjective | Generic | **40 Verified Rules (`ICE = (I+C+E)/3` + Blockers First)** |
 | **Executive Deliverables (Markdown, JSON, Standalone HTML5)** | Ephemeral chat | Proprietary export | **5-section `.md`, `.json`, and 100% offline `.html` reports** |
 
@@ -240,15 +240,20 @@ $$\text{ICE} = \text{round}\left(\frac{\text{Impact} + \text{Confidence} + \text
 
 ---
 
-## 9. Multi-Framework Support: Next.js, Laravel, Symfony, PHP/Laragon & Static
+## 9. Multi-Framework Support: Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP/Laragon & Static
 
-In strict adherence to Constitutional Principle II (`F-S5`), **no external interpreter (`php`, `node`, `eval`) is ever executed on target project files**:
+In strict adherence to Constitutional Principle II (`F-S5`), **no external interpreter (`python`, `php`, `node`, `eval`) is ever executed on target project files**:
 
-- **`NextJsAdapter`**: App Router (`app/**/page.tsx`) and Pages Router (`pages/**/*.tsx`), static `metadata` and `generateMetadata`.
+- **`AstroAdapter` (`astro`)**: Statically parses `src/pages/**` (`.astro`, `.md`, `.mdx`, `.html`), extracts YAML frontmatter, `<Layout title="...">` components, and `<html lang>` layout inheritance.
+- **`NuxtAdapter` (`nuxt`)**: Statically parses Nuxt 3 `pages/**` (`.vue`), extracts `useSeoMeta()` and `useHead()` composables, Vue `<template>` tags, and inherits root metadata from `layouts/default.vue`.
+- **`SvelteKitAdapter` (`sveltekit`)**: Statically parses `src/routes/**/+page.svelte`, extracts `<svelte:head>` SEO tags, and resolves hierarchical layout inheritance from `+layout.svelte`.
+- **`RemixAdapter` (`remix`)**: Unified adapter for Remix and React Router v7 (`app/routes/**`), extracts `export const meta = [...]` and inherits global `<html lang>` from `app/root.tsx`.
+- **`DjangoAdapter` (`django`)**: 100% zero-execution Python parser, maps `urls.py` patterns to views in `views.py`, extracts DTL template tags (`{% extends 'base.html' %}`, `{% block title %}`) and captures exact source lines.
+- **`NextJsAdapter` (`nextjs-app`, `nextjs-pages`)**: App Router (`app/**/page.tsx`) and Pages Router (`pages/**/*.tsx`), static `metadata` and `generateMetadata`.
 - **`PhpAdapter` (`laravel`)**: Parses `routes/web.php` and Blade templates with `@extends`, `@section`, and `@yield`.
 - **`PhpAdapter` (`symfony`)**: Parses PHP 8 `#[Route]` attributes, `config/routes.yaml`, and Twig templates with `{% extends %}` and `{% block %}`.
 - **`PhpAdapter` (`php`)**: Analyzes native PHP / Laragon projects (`public/*.php`), resolving header inclusions.
-- **`StaticAdapter`**: Static HTML5 (`*.html`) and Markdown (`*.md`, `*.mdx`) files.
+- **`StaticAdapter` (`static-html`, `markdown`)**: Static HTML5 (`*.html`) and Markdown (`*.md`, `*.mdx`) files.
 
 ---
 
@@ -304,7 +309,7 @@ pnpm run test:coverage                # Full coverage suite (>= 80%)
 - **`v0.2` (Delivered)**: Incremental Scan (`< 5s`) + SQLite FTS5 search, Anti-SSRF HTTP Crawler, PhpAdapter (Laravel, Symfony, Laragon), 40 Verified SEO Rules, and standalone HTML5 reports.
 - **`v0.3` (Delivered)**: Local API Server on `127.0.0.1` (port auto-fallback, OpenAPI 3.1, RFC 9457, HttpOnly cookie) and Modular WCAG 2.2 AA Web Dashboard.
 - **`v0.4` (Delivered)**: Standard stdio MCP Server (`@seo-partner/mcp`, 7 tools), Deterministic Remediation Engine (`seo-partner patch`, LCS unified diffs, safe `--apply`, backups, git dirty guard), Multi-IDE MCP config merge, and Dashboard Patches tab.
-- **`v0.5` (Planned)**: Astro, Nuxt, Remix, SvelteKit, and Django adapters.
+- **`v0.5` (Delivered)**: Astro, Nuxt 3, SvelteKit, Remix (with React Router v7), and Django adapters (Zero target code execution F-S5, hierarchical layout inheritance, deterministic patch support).
 - **`v0.6`–`v1.0` (Planned)**: Autonomous agent loop, opt-in GSC/CWV connectors, and standalone OS binaries.
 
 ---

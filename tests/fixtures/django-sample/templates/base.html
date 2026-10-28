@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>{% block title %}Titre par défaut Django{% endblock %}</title>
+    {% block meta %}{% endblock %}
+  </head>
+  <body>
+    <header>
+      <nav>En-tête du site Django</nav>
+    </header>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>
+

@@ -7,7 +7,12 @@ export type RouterKind =
   | 'markdown'
   | 'laravel'
   | 'symfony'
-  | 'php';
+  | 'php'
+  | 'astro'
+  | 'nuxt'
+  | 'sveltekit'
+  | 'remix'
+  | 'django';
 export type RenderingMode = 'ssr-ssg' | 'client-only' | 'dynamic' | 'static';
 export type FileKind = 'route' | 'layout' | 'robots' | 'sitemap' | 'config' | 'static' | 'other';
 export type RuleCategory = 'technical' | 'on-page' | 'schema' | 'local' | 'geo';
@@ -66,6 +71,7 @@ export interface DiscoveredRoute {
   readonly renderingMode: RenderingMode;
   readonly isPrivate: boolean;
   readonly inSitemap: boolean;
+  readonly isDynamic?: boolean;
 }
 
 export interface HeadingItem {
@@ -112,6 +118,7 @@ export interface ExtractedRouteData {
   readonly images: ReadonlyArray<ImageItem>;
   readonly links: ReadonlyArray<LinkItem>;
   readonly jsonLdItems: ReadonlyArray<JsonLdItem>;
+  readonly isDynamic?: boolean;
 }
 
 export interface IncrementalScanStats {

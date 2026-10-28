@@ -113,7 +113,7 @@ export async function executeCli(
   try {
     if (command === 'help' || parsed.values['help']) {
       const helpText = [
-        'seo-partner v0.4.0 — Deterministic Local SEO Partner',
+        'seo-partner v0.5.0 — Deterministic Local SEO Partner',
         '',
         'Commands:',
         '  seo-partner init [--here] [--ide agy|claude|cursor|gemini|codex] [--with-mcp] [--lang en|fr] [--ignore-agent-tools] [--dry-run]',

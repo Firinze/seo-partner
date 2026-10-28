@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export const INITIAL_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS schema_migration (
@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS route (
   router_kind TEXT NOT NULL,
   rendering_mode TEXT NOT NULL,
   is_private INTEGER NOT NULL DEFAULT 0,
-  in_sitemap INTEGER NOT NULL DEFAULT 0
+  in_sitemap INTEGER NOT NULL DEFAULT 0,
+  is_dynamic INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS page_meta (
@@ -58,7 +59,8 @@ CREATE TABLE IF NOT EXISTS page_meta (
   headings_json TEXT NOT NULL DEFAULT '[]',
   og_json TEXT NOT NULL DEFAULT '{}',
   hreflang_json TEXT NOT NULL DEFAULT '[]',
-  images_json TEXT NOT NULL DEFAULT '[]'
+  images_json TEXT NOT NULL DEFAULT '[]',
+  is_dynamic INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS fts_page_index USING fts5(

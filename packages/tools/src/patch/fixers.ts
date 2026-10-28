@@ -510,6 +510,25 @@ function fixTitle(ctx: FixerContext, finding: Finding): FixResult {
 
   const content = fs.readFileSync(safeRes.absolutePath, 'utf-8');
   if (!content.includes('</head>')) {
+    const templatePatched = applyTemplateFix(filePath, content, 'title');
+    if (templatePatched !== null) {
+      const diff = generateUnifiedDiff(filePath, content, templatePatched, false);
+      return {
+        ok: true,
+        proposal: {
+          id: `prop_${finding.id}`,
+          findingId: finding.id,
+          ruleId: finding.ruleId,
+          filePath,
+          kind: 'modify',
+          hunks: diff.hunks,
+          diff: diff.diffText,
+          manualReviewRequired: true,
+          todoMarkers: 1,
+        },
+      };
+    }
+
     if (filePath.endsWith('.tsx') || filePath.endsWith('.jsx')) {
       return {
         ok: false,
@@ -596,6 +615,25 @@ function fixMetaDescription(ctx: FixerContext, finding: Finding): FixResult {
 
   const content = fs.readFileSync(safeRes.absolutePath, 'utf-8');
   if (!content.includes('</head>')) {
+    const templatePatched = applyTemplateFix(filePath, content, 'description');
+    if (templatePatched !== null) {
+      const diff = generateUnifiedDiff(filePath, content, templatePatched, false);
+      return {
+        ok: true,
+        proposal: {
+          id: `prop_${finding.id}`,
+          findingId: finding.id,
+          ruleId: finding.ruleId,
+          filePath,
+          kind: 'modify',
+          hunks: diff.hunks,
+          diff: diff.diffText,
+          manualReviewRequired: true,
+          todoMarkers: 1,
+        },
+      };
+    }
+
     if (filePath.endsWith('.tsx') || filePath.endsWith('.jsx')) {
       return {
         ok: false,
@@ -636,4 +674,98 @@ function fixMetaDescription(ctx: FixerContext, finding: Finding): FixResult {
       todoMarkers: 1,
     },
   };
+}
+
+function applyTemplateFix(
+  filePath: string,
+  content: string,
+  type: 'title' | 'description',
+): string | null {
+  const isAstro = filePath.endsWith('.astro');
+  const isSvelte = filePath.endsWith('.svelte');
+  const isVue = filePath.endsWith('.vue');
+  const isRemix =
+    filePath.includes('app/routes/') && (filePath.endsWith('.tsx') || filePath.endsWith('.jsx'));
+  const isDjango =
+    filePath.endsWith('.html') && (content.includes('{% extends') || content.includes('{% block'));
+
+  if (isAstro) {
+    if (content.startsWith('---')) {
+      const secondDash = content.indexOf('---', 3);
+      if (secondDash !== -1) {
+        const insertion = type === 'title' ? "title: 'TODO-SEO'\n" : "description: 'TODO-SEO'\n";
+        return content.slice(0, 3) + '\n' + insertion + content.slice(4);
+      }
+    }
+    const insertion =
+      type === 'title' ? "---\ntitle: 'TODO-SEO'\n---\n" : "---\ndescription: 'TODO-SEO'\n---\n";
+    return insertion + content;
+  }
+
+  if (isSvelte) {
+    if (content.includes('<svelte:head>')) {
+      const insertion =
+        type === 'title'
+          ? '  <title>TODO-SEO</title>\n'
+          : '  <meta name="description" content="TODO-SEO" />\n';
+      return content.replace('<svelte:head>', `<svelte:head>\n${insertion}`);
+    }
+    const block =
+      type === 'title'
+        ? '<svelte:head>\n  <title>TODO-SEO</title>\n</svelte:head>\n\n'
+        : '<svelte:head>\n  <meta name="description" content="TODO-SEO" />\n</svelte:head>\n\n';
+    return block + content;
+  }
+
+  if (isVue) {
+    if (content.includes('<script setup>')) {
+      const insertion =
+        type === 'title'
+          ? "useSeoMeta({ title: 'TODO-SEO' });\n"
+          : "useSeoMeta({ description: 'TODO-SEO' });\n";
+      return content.replace('<script setup>', `<script setup>\n${insertion}`);
+    }
+    const scriptBlock =
+      type === 'title'
+        ? "<script setup>\nuseSeoMeta({ title: 'TODO-SEO' });\n</script>\n\n"
+        : "<script setup>\nuseSeoMeta({ description: 'TODO-SEO' });\n</script>\n\n";
+    return scriptBlock + content;
+  }
+
+  if (isRemix) {
+    if (content.includes('export const meta')) {
+      const arrayStart = content.indexOf('[', content.indexOf('export const meta'));
+      if (arrayStart !== -1) {
+        const item =
+          type === 'title'
+            ? "{ title: 'TODO-SEO' },\n  "
+            : "{ name: 'description', content: 'TODO-SEO' },\n  ";
+        return content.slice(0, arrayStart + 1) + '\n  ' + item + content.slice(arrayStart + 1);
+      }
+    }
+    const metaBlock =
+      type === 'title'
+        ? "export const meta = () => [\n  { title: 'TODO-SEO' },\n];\n\n"
+        : "export const meta = () => [\n  { name: 'description', content: 'TODO-SEO' },\n];\n\n";
+    return metaBlock + content;
+  }
+
+  if (isDjango) {
+    const extendsMatch = content.match(/\{%\s*extends\s+[^%]+%\}\r?\n/);
+    if (extendsMatch && extendsMatch[0]) {
+      const idx = (extendsMatch.index ?? 0) + extendsMatch[0].length;
+      const block =
+        type === 'title'
+          ? '{% block title %}TODO-SEO{% endblock %}\n'
+          : '{% block meta %}\n<meta name="description" content="TODO-SEO" />\n{% endblock %}\n';
+      return content.slice(0, idx) + block + content.slice(idx);
+    }
+    const block =
+      type === 'title'
+        ? '{% block title %}TODO-SEO{% endblock %}\n'
+        : '{% block meta %}\n<meta name="description" content="TODO-SEO" />\n{% endblock %}\n';
+    return block + content;
+  }
+
+  return null;
 }

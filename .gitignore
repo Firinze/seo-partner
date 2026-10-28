@@ -20,14 +20,14 @@ specs/
 # 2. seo-partner Local State & Reconstructible SQLite WAL Index
 #    (.seo/config.json and .seo/decisions.md remain versionable by choice)
 # ============================================================================
-.seo/index.db
-.seo/index.db-shm
-.seo/index.db-wal
-.seo/index.db.*.bak
-.seo/logs/
-.seo/cache/
-.seo/patches/
-.seo/backups/
+**/.seo/index.db
+**/.seo/index.db-shm
+**/.seo/index.db-wal
+**/.seo/index.db.*.bak
+**/.seo/logs/
+**/.seo/cache/
+**/.seo/patches/
+**/.seo/backups/
 
 # ============================================================================
 # 3. Dependencies, Monorepo Build & Package Outputs
