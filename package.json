@@ -1,0 +1,31 @@
+{
+  "name": "seo-partner-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deterministic local SEO scanner, 15 Must rules engine with ICE prioritization, and multi-IDE skill installer",
+  "license": "MIT",
+  "author": "Firinze Gbènito Dossou",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "pnpm -r typecheck",
+    "seo-partner": "node packages/cli/dist/bin.js"
+  },
+  "devDependencies": {
+    "@seo-partner/adapters": "workspace:*",
+    "@seo-partner/core": "workspace:*",
+    "@seo-partner/rules": "workspace:*",
+    "@seo-partner/store": "workspace:*",
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^3.0.0",
+    "seo-partner": "workspace:*",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  }
+}
+

@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@seo-partner/core": ["./packages/core/src/index.ts"],
+      "@seo-partner/store": ["./packages/store/src/index.ts"],
+      "@seo-partner/adapters": ["./packages/adapters/src/index.ts"],
+      "@seo-partner/rules": ["./packages/rules/src/index.ts"],
+      "seo-partner": ["./packages/cli/src/index.ts"]
+    }
+  },
+  "include": [
+    "packages/*/src/**/*.ts",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "vitest.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/dist/**"
+  ]
+}
+

@@ -1,0 +1,27 @@
+{
+  "name": "seo-partner",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "seo-partner": "./dist/bin.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@seo-partner/core": "workspace:*",
+    "@seo-partner/store": "workspace:*",
+    "@seo-partner/adapters": "workspace:*",
+    "@seo-partner/rules": "workspace:*"
+  }
+}
+

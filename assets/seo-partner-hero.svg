@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 370" width="100%" height="100%" role="img" aria-label="SEO Partner — Deterministic Local-First SEO Engine">
+  <defs>
+    <!-- Animated Shimmering Emerald Gradient for "SEO" (Crisp vector stops, zero blur/glass) -->
+    <linearGradient id="emeraldShimmerTop" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669">
+        <animate attributeName="stop-color" values="#059669;#10b981;#34d399;#059669" dur="3.6s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="35%" stop-color="#10b981">
+        <animate attributeName="stop-color" values="#10b981;#6ee7b7;#d1fae5;#10b981" dur="3.6s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="50%" stop-color="#ecfdf5">
+        <animate attributeName="stop-color" values="#ecfdf5;#34d399;#10b981;#ecfdf5" dur="3.6s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="70%" stop-color="#34d399">
+        <animate attributeName="stop-color" values="#34d399;#059669;#6ee7b7;#34d399" dur="3.6s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="100%" stop-color="#047857">
+        <animate attributeName="stop-color" values="#047857;#34d399;#059669;#047857" dur="3.6s" repeatCount="indefinite" />
+      </stop>
+    </linearGradient>
+
+    <!-- Animated Shimmering Emerald Gradient for "PARTNER" -->
+    <linearGradient id="emeraldShimmerBottom" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34d399">
+        <animate attributeName="stop-color" values="#34d399;#059669;#6ee7b7;#34d399" dur="4s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="45%" stop-color="#d1fae5">
+        <animate attributeName="stop-color" values="#d1fae5;#34d399;#10b981;#d1fae5" dur="4s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="75%" stop-color="#10b981">
+        <animate attributeName="stop-color" values="#10b981;#a7f3d0;#059669;#10b981" dur="4s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="100%" stop-color="#059669">
+        <animate attributeName="stop-color" values="#059669;#10b981;#34d399;#059669" dur="4s" repeatCount="indefinite" />
+      </stop>
+    </linearGradient>
+
+    <!-- Crisp Vector 4-Point Star (No blur, pure geometry) -->
+    <g id="star">
+      <path d="M 0,-11 L 2.5,-2.5 L 11,0 L 2.5,2.5 L 0,11 L -2.5,2.5 L -11,0 L -2.5,-2.5 Z" fill="#6ee7b7" />
+      <rect x="-1.5" y="-1.5" width="3" height="3" fill="#ecfdf5" transform="rotate(45)" />
+    </g>
+  </defs>
+
+  <!-- Solid Matte Architectural Canvas (Zero Glassmorphism, Zero Blur) -->
+  <rect x="2" y="2" width="1196" height="366" rx="8" fill="#050b08" stroke="#10b981" stroke-width="2" />
+
+  <!-- Crisp Corner Marks -->
+  <g stroke="#10b981" stroke-width="2" fill="none">
+    <path d="M 24 44 L 24 22 L 46 22" />
+    <path d="M 1176 44 L 1176 22 L 1154 22" />
+    <path d="M 24 326 L 24 348 L 46 348" />
+    <path d="M 1176 326 L 1176 348 L 1154 348" />
+  </g>
+
+  <!-- ===================================================================== -->
+  <!-- TOP LINE: "SEO" (Massive Bold Display, Solid Geometric Offset Shadow) -->
+  <!-- ===================================================================== -->
+  <text
+    x="146"
+    y="168"
+    font-family="'Inter', 'SF Pro Display', 'Segoe UI', 'Montserrat', system-ui, -apple-system, sans-serif"
+    font-size="136"
+    font-weight="900"
+    letter-spacing="18"
+    fill="#062c1e"
+  >SEO</text>
+  <text
+    x="140"
+    y="162"
+    font-family="'Inter', 'SF Pro Display', 'Segoe UI', 'Montserrat', system-ui, -apple-system, sans-serif"
+    font-size="136"
+    font-weight="900"
+    letter-spacing="18"
+    fill="url(#emeraldShimmerTop)"
+  >SEO</text>
+
+  <!-- Flat Editorial Block under "SEO" (Left of "PARTNER") -->
+  <g transform="translate(144, 198)">
+    <line x1="0" y1="0" x2="210" y2="0" stroke="#10b981" stroke-width="3" />
+    <text
+      x="0"
+      y="28"
+      font-family="'JetBrains Mono', 'Fira Code', 'Consolas', monospace"
+      font-size="13"
+      font-weight="700"
+      letter-spacing="2.5"
+      fill="#34d399"
+    >LOCAL-FIRST ENGINE</text>
+    <text
+      x="0"
+      y="50"
+      font-family="'JetBrains Mono', 'Fira Code', 'Consolas', monospace"
+      font-size="11.5"
+      font-weight="600"
+      letter-spacing="1.8"
+      fill="#6ee7b7"
+    >ZERO CODE EXECUTION</text>
+    <line x1="0" y1="68" x2="210" y2="68" stroke="#047857" stroke-width="1.5" />
+  </g>
+
+  <!-- ===================================================================== -->
+  <!-- BOTTOM LINE: "PARTNER" (Shifted to the Right, Solid Offset Shadow)    -->
+  <!-- ===================================================================== -->
+  <text
+    x="394"
+    y="276"
+    font-family="'Inter', 'SF Pro Display', 'Segoe UI', 'Montserrat', system-ui, -apple-system, sans-serif"
+    font-size="106"
+    font-weight="900"
+    letter-spacing="14"
+    fill="#062c1e"
+  >PARTNER</text>
+  <text
+    x="388"
+    y="270"
+    font-family="'Inter', 'SF Pro Display', 'Segoe UI', 'Montserrat', system-ui, -apple-system, sans-serif"
+    font-size="106"
+    font-weight="900"
+    letter-spacing="14"
+    fill="url(#emeraldShimmerBottom)"
+  >PARTNER</text>
+
+  <!-- ===================================================================== -->
+  <!-- CRISP VECTOR SCINTILLATING STARS                                      -->
+  <!-- ===================================================================== -->
+  <use href="#star" x="122" y="58">
+    <animate attributeName="opacity" values="0.2;1;0.2" dur="2.2s" repeatCount="indefinite" />
+  </use>
+  <use href="#star" x="512" y="64">
+    <animate attributeName="opacity" values="1;0.25;1" dur="2.8s" repeatCount="indefinite" />
+  </use>
+  <use href="#star" x="372" y="182">
+    <animate attributeName="opacity" values="0.25;1;0.25" dur="2.5s" repeatCount="indefinite" />
+  </use>
+  <use href="#star" x="1058" y="172">
+    <animate attributeName="opacity" values="0.2;1;0.2" dur="2.0s" repeatCount="indefinite" />
+  </use>
+  <use href="#star" x="1068" y="274">
+    <animate attributeName="opacity" values="1;0.2;1" dur="3.0s" repeatCount="indefinite" />
+  </use>
+
+  <!-- ===================================================================== -->
+  <!-- SOLID BOTTOM SPECIFICATION RULE                                       -->
+  <!-- ===================================================================== -->
+  <line x1="60" y1="312" x2="1140" y2="312" stroke="#047857" stroke-width="1.5" />
+  <text
+    x="600"
+    y="340"
+    text-anchor="middle"
+    font-family="'JetBrains Mono', 'Fira Code', 'Consolas', monospace"
+    font-size="12"
+    font-weight="700"
+    letter-spacing="2.4"
+    fill="#a7f3d0"
+  >AST SCANNER  |  15 MUST RULES &amp; ICE SCORING  |  SQLITE WAL  |  11/11 SKILL PACK  |  5 IDES</text>
+</svg>

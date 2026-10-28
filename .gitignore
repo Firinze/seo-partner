@@ -1,38 +1,74 @@
-# Agent & Spec Kit directories (may contain credentials, tokens, or private artifacts)
+# ============================================================================
+# 1. Agent, Multi-IDE Skill Installations & Spec Kit Directories
+#    (May contain session tokens, local prompts, or private spec artifacts)
+# ============================================================================
 .agents/
+.agent/
+.specify/
 .qodo/
+.codeium/
+.claude/
+.cursor/
+.gemini/
+.codex/
+.opencode/
+.windsurf/
+specs/
+.specs/
 
-# seo-partner local state & reconstructible index
+# ============================================================================
+# 2. seo-partner Local State & Reconstructible SQLite WAL Index
+#    (.seo/config.json and .seo/decisions.md remain versionable by choice)
+# ============================================================================
 .seo/index.db
 .seo/index.db-shm
 .seo/index.db-wal
+.seo/index.db.*.bak
 .seo/logs/
 .seo/cache/
 
-# Dependencies & build outputs
+# ============================================================================
+# 3. Dependencies, Monorepo Build & Package Outputs
+# ============================================================================
 node_modules/
 dist/
 build/
 .turbo/
 *.tsbuildinfo
+*.tgz
 
-# Environment variables & secrets
+# ============================================================================
+# 4. Environment Variables, Secrets & Private Keys (Zero-Leak Guardrail)
+# ============================================================================
 .env
 .env.*
 !.env.example
+!.env.sample
+!.env.template
 *.pem
 *.key
+*.p12
+*.pfx
+*.cert
+*.crt
 
-# Testing & coverage
+# ============================================================================
+# 5. Testing, Coverage & Benchmark Artifacts
+# ============================================================================
 coverage/
+.nyc_output/
 playwright-report/
 test-results/
 
-# OS & IDE files
+# ============================================================================
+# 6. OS, Editor & Diagnostic Logs
+# ============================================================================
 .DS_Store
 Thumbs.db
+desktop.ini
 .vscode/*
 !.vscode/extensions.json
 .idea/
 *.log
-
+npm-debug.log*
+pnpm-debug.log*
