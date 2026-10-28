@@ -6,9 +6,10 @@ import {
   FindingRepository,
   ProjectRepository,
   RouteRepository,
+  CwvRepository,
   SeoDatabase,
 } from '@seo-partner/store';
-import { ALL_V02_RULES, runRulesEngine } from '@seo-partner/rules';
+import { ALL_RULES, runRulesEngine } from '@seo-partner/rules';
 import { runScanCommand } from './scan.js';
 
 export interface AuditCommandOptions {
@@ -16,6 +17,7 @@ export interface AuditCommandOptions {
   readonly category?: RuleCategory;
   readonly severity?: SeverityLevel;
   readonly crawlRunId?: string;
+  readonly withCwv?: boolean;
 }
 
 export interface AuditCommandResult {
@@ -76,6 +78,9 @@ export async function runAuditCommand(
       : crawlRepo.getLatestCompletedCrawlRun(project.id);
     const crawlPages = activeCrawlRun ? crawlRepo.getCrawlPages(activeCrawlRun.id) : [];
 
+    const cwvRepo = new CwvRepository(store);
+    const cwvMetrics = options.withCwv ? cwvRepo.listAllMetrics(project.id) : undefined;
+
     const evaluatedFindings = runRulesEngine({
       project,
       routes,
@@ -83,10 +88,11 @@ export async function runAuditCommand(
       crawlPages,
       robotsTxtContent,
       robotsFilePath: robotsFile,
+      cwvMetrics,
     });
 
     store.runInTransaction(() => {
-      findingRepo.syncRulesCatalog(ALL_V02_RULES);
+      findingRepo.syncRulesCatalog(ALL_RULES);
       findingRepo.syncFindingsAndActions(evaluatedFindings);
     });
 
@@ -111,7 +117,7 @@ export async function runAuditCommand(
     return {
       projectId: project.id,
       crawlRunId: activeCrawlRun?.id ?? null,
-      activeRulesCount: ALL_V02_RULES.length,
+      activeRulesCount: ALL_RULES.length,
       totalFindings: filteredFindings.length,
       blockingIndexingCount,
       bySeverity,

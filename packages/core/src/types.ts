@@ -15,7 +15,7 @@ export type RouterKind =
   | 'django';
 export type RenderingMode = 'ssr-ssg' | 'client-only' | 'dynamic' | 'static';
 export type FileKind = 'route' | 'layout' | 'robots' | 'sitemap' | 'config' | 'static' | 'other';
-export type RuleCategory = 'technical' | 'on-page' | 'schema' | 'local' | 'geo';
+export type RuleCategory = 'technical' | 'on-page' | 'schema' | 'local' | 'geo' | 'performance';
 export type SeverityLevel = 'critical' | 'high' | 'medium' | 'low';
 export type FindingStatus = 'open' | 'acknowledged' | 'resolved';
 export type OwnerRole = 'dev' | 'content' | 'outreach';
@@ -204,7 +204,7 @@ export interface IceBreakdown {
 }
 
 export interface FindingEvidence {
-  readonly source: 'code-scan' | 'http-crawl' | 'code-vs-crawl';
+  readonly source: 'code-scan' | 'http-crawl' | 'code-vs-crawl' | 'cwv';
   readonly filePath: string;
   readonly lineNumber: number;
   readonly url?: string;
@@ -385,7 +385,11 @@ export type ToolName =
   | 'search_fts'
   | 'compare_code_crawl'
   | 'record_decision'
-  | 'propose_patch';
+  | 'propose_patch'
+  | 'get_gsc_performance'
+  | 'inspect_gsc_url'
+  | 'get_cwv_metrics'
+  | 'run_agent_step';
 
 export interface ToolContext {
   readonly projectRoot: string;
@@ -479,6 +483,90 @@ export interface InitCommandResult {
   readonly dryRun: boolean;
   readonly mcpSnippets?: ReadonlyArray<McpConfigSnippet>;
 }
+
+// ----------------------------------------------------------------------------
+// Milestone v0.6: Connectors & Autonomous Agent
+// ----------------------------------------------------------------------------
+
+export interface GscPerformanceRecord {
+  readonly id: string;
+  readonly projectId: string;
+  readonly url: string;
+  readonly query: string;
+  readonly device: 'all' | 'desktop' | 'mobile' | 'tablet';
+  readonly country: string;
+  readonly clicks: number;
+  readonly impressions: number;
+  readonly ctr: number;
+  readonly position: number;
+  readonly dateStart: string;
+  readonly dateEnd: string;
+  readonly fetchedAt: string;
+}
+
+export interface GscInspectionRecord {
+  readonly id: string;
+  readonly projectId: string;
+  readonly url: string;
+  readonly verdict: 'PASS' | 'PARTIAL' | 'FAIL' | 'NEUTRAL';
+  readonly coverageState: string;
+  readonly indexingState: string;
+  readonly robotsTxtState: string;
+  readonly lastCrawlTime: string | null;
+  readonly pageFetchState: string | null;
+  readonly canonicalUser: string | null;
+  readonly canonicalGoogle: string | null;
+  readonly fetchedAt: string;
+}
+
+export type CwvRating = 'good' | 'needs-improvement' | 'poor';
+
+export interface CwvMetricRecord {
+  readonly id: string;
+  readonly projectId: string;
+  readonly url: string;
+  readonly formFactor: 'PHONE' | 'DESKTOP';
+  readonly scope: 'url' | 'origin';
+  readonly lcpMs: number | null;
+  readonly lcpRating: CwvRating | null;
+  readonly inpMs: number | null;
+  readonly inpRating: CwvRating | null;
+  readonly clsScore: number | null;
+  readonly clsRating: CwvRating | null;
+  readonly fcpMs: number | null;
+  readonly fcpRating: CwvRating | null;
+  readonly ttfbMs: number | null;
+  readonly ttfbRating: CwvRating | null;
+  readonly fetchedAt: string;
+  readonly expiresAt: string;
+}
+
+export interface AgentRunSession {
+  readonly id: string;
+  readonly projectId: string;
+  readonly goal: string;
+  readonly modelName: string;
+  readonly provider: 'anthropic' | 'openai' | 'gemini' | 'custom';
+  readonly maxIterations: number;
+  readonly iterationsCompleted: number;
+  readonly status: 'running' | 'completed' | 'aborted' | 'failed';
+  readonly startedAt: string;
+  readonly completedAt: string | null;
+  readonly patchesGenerated: number;
+  readonly patchesApplied: number;
+}
+
+export interface AgentStepLog {
+  readonly id: string;
+  readonly sessionId: string;
+  readonly stepIndex: number;
+  readonly thought: string | null;
+  readonly toolName: string;
+  readonly toolArguments: Record<string, unknown>;
+  readonly toolResult: Record<string, unknown>;
+  readonly createdAt: string;
+}
+
 
 
 

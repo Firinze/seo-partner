@@ -5,3 +5,6 @@ export * from './repositories/route-repo.js';
 export * from './repositories/crawl-repo.js';
 export * from './repositories/finding-repo.js';
 export * from './repositories/decision-repo.js';
+export * from './repositories/gsc-repo.js';
+export * from './repositories/cwv-repo.js';
+export * from './repositories/agent-repo.js';

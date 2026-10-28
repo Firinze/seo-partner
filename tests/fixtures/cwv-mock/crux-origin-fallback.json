@@ -1,0 +1,36 @@
+{
+  "record": {
+    "key": {
+      "origin": "https://example.com",
+      "formFactor": "PHONE"
+    },
+    "metrics": {
+      "largest_contentful_paint": {
+        "percentiles": {
+          "p75": 2400
+        }
+      },
+      "interaction_to_next_paint": {
+        "percentiles": {
+          "p75": 120
+        }
+      },
+      "cumulative_layout_shift": {
+        "percentiles": {
+          "p75": "0.08"
+        }
+      },
+      "first_contentful_paint": {
+        "percentiles": {
+          "p75": 1400
+        }
+      },
+      "experimental_time_to_first_byte": {
+        "percentiles": {
+          "p75": 580
+        }
+      }
+    }
+  }
+}
+

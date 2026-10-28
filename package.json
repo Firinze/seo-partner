@@ -1,8 +1,8 @@
 {
   "name": "seo-partner-monorepo",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
-  "description": "Deterministic local SEO scanner, anti-SSRF HTTP crawler, PHP/Next.js adapters, 40 rules engine, local API & Dashboard, and multi-IDE skill installer",
+  "description": "Deterministic local SEO scanner, anti-SSRF HTTP crawler, multi-framework adapters, GSC & CWV connectors, autonomous agent loop, local API & Dashboard",
   "license": "MIT",
   "author": "Firinze Gbènito Dossou",
   "type": "module",
@@ -18,6 +18,8 @@
   },
   "devDependencies": {
     "@seo-partner/adapters": "workspace:*",
+    "@seo-partner/agent": "workspace:*",
+    "@seo-partner/connectors": "workspace:*",
     "@seo-partner/core": "workspace:*",
     "@seo-partner/crawler": "workspace:*",
     "@seo-partner/dashboard": "workspace:*",

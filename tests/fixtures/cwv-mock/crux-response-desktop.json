@@ -1,0 +1,36 @@
+{
+  "record": {
+    "key": {
+      "url": "https://example.com/blog/article-1",
+      "formFactor": "DESKTOP"
+    },
+    "metrics": {
+      "largest_contentful_paint": {
+        "percentiles": {
+          "p75": 1950
+        }
+      },
+      "interaction_to_next_paint": {
+        "percentiles": {
+          "p75": 85
+        }
+      },
+      "cumulative_layout_shift": {
+        "percentiles": {
+          "p75": "0.04"
+        }
+      },
+      "first_contentful_paint": {
+        "percentiles": {
+          "p75": 1100
+        }
+      },
+      "experimental_time_to_first_byte": {
+        "percentiles": {
+          "p75": 420
+        }
+      }
+    }
+  }
+}
+

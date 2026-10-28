@@ -26,7 +26,8 @@
     "@seo-partner/dashboard": "workspace:*",
     "@seo-partner/server": "workspace:*",
     "@seo-partner/tools": "workspace:*",
-    "@seo-partner/mcp": "workspace:*"
+    "@seo-partner/mcp": "workspace:*",
+    "@seo-partner/agent": "workspace:*"
   }
 }
 

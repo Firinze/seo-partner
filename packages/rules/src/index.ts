@@ -4,6 +4,7 @@ export * from './catalog/onpage-rules.js';
 export * from './catalog/schema-rules.js';
 export * from './catalog/local-rules.js';
 export * from './catalog/geo-rules.js';
+export * from './catalog/perf-rules.js';
 export * from './engine.js';
 export * from './reporter.js';
 export * from './html-reporter.js';

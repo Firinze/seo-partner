@@ -17,6 +17,7 @@ import {
   FindingRepository,
   ProjectRepository,
   RouteRepository,
+  GscRepository,
   SeoDatabase,
 } from '@seo-partner/store';
 import {
@@ -30,6 +31,8 @@ import { runAuditCommand, type AuditCommandResult } from './engine/audit.js';
 import { compareCodeVsCrawl } from './engine/comparator.js';
 import { recordDecision } from './engine/decisions.js';
 import { ensureIndex } from './engine/ensure-index.js';
+import { runGscSyncCommand, runGscInspectCommand } from './engine/gsc-sync.js';
+import { runCwvFetchCommand } from './engine/cwv-fetch.js';
 import {
   applyPatchBatch,
   proposePatches,
@@ -836,6 +839,274 @@ const proposePatchTool: ToolDefinition<ProposePatchToolArgs, PatchBatchResult> =
 };
 
 // ---------------------------------------------------------------------------
+// GSC Performance Tool
+// ---------------------------------------------------------------------------
+
+export interface GetGscPerformanceArgs {
+  readonly siteUrl: string;
+  readonly url?: string;
+  readonly days?: number;
+  readonly sync?: boolean;
+}
+
+export const getGscPerformanceTool: ToolDefinition<GetGscPerformanceArgs> = {
+  name: 'get_gsc_performance',
+  title: {
+    en: 'Get GSC Search Performance',
+    fr: 'Obtenir les performances Search Console',
+  },
+  description: {
+    en: 'Fetch or query search performance metrics (clicks, impressions, ctr, position) from Google Search Console.',
+    fr: 'Récupérer ou interroger les métriques de performance de recherche (clics, impressions, ctr, position) de Google Search Console.',
+  },
+  inputSchema: {
+    type: 'object',
+    properties: {
+      siteUrl: { type: 'string', description: 'Google Search Console verified site URL (e.g. https://example.com/)' },
+      url: { type: 'string', description: 'Filter performance metrics to a specific page URL' },
+      days: { type: 'number', description: 'Number of past days of performance data (default 28)' },
+      sync: { type: 'boolean', description: 'Force a live sync from GSC API before reading' },
+    },
+    required: ['siteUrl'],
+    additionalProperties: false,
+  },
+  mutatesState: false,
+  validateArgs(args: unknown): ToolValidationResult<GetGscPerformanceArgs> {
+    if (!args || typeof args !== 'object') {
+      return { ok: false, error: 'Arguments must be an object' };
+    }
+    const a = args as Record<string, unknown>;
+    if (typeof a['siteUrl'] !== 'string' || !a['siteUrl'].trim()) {
+      return { ok: false, error: 'siteUrl must be a non-empty string' };
+    }
+    return {
+      ok: true,
+      data: {
+        siteUrl: String(a['siteUrl']).trim(),
+        url: typeof a['url'] === 'string' ? a['url'].trim() : undefined,
+        days: typeof a['days'] === 'number' ? a['days'] : undefined,
+        sync: typeof a['sync'] === 'boolean' ? a['sync'] : false,
+      },
+    };
+  },
+  async execute(ctx: ToolContext, args: GetGscPerformanceArgs): Promise<ToolResult> {
+    if (args.sync) {
+      await runGscSyncCommand({
+        projectRoot: ctx.projectRoot,
+        siteUrl: args.siteUrl,
+        days: args.days,
+      });
+    }
+
+    const store = SeoDatabase.open(ctx.projectRoot);
+    try {
+      const projectRepo = new ProjectRepository(store);
+      let project = projectRepo.getLatestProject();
+      if (!project) {
+        await runScanCommand({ projectRoot: ctx.projectRoot });
+        project = projectRepo.getLatestProject();
+      }
+
+      if (!project) {
+        return {
+          ok: false,
+          data: null,
+          summary: ctx.lang === 'fr' ? 'Projet non initialisé.' : 'Project not initialized.',
+          initialScanPerformed: true,
+        };
+      }
+
+      const gscRepo = new GscRepository(store);
+      const records = args.url
+        ? gscRepo.getPerformanceByUrl(project.id, args.url)
+        : gscRepo.listTopQueries(project.id);
+
+      const summary =
+        ctx.lang === 'fr'
+          ? `${records.length} métrique(s) GSC trouvée(s) pour ${args.siteUrl}.`
+          : `Found ${records.length} GSC performance record(s) for ${args.siteUrl}.`;
+
+      return {
+        ok: true,
+        data: { siteUrl: args.siteUrl, recordsCount: records.length, records },
+        summary,
+        initialScanPerformed: false,
+      };
+    } finally {
+      store.close();
+    }
+  },
+};
+
+// ---------------------------------------------------------------------------
+// GSC Inspect Tool
+// ---------------------------------------------------------------------------
+
+export interface InspectGscUrlArgs {
+  readonly siteUrl: string;
+  readonly url: string;
+}
+
+export const inspectGscUrlTool: ToolDefinition<InspectGscUrlArgs> = {
+  name: 'inspect_gsc_url',
+  title: {
+    en: 'Inspect URL in GSC',
+    fr: 'Inspecter une URL dans Search Console',
+  },
+  description: {
+    en: 'Inspect indexation status, coverage, and Googlebot crawl state for an URL via GSC URL Inspection API.',
+    fr: 'Inspecter le statut d indexation, la couverture et l état de crawl Googlebot d une URL via l API URL Inspection de GSC.',
+  },
+  inputSchema: {
+    type: 'object',
+    properties: {
+      siteUrl: { type: 'string', description: 'Google Search Console verified site URL' },
+      url: { type: 'string', description: 'The absolute URL to inspect' },
+    },
+    required: ['siteUrl', 'url'],
+    additionalProperties: false,
+  },
+  mutatesState: false,
+  validateArgs(args: unknown): ToolValidationResult<InspectGscUrlArgs> {
+    if (!args || typeof args !== 'object') {
+      return { ok: false, error: 'Arguments must be an object' };
+    }
+    const a = args as Record<string, unknown>;
+    if (typeof a['siteUrl'] !== 'string' || !a['siteUrl'].trim()) {
+      return { ok: false, error: 'siteUrl must be a non-empty string' };
+    }
+    if (typeof a['url'] !== 'string' || !a['url'].trim()) {
+      return { ok: false, error: 'url must be a non-empty string' };
+    }
+    return {
+      ok: true,
+      data: {
+        siteUrl: String(a['siteUrl']).trim(),
+        url: String(a['url']).trim(),
+      },
+    };
+  },
+  async execute(ctx: ToolContext, args: InspectGscUrlArgs): Promise<ToolResult> {
+    const res = await runGscInspectCommand({
+      projectRoot: ctx.projectRoot,
+      siteUrl: args.siteUrl,
+      url: args.url,
+    });
+
+    if (!res.success || !res.record) {
+      return {
+        ok: false,
+        data: { error: res.error ?? 'GSC URL Inspection failed' },
+        summary: ctx.lang === 'fr' ? `Échec inspection GSC : ${res.error}` : `GSC inspection failed: ${res.error}`,
+        initialScanPerformed: false,
+      };
+    }
+
+    const summary =
+      ctx.lang === 'fr'
+        ? `Inspection GSC ${args.url} : verdict ${res.record.verdict}, couverture : ${res.record.coverageState}.`
+        : `GSC inspection for ${args.url}: verdict ${res.record.verdict}, coverage: ${res.record.coverageState}.`;
+
+    return {
+      ok: true,
+      data: res.record,
+      summary,
+      initialScanPerformed: false,
+    };
+  },
+};
+
+// ---------------------------------------------------------------------------
+// CWV Metrics Tool
+// ---------------------------------------------------------------------------
+
+export interface GetCwvMetricsArgs {
+  readonly url: string;
+  readonly formFactor?: 'PHONE' | 'DESKTOP' | 'ALL';
+  readonly refresh?: boolean;
+}
+
+export const getCwvMetricsTool: ToolDefinition<GetCwvMetricsArgs> = {
+  name: 'get_cwv_metrics',
+  title: {
+    en: 'Get Core Web Vitals Metrics',
+    fr: 'Obtenir les métriques Core Web Vitals',
+  },
+  description: {
+    en: 'Fetch and evaluate field Core Web Vitals (LCP, INP, CLS, FCP, TTFB) from CrUX or PageSpeed with 7-day TTL cache.',
+    fr: 'Récupérer et évaluer les signaux Core Web Vitals réels (LCP, INP, CLS, FCP, TTFB) depuis CrUX ou PageSpeed avec cache TTL 7 jours.',
+  },
+  inputSchema: {
+    type: 'object',
+    properties: {
+      url: { type: 'string', description: 'The absolute URL to check CWV for' },
+      formFactor: {
+        type: 'string',
+        enum: ['PHONE', 'DESKTOP', 'ALL'],
+        description: 'Form factor (PHONE, DESKTOP, or ALL)',
+      },
+      refresh: {
+        type: 'boolean',
+        description: 'Bypass local 7-day SQLite cache and force fresh API fetch',
+      },
+    },
+    required: ['url'],
+    additionalProperties: false,
+  },
+  mutatesState: false,
+  validateArgs(args: unknown): ToolValidationResult<GetCwvMetricsArgs> {
+    if (!args || typeof args !== 'object') {
+      return { ok: false, error: 'Arguments must be an object' };
+    }
+    const a = args as Record<string, unknown>;
+    if (typeof a['url'] !== 'string' || !a['url'].trim()) {
+      return { ok: false, error: 'url must be a non-empty string' };
+    }
+    const ff = a['formFactor'];
+    if (ff !== undefined && ff !== 'PHONE' && ff !== 'DESKTOP' && ff !== 'ALL') {
+      return { ok: false, error: 'formFactor must be PHONE, DESKTOP, or ALL' };
+    }
+    return {
+      ok: true,
+      data: {
+        url: String(a['url']).trim(),
+        formFactor: ff as 'PHONE' | 'DESKTOP' | 'ALL' | undefined,
+        refresh: Boolean(a['refresh']),
+      },
+    };
+  },
+  async execute(ctx: ToolContext, args: GetCwvMetricsArgs): Promise<ToolResult> {
+    const res = await runCwvFetchCommand({
+      projectRoot: ctx.projectRoot,
+      url: args.url,
+      formFactor: args.formFactor,
+      refresh: args.refresh,
+    });
+
+    if (!res.success) {
+      return {
+        ok: false,
+        data: { error: res.error ?? 'Failed to fetch CWV metrics' },
+        summary: ctx.lang === 'fr' ? `Échec récupération CWV : ${res.error}` : `CWV fetch failed: ${res.error}`,
+        initialScanPerformed: false,
+      };
+    }
+
+    const summary =
+      ctx.lang === 'fr'
+        ? `${res.records.length} métrique(s) CWV obtenue(s) pour ${args.url} (cache: ${res.cached}).`
+        : `Retrieved ${res.records.length} CWV metric(s) for ${args.url} (cached: ${res.cached}).`;
+
+    return {
+      ok: true,
+      data: { url: args.url, cached: res.cached, records: res.records },
+      summary,
+      initialScanPerformed: false,
+    };
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Tool Registry Map & Management Functions
 // ---------------------------------------------------------------------------
 
@@ -847,6 +1118,9 @@ const registry = new Map<ToolName, ToolDefinition>([
   ['compare_code_crawl', compareCodeCrawlTool],
   ['record_decision', recordDecisionTool],
   ['propose_patch', proposePatchTool],
+  ['get_gsc_performance', getGscPerformanceTool],
+  ['inspect_gsc_url', inspectGscUrlTool],
+  ['get_cwv_metrics', getCwvMetricsTool],
 ]);
 
 export function registerTool(tool: ToolDefinition): void {

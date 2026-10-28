@@ -1,0 +1,27 @@
+{
+  "rows": [
+    {
+      "keys": ["https://example.com/", "agence seo bordeaux"],
+      "clicks": 142,
+      "impressions": 2840,
+      "ctr": 0.05,
+      "position": 3.2
+    },
+    {
+      "keys": ["https://example.com/a-propos", "qui sommes nous seo"],
+      "clicks": 28,
+      "impressions": 450,
+      "ctr": 0.062,
+      "position": 5.1
+    },
+    {
+      "keys": ["https://example.com/blog/audit-technique", "guide audit technique seo"],
+      "clicks": 89,
+      "impressions": 1200,
+      "ctr": 0.074,
+      "position": 2.1
+    }
+  ],
+  "responseAggregationType": "byPage"
+}
+

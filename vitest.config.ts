@@ -5,6 +5,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@seo-partner/core': path.resolve(__dirname, 'packages/core/src/index.ts'),
+      '@seo-partner/connectors': path.resolve(__dirname, 'packages/connectors/src/index.ts'),
+      '@seo-partner/agent': path.resolve(__dirname, 'packages/agent/src/index.ts'),
       '@seo-partner/store': path.resolve(__dirname, 'packages/store/src/index.ts'),
       '@seo-partner/adapters': path.resolve(__dirname, 'packages/adapters/src/index.ts'),
       '@seo-partner/crawler': path.resolve(__dirname, 'packages/crawler/src/index.ts'),

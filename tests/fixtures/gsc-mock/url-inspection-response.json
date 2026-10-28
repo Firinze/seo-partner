@@ -1,0 +1,16 @@
+{
+  "inspectionResult": {
+    "verdict": "PASS",
+    "indexStatusResult": {
+      "verdict": "PASS",
+      "coverageState": "Submitted and indexed",
+      "robotsTxtState": "ALLOWED",
+      "indexingState": "INDEXING_ALLOWED",
+      "lastCrawlTime": "2026-10-25T14:32:00Z",
+      "pageFetchState": "SUCCESSFUL",
+      "userCanonical": "https://example.com/a-propos",
+      "googleCanonical": "https://example.com/a-propos"
+    }
+  }
+}
+

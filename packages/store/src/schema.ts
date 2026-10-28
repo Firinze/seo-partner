@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 export const INITIAL_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS schema_migration (
@@ -187,10 +187,93 @@ CREATE TABLE IF NOT EXISTS decision (
   finding_id TEXT
 );
 
+CREATE TABLE IF NOT EXISTS gsc_performance (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  url TEXT NOT NULL,
+  query TEXT NOT NULL DEFAULT '',
+  device TEXT NOT NULL DEFAULT 'all',
+  country TEXT NOT NULL DEFAULT 'all',
+  clicks INTEGER NOT NULL DEFAULT 0,
+  impressions INTEGER NOT NULL DEFAULT 0,
+  ctr REAL NOT NULL DEFAULT 0.0,
+  position REAL NOT NULL DEFAULT 0.0,
+  date_start TEXT NOT NULL,
+  date_end TEXT NOT NULL,
+  fetched_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS gsc_inspection (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  url TEXT NOT NULL,
+  verdict TEXT NOT NULL,
+  coverage_state TEXT NOT NULL,
+  indexing_state TEXT NOT NULL,
+  robots_txt_state TEXT NOT NULL,
+  last_crawl_time TEXT,
+  page_fetch_state TEXT,
+  canonical_user TEXT,
+  canonical_google TEXT,
+  fetched_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cwv_metrics (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  url TEXT NOT NULL,
+  form_factor TEXT NOT NULL DEFAULT 'PHONE',
+  scope TEXT NOT NULL DEFAULT 'url',
+  lcp_ms INTEGER,
+  lcp_rating TEXT,
+  inp_ms INTEGER,
+  inp_rating TEXT,
+  cls_score REAL,
+  cls_rating TEXT,
+  fcp_ms INTEGER,
+  fcp_rating TEXT,
+  ttfb_ms INTEGER,
+  ttfb_rating TEXT,
+  fetched_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS agent_run_session (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  goal TEXT NOT NULL,
+  model_name TEXT NOT NULL,
+  provider TEXT NOT NULL,
+  max_iterations INTEGER NOT NULL DEFAULT 10,
+  iterations_completed INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'running',
+  started_at TEXT NOT NULL,
+  completed_at TEXT,
+  patches_generated INTEGER NOT NULL DEFAULT 0,
+  patches_applied INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS agent_step_log (
+  id TEXT PRIMARY KEY,
+  session_id TEXT NOT NULL REFERENCES agent_run_session(id) ON DELETE CASCADE,
+  step_index INTEGER NOT NULL,
+  thought TEXT,
+  tool_name TEXT NOT NULL,
+  tool_arguments TEXT NOT NULL,
+  tool_result TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_file_project ON file(project_id);
 CREATE INDEX IF NOT EXISTS idx_route_project ON route(project_id);
 CREATE INDEX IF NOT EXISTS idx_crawl_run_project ON crawl_run(project_id, started_at DESC);
 CREATE INDEX IF NOT EXISTS idx_crawl_page_run ON crawl_page(crawl_run_id);
 CREATE INDEX IF NOT EXISTS idx_finding_status ON finding(status);
 CREATE INDEX IF NOT EXISTS idx_action_priority ON action(blocks_indexing DESC, ice_score DESC);
+CREATE INDEX IF NOT EXISTS idx_gsc_perf_proj_url ON gsc_performance (project_id, url);
+CREATE INDEX IF NOT EXISTS idx_gsc_perf_query ON gsc_performance (project_id, query);
+CREATE INDEX IF NOT EXISTS idx_gsc_insp_proj_url ON gsc_inspection (project_id, url);
+CREATE INDEX IF NOT EXISTS idx_cwv_proj_url ON cwv_metrics (project_id, url, form_factor);
+CREATE INDEX IF NOT EXISTS idx_agent_session_proj ON agent_run_session (project_id, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_agent_step_session ON agent_step_log (session_id, step_index ASC);
 `;

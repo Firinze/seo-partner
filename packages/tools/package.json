@@ -18,6 +18,7 @@
     "@seo-partner/core": "workspace:*",
     "@seo-partner/store": "workspace:*",
     "@seo-partner/adapters": "workspace:*",
+    "@seo-partner/connectors": "workspace:*",
     "@seo-partner/crawler": "workspace:*",
     "@seo-partner/rules": "workspace:*"
   }

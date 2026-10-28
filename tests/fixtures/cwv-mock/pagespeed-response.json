@@ -1,0 +1,30 @@
+{
+  "id": "https://example.com/blog/article-1",
+  "loadingExperience": {
+    "id": "https://example.com/blog/article-1",
+    "metrics": {
+      "LARGEST_CONTENTFUL_PAINT_MS": {
+        "percentile": 3200,
+        "category": "SLOW"
+      },
+      "INTERACTION_TO_NEXT_PAINT": {
+        "percentile": 160,
+        "category": "FAST"
+      },
+      "CUMULATIVE_LAYOUT_SHIFT_SCORE": {
+        "percentile": 18,
+        "category": "SLOW"
+      },
+      "FIRST_CONTENTFUL_PAINT_MS": {
+        "percentile": 1700,
+        "category": "FAST"
+      },
+      "EXPERIMENTAL_TIME_TO_FIRST_BYTE": {
+        "percentile": 920,
+        "category": "SLOW"
+      }
+    },
+    "overall_category": "SLOW"
+  }
+}
+

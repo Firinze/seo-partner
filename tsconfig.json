@@ -6,6 +6,8 @@
     "baseUrl": ".",
     "paths": {
       "@seo-partner/core": ["./packages/core/src/index.ts"],
+      "@seo-partner/connectors": ["./packages/connectors/src/index.ts"],
+      "@seo-partner/agent": ["./packages/agent/src/index.ts"],
       "@seo-partner/store": ["./packages/store/src/index.ts"],
       "@seo-partner/adapters": ["./packages/adapters/src/index.ts"],
       "@seo-partner/crawler": ["./packages/crawler/src/index.ts"],

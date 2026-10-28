@@ -8,5 +8,6 @@ export * from './components/features/backlog-feature.js';
 export * from './components/features/crawl-comparator-feature.js';
 export * from './components/features/decisions-reports-feature.js';
 export * from './components/features/patches-feature.js';
+export * from './components/features/gsc-feature.js';
+export * from './components/features/cwv-feature.js';
 export * from './bundle.js';
-

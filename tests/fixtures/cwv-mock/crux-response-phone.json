@@ -1,0 +1,51 @@
+{
+  "record": {
+    "key": {
+      "url": "https://example.com/blog/article-1",
+      "formFactor": "PHONE"
+    },
+    "metrics": {
+      "largest_contentful_paint": {
+        "percentiles": {
+          "p75": 3200
+        },
+        "histogram": [
+          { "start": 0, "end": 2500, "density": 0.55 },
+          { "start": 2500, "end": 4000, "density": 0.35 },
+          { "start": 4000, "density": 0.10 }
+        ]
+      },
+      "interaction_to_next_paint": {
+        "percentiles": {
+          "p75": 160
+        },
+        "histogram": [
+          { "start": 0, "end": 200, "density": 0.85 },
+          { "start": 200, "end": 500, "density": 0.10 },
+          { "start": 500, "density": 0.05 }
+        ]
+      },
+      "cumulative_layout_shift": {
+        "percentiles": {
+          "p75": "0.18"
+        },
+        "histogram": [
+          { "start": "0.0", "end": "0.1", "density": 0.60 },
+          { "start": "0.1", "end": "0.25", "density": 0.30 },
+          { "start": "0.25", "density": 0.10 }
+        ]
+      },
+      "first_contentful_paint": {
+        "percentiles": {
+          "p75": 1700
+        }
+      },
+      "experimental_time_to_first_byte": {
+        "percentiles": {
+          "p75": 920
+        }
+      }
+    }
+  }
+}
+

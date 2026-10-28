@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "@seo-partner/core": "workspace:*",
-    "@seo-partner/tools": "workspace:*"
+    "@seo-partner/tools": "workspace:*",
+    "@seo-partner/agent": "workspace:*"
   }
 }
 

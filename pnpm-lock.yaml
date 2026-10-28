@@ -11,6 +11,12 @@ importers:
       '@seo-partner/adapters':
         specifier: workspace:*
         version: link:packages/adapters
+      '@seo-partner/agent':
+        specifier: workspace:*
+        version: link:packages/agent
+      '@seo-partner/connectors':
+        specifier: workspace:*
+        version: link:packages/connectors
       '@seo-partner/core':
         specifier: workspace:*
         version: link:packages/core
@@ -60,6 +66,18 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/agent:
+    dependencies:
+      '@seo-partner/core':
+        specifier: workspace:*
+        version: link:../core
+      '@seo-partner/store':
+        specifier: workspace:*
+        version: link:../store
+      '@seo-partner/tools':
+        specifier: workspace:*
+        version: link:../tools
+
   packages/cli:
     dependencies:
       '@seo-partner/adapters':
@@ -89,6 +107,12 @@ importers:
       '@seo-partner/tools':
         specifier: workspace:*
         version: link:../tools
+
+  packages/connectors:
+    dependencies:
+      '@seo-partner/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/core: {}
 

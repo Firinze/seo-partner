@@ -1,5 +1,6 @@
 import type {
   CrawlPage,
+  CwvMetricRecord,
   ExtractedRouteData,
   Finding,
   ProjectRecord,
@@ -14,6 +15,7 @@ export interface AuditContext {
   readonly crawlPages?: ReadonlyArray<CrawlPage>;
   readonly robotsTxtContent?: string | null;
   readonly robotsFilePath?: string | null;
+  readonly cwvMetrics?: ReadonlyArray<CwvMetricRecord>;
 }
 
 export const RULE_TECH_01: RuleDefinition = {

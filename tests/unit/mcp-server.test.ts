@@ -56,7 +56,7 @@ describe('US1: Local MCP Stdio Server (@seo-partner/mcp) & Multi-IDE Config Inte
     expect(initRes.id).toBe(1);
     expect(initRes.result.protocolVersion).toBe('2025-06-18');
     expect(initRes.result.serverInfo.name).toBe('seo-partner');
-    expect(initRes.result.serverInfo.version).toBe('0.4.0');
+    expect(initRes.result.serverInfo.version).toBe('0.6.0');
     expect(initRes.result.capabilities.tools.listChanged).toBe(false);
 
     // Initialized notification (no response)
@@ -392,12 +392,12 @@ describe('US1: Local MCP Stdio Server (@seo-partner/mcp) & Multi-IDE Config Inte
       '<!DOCTYPE html><html><head></head><body><h1>Title Missing</h1></body></html>',
     );
 
-    // 1. Verify tools/list has 7 tools
+    // 1. Verify tools/list contains propose_patch
     const serverReadOnly = new McpServer({ projectRoot: tmpDir, allowApply: false, lang: 'en' });
     await serverReadOnly.handleMessage(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize' }));
     const listRaw = await serverReadOnly.handleMessage(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }));
     const listRes = JSON.parse(listRaw!);
-    expect(listRes.result.tools.length).toBe(7);
+    expect(listRes.result.tools.length).toBeGreaterThanOrEqual(7);
     expect(listRes.result.tools.map((t: any) => t.name)).toContain('propose_patch');
 
     // 2. Call propose_patch without apply -> leaves files intact

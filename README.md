@@ -4,18 +4,18 @@
 
 <br />
 
-[![Version](https://img.shields.io/badge/version-0.5.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
+[![Version](https://img.shields.io/badge/version-0.6.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-059669?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7_Strict-047857?style=for-the-badge&logo=typescript&logoColor=white)](./tsconfig.base.json)
-[![Packages](https://img.shields.io/badge/Workspaces-10_Packages-34d399?style=for-the-badge)](./package.json)
-[![MCP Tools](https://img.shields.io/badge/MCP_Tools-7_Deterministic-10b981?style=for-the-badge)](./packages/mcp/src/server.ts)
+[![Packages](https://img.shields.io/badge/Workspaces-12_Packages-34d399?style=for-the-badge)](./package.json)
+[![MCP Tools](https://img.shields.io/badge/MCP_Tools-11_Deterministic-10b981?style=for-the-badge)](./packages/mcp/src/server.ts)
 [![SQLite WAL + FTS5](https://img.shields.io/badge/SQLite-WAL_%2B_FTS5-059669?style=for-the-badge&logo=sqlite&logoColor=white)](./packages/store/src/db.ts)
 [![OpenAPI 3.1 + RFC 9457](https://img.shields.io/badge/OpenAPI_3.1-RFC_9457-047857?style=for-the-badge&logoColor=white)](./packages/server/src/openapi.ts)
-[![Rules](https://img.shields.io/badge/SEO_Rules-40_Verified-10b981?style=for-the-badge&logoColor=white)](./packages/rules/src/engine.ts)
+[![Rules](https://img.shields.io/badge/SEO_Rules-44_Verified-10b981?style=for-the-badge&logoColor=white)](./packages/rules/src/engine.ts)
 [![License](https://img.shields.io/badge/License-MIT-065f46?style=for-the-badge)](./LICENSE)
 
 <p align="center">
-  <strong>Local-First Deterministic SEO Tools Registry, Standard stdio MCP Server (7 Tools), Git Unified Diff Remediation Engine (<code>seo-partner patch</code>), Multi-Framework Adapters (Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP, Static), Anti-SSRF Crawler, 40 Rules Engine with ICE Scoring, Local REST API, and WCAG 2.2 AA Dashboard.</strong><br />
+  <strong>Local-First Deterministic SEO Tools Registry, Standard stdio MCP Server (11 Tools), Git Unified Diff Remediation Engine (<code>seo-partner patch</code>), Google Search Console & Core Web Vitals Connectors, Autonomous ReAct Agent Loop (<code>seo-partner agent run</code>), Multi-Framework Adapters (Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP, Static), Anti-SSRF Crawler, 44 Rules Engine with ICE Scoring, Local REST API, and WCAG 2.2 AA Dashboard.</strong><br />
   <em>Engineered for Antigravity (<code>agy</code>), Claude Code, Cursor, Windsurf, Codex, Gemini Code Assist, and Cline — zero LLM repairs, zero code execution (<code>F-S5</code>), and verifiable backups.</em>
 </p>
 
@@ -29,43 +29,47 @@
 
 ## Table of Contents
 
-1. [Vision and Value Proposition (`v0.5`)](#1-vision-and-value-proposition-v05)
-2. [System Architecture and Data Flow (`10 Packages`)](#2-system-architecture-and-data-flow-10-packages)
+1. [Vision and Value Proposition (`v0.6`)](#1-vision-and-value-proposition-v06)
+2. [System Architecture and Data Flow (`12 Packages`)](#2-system-architecture-and-data-flow-12-packages)
 3. [Quick Start Guide](#3-quick-start-guide)
-4. [Complete CLI Reference (12 Commands)](#4-complete-cli-reference-12-commands)
+4. [Complete CLI Reference (15 Commands)](#4-complete-cli-reference-15-commands)
 5. [Model Context Protocol (MCP) Server (`@seo-partner/mcp`)](#5-model-context-protocol-mcp-server-seo-partnermcp)
 6. [Deterministic Remediation Engine (`seo-partner patch`)](#6-deterministic-remediation-engine-seo-partner-patch)
-7. [Local REST API (`127.0.0.1`, OpenAPI 3.1, RFC 9457) & Web Dashboard](#7-local-rest-api-127001-openapi-31-rfc-9457--web-dashboard)
-8. [The 40 Verified SEO Rules Catalog and ICE Methodology](#8-the-40-verified-seo-rules-catalog-and-ice-methodology)
-9. [Multi-Framework Support: Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP/Laragon & Static](#9-multi-framework-support-nextjs-astro-nuxt-3-sveltekit-remix-django-laravel-symfony-phplaragon--static)
-10. [Developer Guide and Workspace Architecture](#10-developer-guide-and-workspace-architecture)
-11. [Security, Git Guard, Safe Backups, and Anti-SSRF](#11-security-git-guard-safe-backups-and-anti-ssrf)
-12. [Troubleshooting Guide and FAQ](#12-troubleshooting-guide-and-faq)
-13. [Roadmap (`v0.1` to `v1.0`) and Documentation Governance](#13-roadmap-v01-to-v10-and-documentation-governance)
+7. [External Connectors: Google Search Console & Core Web Vitals](#7-external-connectors-google-search-console--core-web-vitals)
+8. [Autonomous ReAct Agent Loop (`seo-partner agent run`)](#8-autonomous-react-agent-loop-seo-partner-agent-run)
+9. [Local REST API (`127.0.0.1`, OpenAPI 3.1, RFC 9457) & Web Dashboard](#9-local-rest-api-127001-openapi-31-rfc-9457--web-dashboard)
+10. [The 44 Verified SEO Rules Catalog and ICE Methodology](#10-the-44-verified-seo-rules-catalog-and-ice-methodology)
+11. [Multi-Framework Support: Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP/Laragon & Static](#11-multi-framework-support-nextjs-astro-nuxt-3-sveltekit-remix-django-laravel-symfony-phplaragon--static)
+12. [Developer Guide and Workspace Architecture](#12-developer-guide-and-workspace-architecture)
+13. [Security, Git Guard, Safe Backups, and Anti-SSRF](#13-security-git-guard-safe-backups-and-anti-ssrf)
+14. [Troubleshooting Guide and FAQ](#14-troubleshooting-guide-and-faq)
+15. [Roadmap (`v0.1` to `v1.0`) and Documentation Governance](#15-roadmap-v01-to-v10-and-documentation-governance)
 
 ---
 
-## 1. Vision and Value Proposition (`v0.5`)
+## 1. Vision and Value Proposition (`v0.6`)
 
-`seo-partner` separates **what must be 100% deterministic** (local TypeScript scanning, standard stdio MCP tools, anti-SSRF crawling, native SQLite WAL + `FTS5`, deterministic AST diff repairs, and local `127.0.0.1` OpenAPI server) from **creative, architectural, and editorial guidance** (AI coding agents in host IDEs):
+`seo-partner` separates **what must be 100% deterministic** (local TypeScript scanning, standard stdio MCP tools, anti-SSRF crawling, native SQLite WAL + `FTS5`, deterministic AST diff repairs, GSC / CWV connector synchronization, and local `127.0.0.1` OpenAPI server) from **creative, architectural, and autonomous agent loops** (AI coding agents in host IDEs and autonomous ReAct cycles with loop guards):
 
-| Capability | Generic AI Coding Agent | Cloud SaaS Crawler | **`seo-partner` (`v0.5`)** |
+| Capability | Generic AI Coding Agent | Cloud SaaS Crawler | **`seo-partner` (`v0.6`)** |
 | :--- | :--- | :--- | :--- |
-| **Model Context Protocol (MCP)** | Manual copy-paste prompts | Proprietary APIs | **Yes — Standard JSON-RPC 2.0 stdio Server (7 Shared Tools)** |
+| **Model Context Protocol (MCP)** | Manual copy-paste prompts | Proprietary APIs | **Yes — Standard JSON-RPC 2.0 stdio Server (11 Shared Tools)** |
 | **Code Remediation & Safe Patches** | Hallucinated code edits | Read-only audit | **Yes — Verifiable Unified Diffs + Safe Atomic `--apply` + Backups** |
+| **Google Search Console & CWV** | Disconnected | Heavy SaaS connectors | **Yes — Native RS256 JWT + CrUX & PageSpeed with 7-Day SQLite TTL** |
+| **Autonomous ReAct Agent Loop** | Uncontrolled loops | Black-box cloud agent | **Yes — Local ReAct Engine with Cycle Guards & Step JSONL Auditing** |
 | **Multi-Framework Route Discovery** | Context window limits | Deployed URLs only | **Yes — Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP, Static** |
 | **Incremental Scan in Fast IDE Loops (`< 5s`)** | Re-reads files | N/A | **Yes — `(mtimeMs, sizeBytes, sha256)` diff + `FTS5` `< 100ms`** |
-| **Anti-SSRF HTTP Crawler & Code vs. Crawl Comparator** | No | Disconnected from code | **Yes — `seo-partner crawl` + Side-by-Side Code vs. Crawl Diff** |
+| **Anti-SSRF HTTP Crawler & Code vs. Crawl** | No | Disconnected from code | **Yes — `seo-partner crawl` + Side-by-Side Code vs. Crawl Diff** |
 | **Local Web Dashboard & OpenAPI 3.1 Server (`127.0.0.1`)** | No | Paid external SaaS | **Yes — `seo-partner serve` (Port Auto-Fallback, RFC 9457, WCAG 2.2 AA)** |
 | **Target Code Execution (`F-S5`)** | Unsafe shell calls | N/A | **Zero Execution (`php`/`python`/`eval`/`build` strictly forbidden)** |
-| **Rules Catalog & Mathematical ICE Prioritization (`F-R3`)** | Subjective | Generic | **40 Verified Rules (`ICE = (I+C+E)/3` + Blockers First)** |
+| **Rules Catalog & Mathematical ICE Prioritization (`F-R3`)** | Subjective | Generic | **44 Verified Rules (`ICE = (I+C+E)/3` + Blockers First + Performance)** |
 | **Executive Deliverables (Markdown, JSON, Standalone HTML5)** | Ephemeral chat | Proprietary export | **5-section `.md`, `.json`, and 100% offline `.html` reports** |
 
 ---
 
-## 2. System Architecture and Data Flow (`10 Packages`)
+## 2. System Architecture and Data Flow (`12 Packages`)
 
-### 2.1 Modular Monorepo Architecture (`10 Packages` — `pnpm workspaces`)
+### 2.1 Modular Monorepo Architecture (`12 Packages` — `pnpm workspaces`)
 
 ```mermaid
 flowchart TB
@@ -76,36 +80,47 @@ flowchart TB
   end
 
   subgraph CLI_LAYER["CLI & Integration Layer"]
-    CLI["@seo-partner/cli\nseo-partner binary (12 Commands)\nmcp | patch | init --with-mcp | serve | crawl | scan | audit"]
-    MCP_PKG["@seo-partner/mcp\nStdio JSON-RPC 2.0 Server\nHandshake | tools/list | tools/call"]
+    CLI["@seo-partner/cli\nseo-partner binary (15 Commands)\nmcp | patch | init | serve | crawl | scan | audit | gsc | cwv | agent"]
+    MCP_PKG["@seo-partner/mcp\nStdio JSON-RPC 2.0 Server\nHandshake | tools/list (11 Tools) | tools/call"]
+  end
+
+  subgraph AGENT_LAYER["Autonomous Execution Layer"]
+    AGENT["@seo-partner/agent\nAutonomous ReAct Loop | Loop Guard & Cycle Detection\nNative LLM Adapters (Anthropic, OpenAI, Gemini, Local)"]
   end
 
   subgraph TOOLS_LAYER["Shared Deterministic Tools & Remediation Layer"]
-    TOOLS["@seo-partner/tools\nShared Registry (7 Tools) | Incremental Scan & Audit\nPatch Engine | LCS Unified Diff | 7 Fixers | Safety & Backups"]
+    TOOLS["@seo-partner/tools\nShared Registry (11 Tools) | Incremental Scan & Audit\nPatch Engine | LCS Unified Diff | 7 Fixers | Safety & Backups"]
+  end
+
+  subgraph CONNECTORS_LAYER["External Telemetry Layer"]
+    CONNECTORS["@seo-partner/connectors\nGSC Search Analytics & Inspection (RS256 JWT)\nCrUX & PageSpeed Insights | 7-Day SQLite TTL Cache"]
   end
 
   subgraph WEB_LAYER["Local Web & API Layer"]
-    SERVER["@seo-partner/server\n127.0.0.1 Loopback | OpenAPI 3.1 (/api/v1 - 18 Ops)\nRFC 9457 Errors | HttpOnly Cookie | /api/v1/patches"]
-    DASHBOARD["@seo-partner/dashboard\ncomponents/ui & components/features\nPatches Feature | Code vs Crawl | FTS5 | WCAG 2.2 AA"]
+    SERVER["@seo-partner/server\n127.0.0.1 Loopback | OpenAPI 3.1 (/api/v1 - 22 Ops)\nRFC 9457 Errors | HttpOnly Cookie | /api/v1/patches | /api/v1/gsc | /api/v1/cwv"]
+    DASHBOARD["@seo-partner/dashboard\ncomponents/ui & components/features\nGSC & CWV Tabs | Patches | Code vs Crawl | FTS5 | WCAG 2.2 AA"]
   end
 
   subgraph ENGINE_LAYER["Deterministic Domain Layer"]
     ADAPTERS["@seo-partner/adapters\nNextJsAdapter (App & Pages Router)\nPhpAdapter (Laravel, Symfony, Laragon)\nStaticAdapter"]
     CRAWLER["@seo-partner/crawler\nAnti-SSRF DNS Guard (per hop)\nrobots.txt & Rate-Limiter | Dynamic Playwright (--js)"]
-    RULES["@seo-partner/rules\n40 Verified Rules | ICE Scorer | MD / HTML5 / JSON Reporter"]
+    RULES["@seo-partner/rules\n44 Verified Rules (incl. Performance) | ICE Scorer | MD / HTML5 / JSON Reporter"]
   end
 
   subgraph FOUNDATION_LAYER["Local-First Foundation"]
     CORE["@seo-partner/core\nShared Types | .gitignore Guard | Zod Config | Outbound Audit Log"]
-    STORE["@seo-partner/store\nNative SQLite v2 (WAL + FTS5)\n.seo/index.db | CrawlRun / CrawlPage"]
+    STORE["@seo-partner/store\nNative SQLite v4 (WAL + FTS5)\n.seo/index.db | GSC, CWV, and Agent Session Tables"]
   end
 
   DEV --> CLI
+  CLI --> AGENT
+  AGENT --> TOOLS
   MCP_CLIENT <-->|stdio JSON-RPC 2.0| MCP_PKG
   MCP_PKG --> TOOLS
   CLI --> TOOLS
   SERVER --> TOOLS
   SERVER --> DASHBOARD
+  TOOLS --> CONNECTORS
   TOOLS --> ADAPTERS
   TOOLS --> CRAWLER
   TOOLS --> RULES
@@ -118,7 +133,7 @@ flowchart TB
 ## 3. Quick Start Guide
 
 ```powershell
-# 0. Clone the repository and build all 10 workspace packages
+# 0. Clone the repository and build all 12 workspace packages
 git clone https://github.com/Firinze/seo-partner.git
 cd seo-partner
 pnpm install
@@ -136,35 +151,47 @@ seo-partner mcp
 # 4. Scan source files incrementally (< 5s + FTS5 index)
 seo-partner scan
 
-# 5. Run the 40 rules audit
-seo-partner audit
+# 5. Run the 44 rules audit (optionally with Core Web Vitals)
+seo-partner audit --with-cwv
 
-# 6. Generate deterministic unified patch proposals (dry-run by default)
+# 6. Synchronize Google Search Console performance metrics
+seo-partner gsc sync --site https://example.com/
+
+# 7. Fetch Core Web Vitals from CrUX and PageSpeed Insights
+seo-partner cwv fetch https://example.com/
+
+# 8. Run the autonomous ReAct agent loop with loop guards
+seo-partner agent run "Inspect indexing blockers and propose unified diffs"
+
+# 9. Generate deterministic unified patch proposals (dry-run by default)
 seo-partner patch
 
-# 7. Safely apply patches with automatic backup and git dirty protection
+# 10. Safely apply patches with automatic backup and git dirty protection
 seo-partner patch --apply
 
-# 8. Launch the Local Web Dashboard on http://127.0.0.1:4321
+# 11. Launch the Local Web Dashboard on http://127.0.0.1:4321
 seo-partner serve --port 4321 --lang fr
 ```
 
 ---
 
-## 4. Complete CLI Reference (12 Commands)
+## 4. Complete CLI Reference (15 Commands)
 
-1. **`seo-partner init`**: Creates `.seo/config.json`, `.seo/decisions.md`, secures `.gitignore`, installs skill packs, and with `--with-mcp` automatically merges stdio MCP configurations for Claude Code (`claude_desktop_config.json` / `.claude/mcp.json`), Cursor (`.cursor/mcp.json`), Windsurf (`.codeium/windsurf/mcp_config.json`), Codex (`.codex/config.toml`), Gemini Code Assist (`.gemini/mcp.json`), and Cline.
-2. **`seo-partner mcp`**: Runs the Model Context Protocol stdio server using JSON-RPC 2.0, exposing all 7 deterministic tools. Accepts `--allow-apply` to permit automated patch application.
+1. **`seo-partner init`**: Creates `.seo/config.json`, `.seo/decisions.md`, secures `.gitignore`, installs skill packs, and with `--with-mcp` automatically merges stdio MCP configurations for Claude Code, Cursor, Windsurf, Codex, Gemini Code Assist, and Cline.
+2. **`seo-partner mcp`**: Runs the Model Context Protocol stdio server using JSON-RPC 2.0, exposing all 11 deterministic tools. Accepts `--allow-apply` to permit automated patch application.
 3. **`seo-partner patch`**: Generates verifiable Git unified diffs (`.seo/patches/<batchId>.diff`) for corrigible rules (`R-TECH-01`, `R-TECH-02`, `R-TECH-03`, `R-TECH-05`, `R-TECH-14`, `R-ONPAGE-01`, `R-ONPAGE-04`). With `--apply`, checks git dirty files, creates backups in `.seo/backups/<timestamp>/`, applies diffs, and counts remaining `TODO-SEO` markers.
-4. **`seo-partner doctor`**: Runs 6 health checks in under 5 seconds (`node-version`, `seo-config`, `gitignore-security`, `ide-skill-integrity`, `watch-freshness`, `sqlite-wal`).
-5. **`seo-partner scan`**: Incremental scanner (`< 5s`), reusing unchanged files via `(mtimeMs, sizeBytes, sha256)`, purging deleted routes, and indexing routes in SQLite FTS5.
-6. **`seo-partner crawl <url>`**: Anti-SSRF HTTP crawler enforcing robots.txt, per-hop DNS validation, and rate limiting (`--allow-local` for Laragon / `127.0.0.1`).
-7. **`seo-partner audit`**: Evaluates 40 deterministic SEO rules across static scan data and crawl results.
-8. **`seo-partner backlog`**: Displays prioritized action items with indexing blockers (`F-R3`) always listed first, followed by descending ICE score.
-9. **`seo-partner report`**: Generates 5-section executive reports in Markdown, JSON, or standalone offline HTML5.
-10. **`seo-partner serve`**: Starts the local API server and interactive Web Dashboard on `127.0.0.1` with automatic port fallback (`+1..20`).
-11. **`seo-partner memory`**: Synchronizes architectural SEO decisions between `.seo/decisions.md` and SQLite.
-12. **`seo-partner uninstall`**: Safely removes IDE skill files while preserving `.seo/` data.
+4. **`seo-partner gsc <sync|inspect>`**: Connects to Google Search Console via Service Account RS256 JWT auth without heavy SDKs. Synchronizes search analytics metrics (clicks, impressions, CTR, position) or inspects URL indexing status in real time.
+5. **`seo-partner cwv fetch <url>`**: Retrieves 75th percentile Core Web Vitals (LCP, INP, CLS, FCP, TTFB) from Google CrUX with origin fallback, or runs PageSpeed Insights audits, persisting results in SQLite with 7-day TTL cache.
+6. **`seo-partner agent run <goal>`**: Executes an autonomous ReAct loop solving targeted SEO goals using `@seo-partner/tools`. Protected by cycle detection, maximum iteration budgets, and safe argument sanitizers.
+7. **`seo-partner doctor`**: Runs 6 health checks in under 5 seconds (`node-version`, `seo-config`, `gitignore-security`, `ide-skill-integrity`, `watch-freshness`, `sqlite-wal`).
+8. **`seo-partner scan`**: Incremental scanner (`< 5s`), reusing unchanged files via `(mtimeMs, sizeBytes, sha256)`, purging deleted routes, and indexing routes in SQLite FTS5.
+9. **`seo-partner crawl <url>`**: Anti-SSRF HTTP crawler enforcing robots.txt, per-hop DNS validation, and rate limiting (`--allow-local` for Laragon / `127.0.0.1`).
+10. **`seo-partner audit`**: Evaluates 44 deterministic SEO rules across static scan data, crawl results, and opt-in Core Web Vitals metrics (`--with-cwv`).
+11. **`seo-partner backlog`**: Displays prioritized action items with indexing blockers (`F-R3`) always listed first, followed by descending ICE score.
+12. **`seo-partner report`**: Generates 5-section executive reports in Markdown, JSON, or standalone offline HTML5.
+13. **`seo-partner serve`**: Starts the local API server and interactive Web Dashboard on `127.0.0.1` with automatic port fallback (`+1..20`).
+14. **`seo-partner memory`**: Synchronizes architectural SEO decisions between `.seo/decisions.md` and SQLite.
+15. **`seo-partner uninstall`**: Safely removes IDE skill files while preserving `.seo/` data.
 
 ---
 
@@ -172,7 +199,7 @@ seo-partner serve --port 4321 --lang fr
 
 The MCP server implements the standard Model Context Protocol over `stdio` using JSON-RPC 2.0 without third-party heavyweight SDKs:
 
-### Exposed Tools (7 Deterministic Tools)
+### Exposed Tools (11 Deterministic Tools)
 
 | Tool Name | Parameters | Description |
 | :--- | :--- | :--- |
@@ -183,6 +210,10 @@ The MCP server implements the standard Model Context Protocol over `stdio` using
 | `get_backlog` | `ownerRole?, targetTimeframe?` | Returns ICE prioritized actions (`ICE = (I+C+E)/3`) with indexing blockers ranked first. |
 | `run_audit` | `crawlRunId?: string` | Triggers a fresh audit evaluation over static scan data and records findings to SQLite. |
 | `propose_patch` | `findingId?, ruleId?, apply?: boolean, force?: boolean` | Generates unified diffs for corrigible rules; applies safely only when `--allow-apply` is granted. |
+| `get_gsc_performance` | `siteUrl?: string, startDate?: string, endDate?: string, limit?: number` | Queries historical search performance (clicks, impressions, CTR, position) from SQLite store. |
+| `inspect_gsc_url` | `url: string, siteUrl?: string` | Queries live or cached Google Search Console URL inspection data (verdict, coverage, indexing). |
+| `get_cwv_metrics` | `url: string, formFactor?: string` | Retrieves evaluated Core Web Vitals percentiles and status from CrUX and PageSpeed SQLite store. |
+| `run_agent_step` | `action: string, params: object` | Executes an isolated single tool step for autonomous coding agents with safety validation. |
 
 ---
 
@@ -211,21 +242,55 @@ The remediation engine repairs corrigible SEO defects using pure AST and string 
 
 ---
 
-## 7. Local REST API (`127.0.0.1`, OpenAPI 3.1, RFC 9457) & Web Dashboard
+## 7. External Connectors: Google Search Console & Core Web Vitals
+
+### 7.1 Google Search Console (`@seo-partner/connectors`)
+- **Native RS256 JWT Authentication**: Zero external Google API client dependencies. Uses standard `node:crypto` to generate signed JWTs exchangeable for OAuth tokens with read-only scope `https://www.googleapis.com/auth/webmasters.readonly`.
+- **Search Analytics**: Pulls impressions, clicks, CTR, and average position broken down by page and query date range.
+- **URL Inspection API**: Fetches real-time coverage verdicts, indexing status, mobile usability, and canonical verification.
+
+### 7.2 Core Web Vitals (`@seo-partner/connectors`)
+- **Chrome User Experience Report (CrUX)**: Retrieves field data for LCP, INP, CLS, FCP, and TTFB. Gracefully falls back to origin-level metrics if page-level data is sparse.
+- **PageSpeed Insights**: Conducts lab performance audits when field data is unavailable.
+- **SQLite 7-Day TTL Cache**: Prevents duplicate API quota consumption by caching evaluated CWV payloads for 7 days (`--refresh` bypass available).
+
+---
+
+## 8. Autonomous ReAct Agent Loop (`seo-partner agent run`)
+
+The agent engine runs a local ReAct (Thought-Action-Observation) loop solving multi-step SEO optimization goals:
+
+1. **Lightweight Native LLM Adapters**:
+   - Anthropic Claude (`/v1/messages`)
+   - OpenAI (`/v1/chat/completions`)
+   - Google Gemini (`/v1beta/models`)
+   - Local LLM inference via `--base-url` (Ollama, vLLM, LM Studio)
+2. **Loop Guard & Safety Mechanism**:
+   - **Cycle Detection**: Immediately aborts if the exact same tool call and arguments recur 3 times consecutively.
+   - **Iteration Budget**: Hard limit on loop iterations (default 10, configurable via `--max-iterations`).
+   - **Safe Parameter Sanitization**: Prevents execution of destructive tool arguments; enforces dry-run mode unless `--auto-apply` is explicitly passed.
+3. **Structured Audit Logging**:
+   - Persists all thoughts, tool calls, and observations in SQLite (`agent_run_session` and `agent_step_log`).
+   - Writes human-verifiable streaming logs to `.seo/logs/agent-<sessionId>.jsonl`.
+
+---
+
+## 9. Local REST API (`127.0.0.1`, OpenAPI 3.1, RFC 9457) & Web Dashboard
 
 - **Loopback Isolation (`127.0.0.1`)**: Never exposes endpoints to external networks or `0.0.0.0`.
 - **Security Interceptors**: Validates `Host` and `Origin` headers; requires `seo_partner_session` HttpOnly cookie or session header on all mutating POST endpoints.
-- **REST Patch Endpoints**:
-  - `GET /api/v1/patches`: Lists all recorded patch batches on disk, or returns single batch by `?batchId=...`.
-  - `POST /api/v1/patches`: Generates patch proposals in memory and writes `.seo/patches/<batchId>.diff`. Rejects direct `apply: true` via REST with `422 Unprocessable Entity` for security.
+- **REST Endpoints (`22 Operations`)**:
+  - `GET /api/v1/patches`, `POST /api/v1/patches`
+  - `GET /api/v1/gsc/performance`, `POST /api/v1/gsc/sync`, `POST /api/v1/gsc/inspect`
+  - `GET /api/v1/cwv`, `POST /api/v1/cwv/fetch`
+  - Standard routes, findings, backlog, comparator, and audit endpoints.
 - **Modular Dashboard (`@seo-partner/dashboard`)**:
-  - 7 Interactive Tabs: Overview, Routes, Findings, Backlog, Comparator, Decisions, and **Patches**.
-  - Unified diff inspection with subtle green/red highlighting.
+  - 9 Interactive Tabs: Overview, Routes, Findings, Backlog, Comparator, Decisions, Patches, **Google Search Console**, and **Core Web Vitals**.
   - Strict UI Rules: WCAG 2.2 AA compliant, zero emojis, zero glassmorphism (`backdrop-filter` forbidden), and zero lateral accent borders.
 
 ---
 
-## 8. The 40 Verified SEO Rules Catalog and ICE Methodology
+## 10. The 44 Verified SEO Rules Catalog and ICE Methodology
 
 $$\text{ICE} = \text{round}\left(\frac{\text{Impact} + \text{Confidence} + \text{Effort}}{3}, 2\right)$$
 
@@ -237,10 +302,15 @@ $$\text{ICE} = \text{round}\left(\frac{\text{Impact} + \text{Confidence} + \text
 - **Schema.org (`R-SCHEMA-01` to `R-SCHEMA-05`, 5 rules)**: JSON-LD validity, `Organization`/`WebSite`, `Article`/`BlogPosting`, `Product`, and `FAQPage`/`BreadcrumbList`.
 - **Local SEO (`R-LOCAL-01` to `R-LOCAL-04`, 4 rules)**: `LocalBusiness` address, `telephone` (NAP), international E.164 phone formatting, and opening hours / geo coordinates.
 - **GEO — International & Generative (`R-GEO-01` to `R-GEO-03`, 3 rules)**: ISO `hreflang` validity, cluster completeness, and explicit AI crawler access policies in `robots.txt`.
+- **Performance (`R-PERF-01` to `R-PERF-04`, 4 rules)**:
+  - `R-PERF-01`: Largest Contentful Paint (`LCP > 2.5s`) exceeding Google recommended threshold (Critical).
+  - `R-PERF-02`: Interaction to Next Paint (`INP > 200ms`) exceeding responsiveness threshold (High).
+  - `R-PERF-03`: Cumulative Layout Shift (`CLS > 0.1`) exceeding visual stability threshold (High).
+  - `R-PERF-04`: First Contentful Paint (`FCP > 1.8s`) or Time to First Byte (`TTFB > 800ms`) degradation (Medium).
 
 ---
 
-## 9. Multi-Framework Support: Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP/Laragon & Static
+## 11. Multi-Framework Support: Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP/Laragon & Static
 
 In strict adherence to Constitutional Principle II (`F-S5`), **no external interpreter (`python`, `php`, `node`, `eval`) is ever executed on target project files**:
 
@@ -257,31 +327,33 @@ In strict adherence to Constitutional Principle II (`F-S5`), **no external inter
 
 ---
 
-## 10. Developer Guide and Workspace Architecture
+## 12. Developer Guide and Workspace Architecture
 
 ```powershell
-pnpm run build                        # Build all 10 workspace packages
+pnpm run build                        # Build all 12 workspace packages
 pnpm exec tsc --noEmit                # Full TypeScript strict verification
 pnpm exec vitest run tests/unit       # Unit test suite
 pnpm run test:coverage                # Full coverage suite (>= 80%)
 ```
 
-### Workspace Packages (`10 Packages`)
+### Workspace Packages (`12 Packages`)
 
 - `@seo-partner/core`: Shared interfaces, configuration, gitignore guard, and audit log.
-- `@seo-partner/store`: Native SQLite database with WAL and FTS5 full-text search.
+- `@seo-partner/store`: Native SQLite database with WAL, FTS5 full-text search, and migrations v1-v4.
+- `@seo-partner/connectors`: Google Search Console (RS256 JWT) and Core Web Vitals (CrUX, PageSpeed) connectors.
+- `@seo-partner/agent`: Autonomous ReAct agent execution loop with provider adapters, cycle detection, and safety guards.
 - `@seo-partner/adapters`: Static AST and template parsers for Next.js, PHP, and Static.
 - `@seo-partner/crawler`: Per-hop anti-SSRF HTTP crawler with robots.txt parser.
-- `@seo-partner/rules`: 40 verified SEO rules engine and ICE prioritization.
-- `@seo-partner/tools`: Shared tools registry, incremental scan/audit engines, LCS unified diff, and remediation fixers.
-- `@seo-partner/mcp`: Standard JSON-RPC 2.0 stdio MCP server exposing the 7 shared tools.
+- `@seo-partner/rules`: 44 verified SEO rules engine and ICE prioritization.
+- `@seo-partner/tools`: Shared tools registry (11 tools), incremental scan/audit engines, LCS unified diff, and remediation fixers.
+- `@seo-partner/mcp`: Standard JSON-RPC 2.0 stdio MCP server exposing 11 shared tools.
 - `@seo-partner/server`: Local REST API on `127.0.0.1` (OpenAPI 3.1, RFC 9457).
-- `@seo-partner/dashboard`: WCAG 2.2 AA compliant local web dashboard SPA.
-- `@seo-partner/cli`: Complete command-line executable (`seo-partner`).
+- `@seo-partner/dashboard`: WCAG 2.2 AA compliant local web dashboard SPA with GSC and CWV tabs.
+- `@seo-partner/cli`: Complete command-line executable (`seo-partner`, 15 commands).
 
 ---
 
-## 11. Security, Git Guard, Safe Backups, and Anti-SSRF
+## 13. Security, Git Guard, Safe Backups, and Anti-SSRF
 
 - **Zero Target Code Execution (`F-S5`)**: Static AST and template parsing only; never invokes external interpreters on scanned files.
 - **Deterministic Fixers Only**: No generative LLM code generation for repairs; editorial text uses `TODO-SEO` placeholders for human review.
@@ -292,25 +364,28 @@ pnpm run test:coverage                # Full coverage suite (>= 80%)
 
 ---
 
-## 12. Troubleshooting Guide and FAQ
+## 14. Troubleshooting Guide and FAQ
 
 - **How do I connect Claude Code or Cursor to seo-partner via MCP?**:
   Run `seo-partner init --with-mcp`. The command merges the `seo-partner` stdio server entry into your IDE configuration without overwriting existing servers.
 - **Why are patch applications rejected via REST API?**:
   Applying file modifications directly via HTTP is strictly forbidden for security. Patches must be reviewed and applied using the CLI (`seo-partner patch --apply`) or via MCP with explicit `--allow-apply`.
+- **How does Google Search Console authentication work without Google SDKs?**:
+  `seo-partner` uses native Node.js `crypto` with RS256 signing on your Service Account JSON key (`.seo/credentials.json`), requesting scoped OAuth access tokens without heavyweight external dependencies.
 - **What happens if a file has uncommitted git changes?**:
   `seo-partner patch --apply` will reject the operation with `git-dirty`. Commit or stash your changes first, or pass `--force` if you intentionally wish to proceed.
 
 ---
 
-## 13. Roadmap (`v0.1` to `v1.0`) and Documentation Governance
+## 15. Roadmap (`v0.1` to `v1.0`) and Documentation Governance
 
 - **`v0.1` (Delivered)**: Bilingual Skill Pack (`11/11` EN/FR), 8 CLI commands, 5 IDE installers, Next.js and Static AST Scanner, native SQLite WAL, 15 Must rules, ICE scorer, and 5-part reports.
 - **`v0.2` (Delivered)**: Incremental Scan (`< 5s`) + SQLite FTS5 search, Anti-SSRF HTTP Crawler, PhpAdapter (Laravel, Symfony, Laragon), 40 Verified SEO Rules, and standalone HTML5 reports.
 - **`v0.3` (Delivered)**: Local API Server on `127.0.0.1` (port auto-fallback, OpenAPI 3.1, RFC 9457, HttpOnly cookie) and Modular WCAG 2.2 AA Web Dashboard.
 - **`v0.4` (Delivered)**: Standard stdio MCP Server (`@seo-partner/mcp`, 7 tools), Deterministic Remediation Engine (`seo-partner patch`, LCS unified diffs, safe `--apply`, backups, git dirty guard), Multi-IDE MCP config merge, and Dashboard Patches tab.
 - **`v0.5` (Delivered)**: Astro, Nuxt 3, SvelteKit, Remix (with React Router v7), and Django adapters (Zero target code execution F-S5, hierarchical layout inheritance, deterministic patch support).
-- **`v0.6`–`v1.0` (Planned)**: Autonomous agent loop, opt-in GSC/CWV connectors, and standalone OS binaries.
+- **`v0.6` (Delivered)**: Google Search Console (GSC) connector, Core Web Vitals (CrUX/PageSpeed) connector, Performance rules (`R-PERF-01..04`), Autonomous ReAct agent loop with cycle guards, 11 MCP tools, 15 CLI commands.
+- **`v0.7`–`v1.0` (Planned)**: Standalone OS binaries, real-time file watcher daemon, and automated Git pull request bot.
 
 ---
 

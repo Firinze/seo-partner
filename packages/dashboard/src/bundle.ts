@@ -1,9 +1,12 @@
 import type {
   CodeVsCrawlComparisonRow,
+  CwvMetricRecord,
   DashboardOverview,
   DecisionRecord,
   ExtractedRouteData,
   Finding,
+  GscInspectionRecord,
+  GscPerformanceRecord,
   PatchBatchResult,
   PrioritizedAction,
   SupportedLanguage,
@@ -17,6 +20,8 @@ import { renderBacklogFeature } from './components/features/backlog-feature.js';
 import { renderCrawlComparatorFeature } from './components/features/crawl-comparator-feature.js';
 import { renderDecisionsReportsFeature } from './components/features/decisions-reports-feature.js';
 import { renderPatchesFeature } from './components/features/patches-feature.js';
+import { renderGscFeature } from './components/features/gsc-feature.js';
+import { renderCwvFeature } from './components/features/cwv-feature.js';
 
 export interface DashboardInitialState {
   readonly lang: SupportedLanguage;
@@ -27,6 +32,9 @@ export interface DashboardInitialState {
   readonly comparisonRows: ReadonlyArray<CodeVsCrawlComparisonRow>;
   readonly decisions: ReadonlyArray<DecisionRecord>;
   readonly patches?: ReadonlyArray<PatchBatchResult>;
+  readonly gscPerformance?: ReadonlyArray<GscPerformanceRecord>;
+  readonly gscInspection?: ReadonlyArray<GscInspectionRecord>;
+  readonly cwvMetrics?: ReadonlyArray<CwvMetricRecord>;
 }
 
 export function renderDashboardCss(): string {
@@ -731,6 +739,8 @@ export function renderDashboardSpaHtml(state: DashboardInitialState): string {
     { id: 'tab-btn-crawl', label: dict.tabCrawl, panelId: 'panel-crawl' },
     { id: 'tab-btn-decisions', label: dict.tabDecisions, panelId: 'panel-decisions' },
     { id: 'tab-btn-patches', label: dict.tabPatches, panelId: 'panel-patches' },
+    { id: 'tab-btn-gsc', label: 'GSC', panelId: 'panel-gsc' },
+    { id: 'tab-btn-cwv', label: 'CWV', panelId: 'panel-cwv' },
   ]);
 
   const langSwitcherHtml = renderSelectFilter({
@@ -757,13 +767,22 @@ export function renderDashboardSpaHtml(state: DashboardInitialState): string {
     lang: state.lang,
     patches: state.patches,
   });
+  const gscPanel = renderGscFeature({
+    lang: state.lang,
+    performanceRecords: state.gscPerformance,
+    inspectionRecords: state.gscInspection,
+  });
+  const cwvPanel = renderCwvFeature({
+    lang: state.lang,
+    metrics: state.cwvMetrics,
+  });
 
   return `<!DOCTYPE html>
 <html lang="${escapeHtml(state.lang)}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SEO PARTNER v0.4 — Local Dashboard (${escapeHtml(state.overview.project?.name ?? 'seo-project')})</title>
+  <title>SEO PARTNER v0.6 — Local Dashboard (${escapeHtml(state.overview.project?.name ?? 'seo-project')})</title>
   <style>${renderDashboardCss()}</style>
 </head>
 <body>
@@ -799,6 +818,12 @@ export function renderDashboardSpaHtml(state: DashboardInitialState): string {
       </div>
       <div id="panel-patches" role="tabpanel" aria-labelledby="tab-btn-patches" class="tab-panel" hidden>
         ${patchesPanel}
+      </div>
+      <div id="panel-gsc" role="tabpanel" aria-labelledby="tab-btn-gsc" class="tab-panel" hidden>
+        ${gscPanel}
+      </div>
+      <div id="panel-cwv" role="tabpanel" aria-labelledby="tab-btn-cwv" class="tab-panel" hidden>
+        ${cwvPanel}
       </div>
     </main>
   </div>

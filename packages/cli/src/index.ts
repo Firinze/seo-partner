@@ -20,6 +20,9 @@ import { runMemoryAddCommand, runMemoryListCommand } from './commands/memory.js'
 import { runServeCommand } from './commands/serve.js';
 import { runMcpCommand } from './commands/mcp.js';
 import { runPatchCommand } from './commands/patch.js';
+import { runGscCommand } from './commands/gsc.js';
+import { runCwvCommand } from './commands/cwv.js';
+import { runAgentCommand } from './commands/agent.js';
 
 export * from './ide-installers/index.js';
 export * from './commands/init.js';
@@ -34,6 +37,9 @@ export * from './commands/memory.js';
 export * from './commands/serve.js';
 export * from './commands/mcp.js';
 export * from './commands/patch.js';
+export * from './commands/gsc.js';
+export * from './commands/cwv.js';
+export * from './commands/agent.js';
 
 export function wrapCliEnvelope<T>(data: T): CliEnvelope<T> {
   return {
@@ -98,6 +104,22 @@ export async function executeCli(
       'no-open': { type: 'boolean' },
       json: { type: 'boolean' },
       offline: { type: 'boolean' },
+      site: { type: 'string' },
+      url: { type: 'string' },
+      days: { type: 'string' },
+      credentials: { type: 'string' },
+      'start-date': { type: 'string' },
+      'end-date': { type: 'string' },
+      'with-cwv': { type: 'boolean' },
+      refresh: { type: 'boolean' },
+      'form-factor': { type: 'string' },
+      'api-key': { type: 'string' },
+      goal: { type: 'string' },
+      provider: { type: 'string' },
+      model: { type: 'string' },
+      'base-url': { type: 'string' },
+      'max-iterations': { type: 'string' },
+      'auto-apply': { type: 'boolean' },
       help: { type: 'boolean', short: 'h' },
     },
   });
@@ -113,16 +135,20 @@ export async function executeCli(
   try {
     if (command === 'help' || parsed.values['help']) {
       const helpText = [
-        'seo-partner v0.5.0 — Deterministic Local SEO Partner',
+        'seo-partner v0.6.0 — Deterministic Local SEO Partner',
         '',
         'Commands:',
         '  seo-partner init [--here] [--ide agy|claude|cursor|gemini|codex] [--with-mcp] [--lang en|fr] [--ignore-agent-tools] [--dry-run]',
         '  seo-partner doctor [--json]',
         '  seo-partner scan [--scope <dir>] [--rebuild] [--max-size <kb>] [--json]',
         '  seo-partner crawl <url> [--allow-local] [--max-pages <n>] [--max-depth <n>] [--concurrency <n>] [--rate-limit-ms <ms>] [--js] [--resume <runId>] [--offline] [--json]',
-        '  seo-partner audit [--category technical|on-page|schema|local|geo] [--severity critical|high|medium|low] [--crawl-run <id>] [--json]',
+        '  seo-partner audit [--category technical|on-page|schema|local|geo|performance] [--severity critical|high|medium|low] [--crawl-run <id>] [--with-cwv] [--json]',
         '  seo-partner backlog [--quick-wins] [--json]',
         '  seo-partner patch [--finding <id>] [--rule <ruleId>] [--apply] [--force] [--lang fr|en] [--json]',
+        '  seo-partner gsc sync --site <url> [--days <n>] [--credentials <path>] [--json]',
+        '  seo-partner gsc inspect --url <url> [--site <url>] [--credentials <path>] [--json]',
+        '  seo-partner cwv fetch --url <url> [--form-factor PHONE|DESKTOP|ALL] [--refresh] [--offline] [--json]',
+        '  seo-partner agent run --goal "..." [--provider anthropic|openai|gemini|custom] [--model <name>] [--base-url <url>] [--max-iterations <n>] [--auto-apply] [--json]',
         '  seo-partner report [--type audit-complet|audit-technique|backlog] [--format md|html|json] [--output <path>] [--json]',
         '  seo-partner serve [--port <number>] [--lang fr|en] [--no-open] [--json]',
         '  seo-partner memory list | add --title "..." --rationale "..." [--finding <id>] [--json]',
@@ -275,6 +301,7 @@ export async function executeCli(
           typeof parsed.values['crawl-run'] === 'string'
             ? parsed.values['crawl-run']
             : undefined,
+        withCwv: Boolean(parsed.values['with-cwv']),
       });
       const text = `Audit complete: ${res.totalFindings} finding(s) (${res.blockingIndexingCount} blocking indexing).`;
       return {
@@ -420,6 +447,126 @@ export async function executeCli(
           ? JSON.stringify(wrapCliEnvelope(res), null, 2)
           : res.decisions.map((d) => `[${d.date}] ${d.title}: ${d.rationale}`).join('\n') ||
             'No decisions recorded.',
+        stderr: '',
+      };
+    }
+
+    if (command === 'gsc') {
+      if (subcommand !== 'sync' && subcommand !== 'inspect') {
+        throw new Error("Missing or invalid subcommand for 'gsc'. Usage: seo-partner gsc <sync|inspect> [options]");
+      }
+
+      const daysVal =
+        typeof parsed.values['days'] === 'string'
+          ? Number(parsed.values['days'])
+          : undefined;
+
+      const res = await runGscCommand({
+        projectRoot,
+        subcommand,
+        siteUrl: typeof parsed.values['site'] === 'string' ? parsed.values['site'] : undefined,
+        url: typeof parsed.values['url'] === 'string' ? parsed.values['url'] : undefined,
+        days: daysVal,
+        credentialsPath:
+          typeof parsed.values['credentials'] === 'string'
+            ? parsed.values['credentials']
+            : undefined,
+        startDate:
+          typeof parsed.values['start-date'] === 'string'
+            ? parsed.values['start-date']
+            : undefined,
+        endDate:
+          typeof parsed.values['end-date'] === 'string'
+            ? parsed.values['end-date']
+            : undefined,
+      });
+
+      let text = '';
+      if (res.kind === 'sync') {
+        text = `GSC sync completed: ${res.result.recordsCount} record(s) synced for ${res.result.siteUrl}.`;
+      } else {
+        const r = res.result.record;
+        text = `GSC inspection completed for ${r?.url}: verdict=${r?.verdict}, coverage=${r?.coverageState}.`;
+      }
+
+      return {
+        exitCode: 0,
+        stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(res.kind === 'sync' ? res.result : res.result.record), null, 2) : text,
+        stderr: '',
+      };
+    }
+
+    if (command === 'cwv') {
+      if (subcommand !== 'fetch') {
+        throw new Error("Missing or invalid subcommand for 'cwv'. Usage: seo-partner cwv fetch --url <url> [options]");
+      }
+
+      const formFactorArg =
+        parsed.values['form-factor'] === 'PHONE' ||
+        parsed.values['form-factor'] === 'DESKTOP' ||
+        parsed.values['form-factor'] === 'ALL'
+          ? (parsed.values['form-factor'] as 'PHONE' | 'DESKTOP' | 'ALL')
+          : undefined;
+
+      const res = await runCwvCommand({
+        projectRoot,
+        url: typeof parsed.values['url'] === 'string' ? parsed.values['url'] : undefined,
+        formFactor: formFactorArg,
+        refresh: Boolean(parsed.values['refresh']),
+        offline: Boolean(parsed.values['offline']),
+        apiKey: typeof parsed.values['api-key'] === 'string' ? parsed.values['api-key'] : undefined,
+      });
+
+      const text = `CWV fetch completed: ${res.records.length} metric record(s) for ${res.url} (cached: ${res.cached}).`;
+
+      return {
+        exitCode: 0,
+        stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(res), null, 2) : text,
+        stderr: '',
+      };
+    }
+
+    if (command === 'agent') {
+      const maxIterVal =
+        typeof parsed.values['max-iterations'] === 'string'
+          ? Number(parsed.values['max-iterations'])
+          : undefined;
+
+      const langArg =
+        parsed.values['lang'] === 'en' || parsed.values['lang'] === 'fr'
+          ? parsed.values['lang']
+          : undefined;
+
+      const providerArg =
+        parsed.values['provider'] === 'anthropic' ||
+        parsed.values['provider'] === 'openai' ||
+        parsed.values['provider'] === 'gemini' ||
+        parsed.values['provider'] === 'custom'
+          ? parsed.values['provider']
+          : undefined;
+
+      const res = await runAgentCommand({
+        projectRoot,
+        subcommand: subcommand ?? 'run',
+        goal: typeof parsed.values['goal'] === 'string' ? parsed.values['goal'] : undefined,
+        provider: providerArg,
+        model: typeof parsed.values['model'] === 'string' ? parsed.values['model'] : undefined,
+        apiKey: typeof parsed.values['api-key'] === 'string' ? parsed.values['api-key'] : undefined,
+        baseUrl: typeof parsed.values['base-url'] === 'string' ? parsed.values['base-url'] : undefined,
+        maxIterations: maxIterVal,
+        autoApply: Boolean(parsed.values['auto-apply']),
+        lang: langArg,
+      });
+
+      const text = [
+        `Agent session ${res.session.id} (${res.session.status}): ${res.session.iterationsCompleted}/${res.session.maxIterations} iterations completed.`,
+        `Patches generated: ${res.session.patchesGenerated}, applied: ${res.session.patchesApplied}.`,
+        `Summary: ${res.summary}`,
+      ].join('\n');
+
+      return {
+        exitCode: 0,
+        stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(res), null, 2) : text,
         stderr: '',
       };
     }

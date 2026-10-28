@@ -12,6 +12,8 @@ export * from './engine/audit.js';
 export * from './engine/comparator.js';
 export * from './engine/decisions.js';
 export * from './engine/ensure-index.js';
+export * from './engine/gsc-sync.js';
+export * from './engine/cwv-fetch.js';
 
 export * from './patch/unified-diff.js';
 export * from './patch/safety.js';

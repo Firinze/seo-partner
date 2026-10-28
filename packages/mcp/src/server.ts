@@ -1,7 +1,8 @@
 import readline from 'node:readline';
 import type { Readable, Writable } from 'node:stream';
-import type { SupportedLanguage, ToolContext } from '@seo-partner/core';
-import { getTool, listTools, type ToolDefinition } from '@seo-partner/tools';
+import type { SupportedLanguage, ToolContext, ToolResult } from '@seo-partner/core';
+import { getTool, listTools, registerTool, type ToolDefinition, type ToolValidationResult } from '@seo-partner/tools';
+import { AutonomousAgent } from '@seo-partner/agent';
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -188,10 +189,10 @@ export class McpServer {
       },
       serverInfo: {
         name: 'seo-partner',
-        version: '0.4.0',
+        version: '0.6.0',
       },
       instructions:
-        'Deterministic local SEO scanner, crawler comparison, backlog priorisation, and propose-patch remediation engine.',
+        'Deterministic local SEO scanner, crawler comparison, backlog priorisation, GSC/CWV connectors, and autonomous agent remediation engine.',
     });
   }
 
@@ -332,3 +333,72 @@ export function runStdioServer(
     });
   });
 }
+
+// ---------------------------------------------------------------------------
+// Autonomous Agent MCP Tool
+// ---------------------------------------------------------------------------
+
+export interface RunAgentStepArgs {
+  readonly goal: string;
+  readonly maxIterations?: number;
+  readonly autoApply?: boolean;
+}
+
+export const runAgentStepTool: ToolDefinition<RunAgentStepArgs> = {
+  name: 'run_agent_step',
+  title: {
+    en: 'Run Autonomous Agent Step',
+    fr: 'Exécuter une étape d agent autonome',
+  },
+  description: {
+    en: 'Run one or more steps of the autonomous SEO agent loop to achieve a specific goal.',
+    fr: 'Exécuter une ou plusieurs étapes de la boucle d agent autonome SEO pour accomplir un objectif.',
+  },
+  inputSchema: {
+    type: 'object',
+    properties: {
+      goal: { type: 'string', description: 'The SEO objective or task to accomplish' },
+      maxIterations: { type: 'number', description: 'Maximum iterations for this run (default 1)' },
+      autoApply: { type: 'boolean', description: 'Whether to allow auto-applying safe patches' },
+    },
+    required: ['goal'],
+    additionalProperties: false,
+  },
+  mutatesState: true,
+  validateArgs(args: unknown): ToolValidationResult<RunAgentStepArgs> {
+    if (!args || typeof args !== 'object') {
+      return { ok: false, error: 'Arguments must be an object' };
+    }
+    const a = args as Record<string, unknown>;
+    if (typeof a['goal'] !== 'string' || !a['goal'].trim()) {
+      return { ok: false, error: 'goal must be a non-empty string' };
+    }
+    return {
+      ok: true,
+      data: {
+        goal: String(a['goal']).trim(),
+        maxIterations: typeof a['maxIterations'] === 'number' ? a['maxIterations'] : undefined,
+        autoApply: Boolean(a['autoApply']),
+      },
+    };
+  },
+  async execute(ctx: ToolContext, args: RunAgentStepArgs): Promise<ToolResult> {
+    const agent = new AutonomousAgent();
+    const result = await agent.run({
+      projectRoot: ctx.projectRoot,
+      goal: args.goal,
+      maxIterations: args.maxIterations ?? 1,
+      autoApply: args.autoApply && ctx.allowApply,
+      lang: ctx.lang,
+    });
+    return {
+      ok: result.session.status === 'completed',
+      data: result,
+      summary: result.summary,
+      initialScanPerformed: false,
+    };
+  },
+};
+
+registerTool(runAgentStepTool);
+

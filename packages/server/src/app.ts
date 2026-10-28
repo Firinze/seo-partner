@@ -25,6 +25,8 @@ import {
   FindingRepository,
   ProjectRepository,
   RouteRepository,
+  GscRepository,
+  CwvRepository,
   SeoDatabase,
 } from '@seo-partner/store';
 import {
@@ -47,6 +49,9 @@ import {
   listPatchBatches,
   proposePatches,
   PatchesRequestSchema,
+  runGscSyncCommand,
+  runGscInspectCommand,
+  runCwvFetchCommand,
 } from '@seo-partner/tools';
 import {
   buildCorsHeaders,
@@ -156,6 +161,7 @@ export function createLocalApiApp(options: LocalApiAppOptions): LocalApiApp {
       schema: 0,
       local: 0,
       geo: 0,
+      performance: 0,
     };
     let blockingIndexingCount = 0;
 
@@ -972,6 +978,181 @@ export function createLocalApiApp(options: LocalApiAppOptions): LocalApiApp {
           ruleId: parsedBody.data.ruleId,
           lang: defaultLang,
         });
+
+        return jsonResponse(200, buildSuccessEnvelope(result), originHeader);
+      }
+
+      if (method === 'GET' && (pathname === '/api/v1/gsc' || pathname === '/api/v1/gsc/performance')) {
+        const store = SeoDatabase.open(projectRoot);
+        try {
+          const project = new ProjectRepository(store).getLatestProject();
+          if (!project) {
+            return jsonResponse(200, buildSuccessEnvelope({ siteUrl: null, recordsCount: 0, records: [] }), originHeader);
+          }
+          const gscRepo = new GscRepository(store);
+          const targetUrl = url.searchParams.get('url');
+          const records = targetUrl
+            ? gscRepo.getPerformanceByUrl(project.id, targetUrl)
+            : gscRepo.listTopQueries(project.id);
+          return jsonResponse(
+            200,
+            buildSuccessEnvelope({
+              recordsCount: records.length,
+              records,
+            }),
+            originHeader,
+          );
+        } finally {
+          store.close();
+        }
+      }
+
+      if (method === 'POST' && pathname === '/api/v1/gsc/sync') {
+        const rawBody = (await req.json().catch(() => ({}))) as any;
+        const siteUrl = rawBody?.siteUrl;
+        if (!siteUrl || typeof siteUrl !== 'string') {
+          return jsonResponse(
+            422,
+            buildErrorEnvelope({
+              typeSlug: 'validation-error',
+              title: 'Invalid GSC Sync Request',
+              status: 422,
+              detail: 'siteUrl is required',
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+
+        const result = await runGscSyncCommand({
+          projectRoot,
+          siteUrl,
+          days: typeof rawBody.days === 'number' ? rawBody.days : undefined,
+          credentialsPath: typeof rawBody.credentialsPath === 'string' ? rawBody.credentialsPath : undefined,
+        });
+
+        if (!result.success) {
+          return jsonResponse(
+            500,
+            buildErrorEnvelope({
+              typeSlug: 'gsc-sync-failed',
+              title: 'GSC Sync Failed',
+              status: 500,
+              detail: result.error ?? 'GSC sync failed',
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+
+        return jsonResponse(200, buildSuccessEnvelope(result), originHeader);
+      }
+
+      if (method === 'POST' && pathname === '/api/v1/gsc/inspect') {
+        const rawBody = (await req.json().catch(() => ({}))) as any;
+        const targetUrl = rawBody?.url;
+        const siteUrl = rawBody?.siteUrl ?? targetUrl;
+        if (!targetUrl || typeof targetUrl !== 'string') {
+          return jsonResponse(
+            422,
+            buildErrorEnvelope({
+              typeSlug: 'validation-error',
+              title: 'Invalid GSC Inspection Request',
+              status: 422,
+              detail: 'url is required',
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+
+        const result = await runGscInspectCommand({
+          projectRoot,
+          siteUrl,
+          url: targetUrl,
+          credentialsPath: typeof rawBody.credentialsPath === 'string' ? rawBody.credentialsPath : undefined,
+        });
+
+        if (!result.success || !result.record) {
+          return jsonResponse(
+            500,
+            buildErrorEnvelope({
+              typeSlug: 'gsc-inspect-failed',
+              title: 'GSC Inspection Failed',
+              status: 500,
+              detail: result.error ?? 'GSC inspection failed',
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+
+        return jsonResponse(200, buildSuccessEnvelope(result.record), originHeader);
+      }
+
+      if (method === 'GET' && pathname === '/api/v1/cwv') {
+        const store = SeoDatabase.open(projectRoot);
+        try {
+          const project = new ProjectRepository(store).getLatestProject();
+          if (!project) {
+            return jsonResponse(200, buildSuccessEnvelope({ metricsCount: 0, metrics: [] }), originHeader);
+          }
+          const cwvRepo = new CwvRepository(store);
+          const targetUrl = url.searchParams.get('url');
+          const records = targetUrl
+            ? [cwvRepo.getMetricsForUrl(project.id, targetUrl)].filter(Boolean)
+            : cwvRepo.listAllMetrics(project.id);
+          return jsonResponse(
+            200,
+            buildSuccessEnvelope({
+              metricsCount: records.length,
+              metrics: records,
+            }),
+            originHeader,
+          );
+        } finally {
+          store.close();
+        }
+      }
+
+      if (method === 'POST' && pathname === '/api/v1/cwv/fetch') {
+        const rawBody = (await req.json().catch(() => ({}))) as any;
+        const targetUrl = rawBody?.url;
+        if (!targetUrl || typeof targetUrl !== 'string') {
+          return jsonResponse(
+            422,
+            buildErrorEnvelope({
+              typeSlug: 'validation-error',
+              title: 'Invalid CWV Fetch Request',
+              status: 422,
+              detail: 'url is required',
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+
+        const result = await runCwvFetchCommand({
+          projectRoot,
+          url: targetUrl,
+          formFactor: rawBody.formFactor,
+          refresh: Boolean(rawBody.refresh),
+          apiKey: typeof rawBody.apiKey === 'string' ? rawBody.apiKey : undefined,
+        });
+
+        if (!result.success) {
+          return jsonResponse(
+            500,
+            buildErrorEnvelope({
+              typeSlug: 'cwv-fetch-failed',
+              title: 'CWV Fetch Failed',
+              status: 500,
+              detail: result.error ?? 'CWV fetch failed',
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
 
         return jsonResponse(200, buildSuccessEnvelope(result), originHeader);
       }

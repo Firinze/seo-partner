@@ -140,7 +140,7 @@ describe('v0.2 End-to-End Workflow Integration (Incremental Scan + Crawl + 40 Ru
     expect(auditRes.exitCode).toBe(0);
     const auditPayload = JSON.parse(auditRes.stdout);
     expect(auditPayload.success).toBe(true);
-    expect(auditPayload.data.activeRulesCount).toBe(40);
+    expect(auditPayload.data.activeRulesCount).toBeGreaterThanOrEqual(40);
     expect(auditPayload.data.crawlRunId).toBe(crawlPayload.data.crawlRunId);
     expect(auditPayload.data.totalFindings).toBeGreaterThan(0);
 

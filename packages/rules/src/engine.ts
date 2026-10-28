@@ -23,6 +23,10 @@ import {
   evaluateGeoRules,
   GEO_RULES,
 } from './catalog/geo-rules.js';
+import {
+  evaluatePerfRules,
+  PERF_RULES,
+} from './catalog/perf-rules.js';
 import { sortFindingsByPriority } from './ice-scorer.js';
 
 export const ALL_V01_RULES: ReadonlyArray<RuleDefinition> = [
@@ -39,7 +43,12 @@ export const ALL_V02_RULES: ReadonlyArray<RuleDefinition> = [
   ...GEO_RULES,
 ];
 
-export const ALL_RULES: ReadonlyArray<RuleDefinition> = ALL_V02_RULES;
+export const ALL_V06_RULES: ReadonlyArray<RuleDefinition> = [
+  ...ALL_V02_RULES,
+  ...PERF_RULES,
+];
+
+export const ALL_RULES: ReadonlyArray<RuleDefinition> = ALL_V06_RULES;
 
 export function runRulesEngine(ctx: AuditContext): ReadonlyArray<Finding> {
   const findings: Finding[] = [
@@ -48,6 +57,7 @@ export function runRulesEngine(ctx: AuditContext): ReadonlyArray<Finding> {
     ...evaluateSchemaRules(ctx.routes),
     ...evaluateLocalRules(ctx.routes),
     ...evaluateGeoRules(ctx),
+    ...evaluatePerfRules(ctx.cwvMetrics),
   ];
 
   return sortFindingsByPriority(findings);
