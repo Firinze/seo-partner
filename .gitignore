@@ -1,0 +1,38 @@
+# Agent & Spec Kit directories (may contain credentials, tokens, or private artifacts)
+.agents/
+.qodo/
+
+# seo-partner local state & reconstructible index
+.seo/index.db
+.seo/index.db-shm
+.seo/index.db-wal
+.seo/logs/
+.seo/cache/
+
+# Dependencies & build outputs
+node_modules/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Testing & coverage
+coverage/
+playwright-report/
+test-results/
+
+# OS & IDE files
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.log
+
