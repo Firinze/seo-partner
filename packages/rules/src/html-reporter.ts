@@ -184,7 +184,7 @@ export function generateHtmlReportContent(options: GenerateReportOptions): strin
     }
     .crawl-box {
       background-color: var(--bg-primary);
-      border-left: 4px solid var(--accent-emerald);
+      border: 1px solid var(--border-emerald);
       padding: 12px 16px;
       margin-top: 12px;
       font-size: 14px;

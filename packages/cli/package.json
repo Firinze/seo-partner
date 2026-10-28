@@ -22,7 +22,9 @@
     "@seo-partner/store": "workspace:*",
     "@seo-partner/adapters": "workspace:*",
     "@seo-partner/crawler": "workspace:*",
-    "@seo-partner/rules": "workspace:*"
+    "@seo-partner/rules": "workspace:*",
+    "@seo-partner/dashboard": "workspace:*",
+    "@seo-partner/server": "workspace:*"
   }
 }
 

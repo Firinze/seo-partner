@@ -4,15 +4,16 @@
 
 <br />
 
-[![Version](https://img.shields.io/badge/version-0.2.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
+[![Version](https://img.shields.io/badge/version-0.3.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-059669?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7_Strict-047857?style=for-the-badge&logo=typescript&logoColor=white)](./tsconfig.base.json)
 [![SQLite WAL + FTS5](https://img.shields.io/badge/SQLite-WAL_%2B_FTS5-34d399?style=for-the-badge&logo=sqlite&logoColor=022c22)](./packages/store/src/db.ts)
+[![OpenAPI 3.1 + RFC 9457](https://img.shields.io/badge/OpenAPI_3.1-RFC_9457-059669?style=for-the-badge&logoColor=white)](./packages/server/src/openapi.ts)
 [![Rules](https://img.shields.io/badge/SEO_Rules-40_Verified-10b981?style=for-the-badge&logoColor=white)](./packages/rules/src/engine.ts)
 [![License](https://img.shields.io/badge/License-MIT-065f46?style=for-the-badge)](./LICENSE)
 
 <p align="center">
-  <strong>Scanner SEO incrémental (<code>&lt; 5 s</code>), Crawler HTTP anti-SSRF, Adapters Next.js &amp; PHP (Laravel, Symfony, Laragon), moteur de 40 règles déterministes avec priorisation ICE, rapports HTML5 autonomes et pack méthodologique bilingue multi-IDE.</strong><br />
+  <strong>Scanner SEO incrémental (<code>&lt; 5 s</code>), Crawler HTTP anti-SSRF, Adapters Next.js &amp; PHP (Laravel, Symfony, Laragon), moteur de 40 règles déterministes avec priorisation ICE, Serveur API local <code>127.0.0.1</code> (OpenAPI 3.1 + RFC 9457) et Dashboard Web WCAG 2.2 AA.</strong><br />
   <em>Conçu pour Antigravity (<code>agy</code>), Claude Code, Cursor, Gemini CLI et Codex — sans exécution de code (<code>F-S5</code>) et sans piège d'installation.</em>
 </p>
 
@@ -26,29 +27,31 @@
 
 ## Table des Matières
 
-1. [Vision et Proposition de Valeur (`v0.2`)](#1-vision-et-proposition-de-valeur-v02)
+1. [Vision et Proposition de Valeur (`v0.3`)](#1-vision-et-proposition-de-valeur-v03)
 2. [Architecture Système, Flux de Données et Schéma ERD (`SQLite v2`)](#2-architecture-système-flux-de-données-et-schéma-erd-sqlite-v2)
 3. [Démarrage Rapide (Getting Started)](#3-démarrage-rapide-getting-started)
-4. [Référence Complète de la CLI (9 Commandes)](#4-référence-complète-de-la-cli-9-commandes)
-5. [Catalogue des 40 Règles SEO Vérifiées et Méthodologie ICE](#5-catalogue-des-40-règles-seo-vérifiées-et-méthodologie-ice)
-6. [Support Multi-Frameworks : Next.js, Laravel, Symfony, PHP/Laragon et Statique](#6-support-multi-frameworks--nextjs-laravel-symfony-phplaragon-et-statique)
-7. [Skill Pack Bilingue (`11/11` Références) et Intégration Multi-IDE](#7-skill-pack-bilingue-1111-références-et-intégration-multi-ide)
-8. [Guide Développeur et Référence SDK TypeScript](#8-guide-développeur-et-référence-sdk-typescript)
-9. [Sécurité, Anti-SSRF, Confidentialité et Garde-Fous `.gitignore`](#9-sécurité-anti-ssrf-confidentialité-et-garde-fous-gitignore)
-10. [Guide de Dépannage (Troubleshooting) et FAQ](#10-guide-de-dépannage-troubleshooting-et-faq)
-11. [Feuille de Route (`v0.1` à `v1.0`) et Gouvernance Documentaire](#11-feuille-de-route-v01-à-v10-et-gouvernance-documentaire)
+4. [Référence Complète de la CLI (10 Commandes)](#4-référence-complète-de-la-cli-10-commandes)
+5. [Serveur API Local (`127.0.0.1`, OpenAPI 3.1, RFC 9457) & Dashboard Web (`v0.3`)](#5-serveur-api-local-127001-openapi-31-rfc-9457--dashboard-web-v03)
+6. [Catalogue des 40 Règles SEO Vérifiées et Méthodologie ICE](#6-catalogue-des-40-règles-seo-vérifiées-et-méthodologie-ice)
+7. [Support Multi-Frameworks : Next.js, Laravel, Symfony, PHP/Laragon et Statique](#7-support-multi-frameworks--nextjs-laravel-symfony-phplaragon-et-statique)
+8. [Skill Pack Bilingue (`11/11` Références) et Intégration Multi-IDE](#8-skill-pack-bilingue-1111-références-et-intégration-multi-ide)
+9. [Guide Développeur et Référence SDK TypeScript (8 Packages)](#9-guide-développeur-et-référence-sdk-typescript-8-packages)
+10. [Sécurité, Anti-SSRF, Session `HttpOnly` et Garde-Fous `.gitignore`](#10-sécurité-anti-ssrf-session-httponly-et-garde-fous-gitignore)
+11. [Guide de Dépannage (Troubleshooting) et FAQ](#11-guide-de-dépannage-troubleshooting-et-faq)
+12. [Feuille de Route (`v0.1` à `v1.0`) et Gouvernance Documentaire](#12-feuille-de-route-v01-à-v10-et-gouvernance-documentaire)
 
 ---
 
-## 1. Vision et Proposition de Valeur (`v0.2`)
+## 1. Vision et Proposition de Valeur (`v0.3`)
 
-`seo-partner` sépare strictement **ce qui doit être exact à 100 %** (exécuté par un moteur déterministe local en TypeScript et SQLite WAL + `FTS5`) de **ce qui relève du conseil éditorial et stratégique** (guidé par le pack méthodologique de 11 références dans votre IDE) :
+`seo-partner` sépare strictement **ce qui doit être exact à 100 %** (exécuté par un moteur déterministe local en TypeScript, SQLite WAL + `FTS5`, et une API REST locale `127.0.0.1`) de **ce qui relève du conseil éditorial et stratégique** (guidé par le pack méthodologique de 11 références dans votre IDE) :
 
-| Capacité | Prompt / Skill classique | Crawler Cloud SaaS | **`seo-partner` (`v0.2`)** |
+| Capacité | Prompt / Skill classique | Crawler Cloud SaaS | **`seo-partner` (`v0.3`)** |
 | :--- | :--- | :--- | :--- |
 | **Découverte des routes (Next.js, Laravel, Symfony, PHP/Laragon)** | Non (limité par le contexte) | Partiel (URLs publiées uniquement) | **Oui — 100 % déterministe (AST & parseurs statiques)** |
 | **Scan incrémental en boucle courte IDE (`< 5 s`)** | Non (relecture intégrale) | Non | **Oui — Diff `(mtimeMs, sizeBytes, sha256)` + `FTS5` `< 100 ms`** |
-| **Crawler HTTP sécurisé & Croisement Code vs. Rendu** | Non | Sans lien avec le code source | **Oui — `seo-partner crawl` (anti-SSRF + `--allow-local` Laragon)** |
+| **Crawler HTTP sécurisé & Comparateur Code vs. Crawl** | Non | Sans lien avec le code source | **Oui — `seo-partner crawl` + Vue côte à côte Code vs. Crawl** |
+| **Dashboard Web local & API OpenAPI 3.1 (`127.0.0.1`)** | Non | Cloud externe payant | **Oui — `seo-partner serve` (auto-fallback de port, RFC 9457, WCAG 2.2 AA)** |
 | **Preuve obligatoire (`filePath:lineNumber` ou `url + statusCode`)** | Non (approximative) | HTML compilé uniquement | **Oui — Ligne exacte du fichier ou statut HTTP crawlé** |
 | **Exécution du code du projet analysé (`F-S5`)** | Variable selon l'agent | N/A | **Zéro exécution (`php`/`eval`/`build` interdits)** |
 | **Catalogue de règles & Priorisation mathématique ICE (`F-R3`)** | Non (subjective) | Générique | **40 règles vérifiées (`ICE = (I+C+E)/3` + Blocages en tête)** |
@@ -58,7 +61,7 @@
 
 ## 2. Architecture Système, Flux de Données et Schéma ERD (`SQLite v2`)
 
-### 2.1 Architecture Modulaire du Monorepo (`pnpm workspaces`)
+### 2.1 Architecture Modulaire du Monorepo (`8 Packages` — `pnpm workspaces`)
 
 ```mermaid
 flowchart TB
@@ -67,12 +70,18 @@ flowchart TB
     DEV["Developpeur / Agent IA"]
   end
 
-  subgraph CLI_LAYER["@seo-partner/cli (Binaire seo-partner — 9 Commandes)"]
+  subgraph CLI_LAYER["@seo-partner/cli (Binaire seo-partner — 10 Commandes)"]
     CMD_INIT["init / doctor / uninstall"]
     CMD_SCAN["scan (Incremental < 5s)"]
     CMD_CRAWL["crawl (Anti-SSRF / --allow-local)"]
     CMD_AUDIT["audit / backlog / report (md | html | json)"]
+    CMD_SERVE["serve (127.0.0.1 + Auto-Fallback Port)"]
     CMD_MEM["memory (list / add)"]
+  end
+
+  subgraph WEB_LAYER["Couche Web & API Locale (Jalon v0.3)"]
+    SERVER["@seo-partner/server\nEcoute 127.0.0.1 uniquement | OpenAPI 3.1 (/api/v1)\nErreurs RFC 9457 | Garde Host/Origin + Cookie HttpOnly"]
+    DASHBOARD["@seo-partner/dashboard\nArchitecture components/ui & components/features\nClient HTTP (credentials: include + 401/403) | WCAG 2.2 AA"]
   end
 
   subgraph ENGINE_LAYER["Couche Metier Deterministe"]
@@ -88,6 +97,12 @@ flowchart TB
 
   DEV --> CLI_LAYER
   SKILL -. "Invoque (CLI --json)" .-> CLI_LAYER
+  CMD_SERVE --> SERVER
+  SERVER --> DASHBOARD
+  SERVER --> ADAPTERS
+  SERVER --> CRAWLER
+  SERVER --> RULES
+  SERVER --> STORE
   CMD_INIT --> CORE
   CMD_SCAN --> CORE
   CMD_SCAN --> ADAPTERS
@@ -98,10 +113,6 @@ flowchart TB
   CMD_AUDIT --> STORE
   CMD_MEM --> CORE
   CMD_MEM --> STORE
-  ADAPTERS --> CORE
-  CRAWLER --> CORE
-  CRAWLER --> STORE
-  RULES --> CORE
 ```
 
 ### 2.2 Diagramme Entité-Relation (`ERD` — Schéma SQLite `v2`)
@@ -120,104 +131,6 @@ erDiagram
     RULE ||--o{ FINDING : "declenche"
     FINDING ||--o| ACTION : "priorise (ICE)"
     FINDING ||--o{ DECISION : "justifie"
-
-    PROJECT {
-        text id PK
-        text root_path
-        text name
-        text frameworks_json
-        integer has_robots_txt
-        integer has_sitemap
-        text last_scanned_at
-    }
-    FILE {
-        integer id PK
-        text project_id FK
-        text path
-        text hash
-        integer mtime_ms
-        integer size_bytes
-        text kind
-    }
-    ROUTE {
-        integer id PK
-        text project_id FK
-        integer file_id FK
-        text pattern
-        text router_kind
-        text rendering_mode
-        integer is_private
-        integer in_sitemap
-    }
-    PAGE_META {
-        integer route_id PK,FK
-        text title
-        text description
-        text canonical
-        text robots
-        text html_lang
-        text headings_json
-        text og_json
-        text hreflang_json
-        text images_json
-    }
-    FTS_PAGE_INDEX {
-        integer route_id
-        text route_pattern
-        text title
-        text description
-        text headings_text
-    }
-    CRAWL_RUN {
-        text id PK
-        text project_id FK
-        text start_url
-        text status
-        integer pages_crawled
-        integer errors_count
-        text started_at
-        text completed_at
-    }
-    CRAWL_PAGE {
-        integer id PK
-        text crawl_run_id FK
-        text url
-        text route_pattern
-        integer status_code
-        text redirect_chain_json
-        integer depth
-        text x_robots_tag
-        text http_canonical
-        text title
-        text h1
-        text html_lang
-        text broken_links_json
-        integer untrusted_external
-    }
-    RULE {
-        text id PK
-        text category
-        text severity
-        integer blocks_indexing
-        text source_url
-    }
-    FINDING {
-        text id PK
-        text rule_id FK
-        text subject_ref
-        text file_path
-        integer line_number
-        text evidence_json
-        text status
-    }
-    ACTION {
-        text id PK
-        text finding_id FK
-        integer blocks_indexing
-        real ice_score
-        text owner_role
-        text target_timeframe
-    }
 ```
 
 ---
@@ -238,14 +151,14 @@ git clone https://github.com/Firinze/seo-partner.git
 cd seo-partner
 pnpm install
 
-# 2. Compiler tous les packages du monorepo (core, store, adapters, crawler, rules, cli)
+# 2. Compiler les 8 packages du monorepo (core, store, adapters, crawler, rules, dashboard, server, cli)
 pnpm run build
 
 # 3. (Optionnel) Lier globalement la commande seo-partner sur votre machine
 pnpm --filter seo-partner link --global
 ```
 
-### 3.3 Workflow Complet en 6 Commandes (Next.js, Laravel, Symfony ou Laragon)
+### 3.3 Workflow Complet en 7 Commandes (Next.js, Laravel, Symfony ou Laragon)
 
 ```powershell
 # 1. Initialiser seo-partner en français pour Antigravity (agy) dans le projet courant
@@ -266,12 +179,14 @@ seo-partner backlog
 
 # 6. Générer le rapport HTML5 autonome (sans dépendance réseau) et/ou Markdown
 seo-partner report --type audit-complet --format html
-seo-partner report --type audit-complet --format md
+
+# 7. Lancer le Dashboard Web local et l'API REST OpenAPI 3.1 sur http://127.0.0.1:4321
+seo-partner serve --port 4321 --lang fr
 ```
 
 ---
 
-## 4. Référence Complète de la CLI (9 Commandes)
+## 4. Référence Complète de la CLI (10 Commandes)
 
 ### 4.1 Options Globales et Codes de Sortie
 
@@ -287,7 +202,7 @@ seo-partner report --type audit-complet --format md
 | `1` | **Échec Métier / Santé** | `doctor` a détecté un contrôle en erreur ou paramètre manquant. |
 | `3` | **Blocage Sécurité Anti-SSRF / Offline** | Tentative de crawl vers une IP privée/locale sans `--allow-local`, ou appel réseau en mode `--offline`. |
 
-### 4.2 Détail des 9 Commandes
+### 4.2 Détail des 10 Commandes
 
 1. **`seo-partner init`** : Initialise `.seo/config.json`, `.seo/decisions.md`, installe le skill pack bilingue (`en` ou `fr`) pour l'IDE choisi (`agy`, `claude`, `cursor`, `gemini`, `codex`) et sécurise `.gitignore`.
    ```powershell
@@ -305,9 +220,6 @@ seo-partner report --type audit-complet --format md
    ```powershell
    seo-partner crawl <url> [--allow-local] [--max-pages 200] [--max-depth 4] [--concurrency 4] [--rate-limit-ms 200] [--js] [--resume <runId>] [--offline] [--json]
    ```
-   - `--allow-local` : Autorise explicitement le crawl d'adresses locales (`127.0.0.1`, `localhost`, domaines virtuels Laragon `*.test`) tout en maintenant le blocage absolu de `169.254.169.254`.
-   - `--js` : Charge dynamiquement `playwright` à la demande (`import('playwright')`) uniquement lorsque le rendu JavaScript est requis.
-   - `--resume <runId>` : Reprend une session de crawl interrompue depuis `.seo/index.db`.
 5. **`seo-partner audit`** : Évalue les **40 règles SEO déterministes** en croisant le scan statique du code et le dernier `CrawlRun` terminé (ou `--crawl-run <id>`).
    ```powershell
    seo-partner audit [--category technical|on-page|schema|local|geo] [--severity critical|high|medium|low] [--crawl-run <id>] [--json]
@@ -320,82 +232,90 @@ seo-partner report --type audit-complet --format md
    ```powershell
    seo-partner report [--type audit-complet|audit-technique|backlog] [--format md|html|json] [--output <path>] [--crawl-run <id>] [--json]
    ```
-8. **`seo-partner memory`** : Consulte ou enregistre une décision d'arbitrage SEO dans `.seo/decisions.md` et SQLite.
+8. **`seo-partner serve`** : Démarre le serveur API local (`127.0.0.1` uniquement) et le Dashboard Web interactif. Si le port demandé (`4321` par défaut) est déjà occupé (`EADDRINUSE`), le serveur **bascule automatiquement sur le premier port libre suivant (`4322`, `4323`... jusqu'à +20 ports)**, recalibre dynamiquement ses contrôles `Host`/`Origin` et affiche l'URL retenue.
+   ```powershell
+   seo-partner serve [--port 4321] [--lang fr|en] [--no-open] [--json]
+   ```
+9. **`seo-partner memory`** : Consulte ou enregistre une décision d'arbitrage SEO dans `.seo/decisions.md` et SQLite.
    ```powershell
    seo-partner memory list | add --title "..." --rationale "..." [--finding <id>] [--json]
    ```
-9. **`seo-partner uninstall`** : Supprime proprement les fichiers du skill installés dans l'IDE tout en préservant `.seo/decisions.md` (sauf si `--purge-data` est activé).
-   ```powershell
-   seo-partner uninstall [--purge-data] [--dry-run] [--json]
-   ```
+10. **`seo-partner uninstall`** : Supprime proprement les fichiers du skill installés dans l'IDE tout en préservant `.seo/decisions.md` (sauf si `--purge-data` est activé).
+    ```powershell
+    seo-partner uninstall [--purge-data] [--dry-run] [--json]
+    ```
 
 ---
 
-## 5. Catalogue des 40 Règles SEO Vérifiées et Méthodologie ICE
+## 5. Serveur API Local (`127.0.0.1`, OpenAPI 3.1, RFC 9457) & Dashboard Web (`v0.3`)
+
+### 5.1 Sécurité et Contrat d'Enveloppe JSON (`/api/v1`)
+
+- **Écoute Loopback Exclusive (`127.0.0.1`)** : Aucune exposition sur `0.0.0.0`.
+- **Auto-Fallback de Port (`EADDRINUSE`)** : Bascule automatique sur `port + 1..20` avec rapport explicite `{ requestedPort, port, fallbackUsed, url }`.
+- **Validation `Host` & `Origin` + Session `HttpOnly`** : Toute requête avec un `Host` ou `Origin` externe est rejetée en `403 Forbidden`. Les routes de mutation (`POST`) exigent le cookie `HttpOnly; SameSite=Strict` (`seo_partner_session`).
+- **Enveloppe JSON Stricte & RFC 9457 (`ProblemDetails`)** :
+  ```json
+  {
+    "success": false,
+    "data": {
+      "problem": {
+        "type": "https://seo-partner.local/problems/validation-error",
+        "title": "Invalid Search Query Parameters",
+        "status": 422,
+        "detail": "Field 'q': Expected a string",
+        "instance": "/api/v1/search"
+      }
+    },
+    "error": "Field 'q': Expected a string"
+  }
+  ```
+
+### 5.2 Les 16 Points de Terminaison (`/api/v1`)
+
+| Méthode & Route | Session `HttpOnly` | Description |
+| :--- | :---: | :--- |
+| `GET /api/v1/health` | Non | Statut du serveur local, version `0.3.0` et port actif. |
+| `GET /api/v1/session` | Initialise | Émet ou renouvelle le cookie `seo_partner_session` (`HttpOnly; SameSite=Strict`). |
+| `GET /api/v1/openapi.json` | Non | Spécification **OpenAPI 3.1.0** complète calibrée sur le port actif. |
+| `GET /api/v1/overview` | Non | KPIs agrégés du projet (fichiers, routes, blocages `F-R3`, Quick Wins, sévérités). |
+| `GET /api/v1/routes` | Non | Liste des routes extraites avec `<title>`, `description`, `canonical`, `h1` et lignes. |
+| `GET /api/v1/search?q=<terme>` | Non | Recherche plein texte instantanée via **SQLite `FTS5`** (`< 100 ms`). |
+| `GET /api/v1/findings` | Non | Constats filtrables (`category`, `severity`, `blocksIndexing`, `ruleId`, `routePattern`). |
+| `GET /api/v1/backlog` | Non | Backlog priorisé (`blocksIndexing DESC, ice.score DESC`) filtrable par rôle/horizon. |
+| `GET /api/v1/crawls` | Non | Historique des sessions de crawl HTTP (`CrawlRun`). |
+| `POST /api/v1/crawls` | **Oui** | Lance un crawl HTTP anti-SSRF (`startUrl`, `allowLocal`, `maxPages`, `maxDepth`). |
+| `GET /api/v1/crawls/latest/compare` | Non | Comparaison côte à côte **Code Source vs. Crawl HTTP** (divergences `canonical`, `title`, `h1`, `X-Robots-Tag`, statut HTTP). |
+| `POST /api/v1/scan` | **Oui** | Déclenche un scan incrémental ou complet (`rebuild`) + ré-évaluation des 40 règles. |
+| `POST /api/v1/audit` | **Oui** | Ré-exécute le moteur des 40 règles SEO. |
+| `GET /api/v1/decisions` | Non | Liste l'historique des décisions d'arbitrage SEO. |
+| `POST /api/v1/decisions` | **Oui** | Crée une décision dans SQLite et synchronise `.seo/decisions.md`. |
+| `POST /api/v1/reports` | **Oui** | Génère et retourne un rapport exécutif 5 parties (`html`, `md` ou `json`). |
+
+### 5.3 Architecture du Dashboard Web (`@seo-partner/dashboard`)
+
+- **`src/components/ui/`** : Composants UI purs et accessibles WCAG 2.2 AA (`renderKpiCard`, `renderSeverityBadge`, `renderIndexingBlockerBadge`, `renderIceScorePill`, `renderFilterToolbar`, `renderEmptyState`, `renderAlertBanner`, `renderModalShell`) avec HTML5 sémantique, rôles ARIA (`role="tablist"`, `aria-live="polite"`), palette émeraude mate (`#050b08` / `#10b981`), **zéro glassmorphisme** (`backdrop-filter` interdit) et **zéro emoji**.
+- **`src/components/features/`** : 6 vues connectées à l'API (`OverviewFeature`, `RoutesSearchFeature`, `FindingsFeature`, `BacklogFeature`, `CrawlComparatorFeature`, `DecisionsReportsFeature`).
+- **`src/lib/api-client.ts`** : Client HTTP unifié avec `credentials: 'include'` systématique et intercepteur `401`/`403` réinitialisant automatiquement la session.
+
+---
+
+## 6. Catalogue des 40 Règles SEO Vérifiées et Méthodologie ICE
 
 $$\text{ICE} = \text{round}\left(\frac{\text{Impact} + \text{Confiance} + \text{Effort}}{3}, 2\right)$$
 
 > [!IMPORTANT]
 > **Règle d'Arbitrage Absolue (`F-R3`)** : Tout constat ayant `blocksIndexing = true` (`R-TECH-01`, `R-TECH-02`, `R-TECH-03`, `R-TECH-06`, `R-TECH-07`, `R-TECH-09`) passe **systématiquement en tête du backlog**, quel que soit son score ICE.
 
-### 5.1 Famille `technical` (14 Règles : `R-TECH-01` à `R-TECH-14`)
-
-| ID | Sévérité | Bloque l'indexation | `(I, C, E)` | Condition détectée et Preuve |
-| :--- | :---: | :---: | :---: | :--- |
-| **`R-TECH-01`** | `critical` | **Oui** | `(8, 10, 9)` | Fichier `robots.txt` absent. |
-| **`R-TECH-02`** | `high` | **Oui** | `(9, 10, 8)` | Fichier `sitemap.xml` ou générateur de sitemap absent. |
-| **`R-TECH-03`** | `critical` | **Oui** | `(10, 10, 10)` | Directive `noindex` dans le code d'une route publique. |
-| **`R-TECH-04`** | `high` | Non | `(7, 9, 9)` | Route privée (`/admin`, `/dashboard`, `/login`) incluse dans `sitemap.xml`. |
-| **`R-TECH-05`** | `high` | Non | `(8, 9, 8)` | URL canonique absente sur une route publique. |
-| **`R-TECH-06`** | `high` | **Oui** | `(9, 9, 7)` | Page publique `'use client'` sans métadonnées serveur. |
-| **`R-TECH-07`** | `critical` | **Oui** | `(10, 10, 8)` | Page publique retournant une erreur HTTP `4xx` ou `5xx` lors du crawl. |
-| **`R-TECH-08`** | `high` | Non | `(8, 10, 8)` | Chaîne de redirections excessive (`>= 2` sauts) ou boucle de redirection. |
-| **`R-TECH-09`** | `critical` | **Oui** | `(10, 10, 9)` | En-tête HTTP `X-Robots-Tag: noindex` servi sur une page publique. |
-| **`R-TECH-10`** | `high` | Non | `(8, 9, 7)` | Contradiction d'URL `canonical` entre le code source et le HTML/en-tête crawlé. |
-| **`R-TECH-11`** | `high` | Non | `(8, 10, 8)` | Lien interne cassé pointant vers une URL en erreur `4xx`/`5xx`. |
-| **`R-TECH-12`** | `medium` | Non | `(7, 9, 7)` | Page publique orpheline (aucun lien interne entrant et absente du sitemap). |
-| **`R-TECH-13`** | `medium` | Non | `(6, 9, 6)` | Profondeur de clic excessive (`> 3` clics depuis la page d'accueil). |
-| **`R-TECH-14`** | `medium` | Non | `(6, 10, 9)` | Attribut `lang` manquant ou vide sur la balise `<html>`. |
-
-### 5.2 Famille `on-page` (14 Règles : `R-ONPAGE-01` à `R-ONPAGE-14`)
-
-| ID | Sévérité | `(I, C, E)` | Condition détectée et Preuve |
-| :--- | :---: | :---: | :--- |
-| **`R-ONPAGE-01`** | `high` | `(9, 10, 9)` | Balise `<title>` absente ou vide sur une page publique. |
-| **`R-ONPAGE-02`** | `high` | `(8, 9, 8)` | `<title>` dupliqué entre plusieurs pages publiques. |
-| **`R-ONPAGE-03`** | `low` | `(5, 7, 9)` | Longueur du `<title>` hors de la plage recommandée (`50–60` caractères). |
-| **`R-ONPAGE-04`** | `medium` | `(7, 9, 9)` | Meta `description` absente ou vide sur une page publique. |
-| **`R-ONPAGE-05`** | `medium` | `(6, 8, 8)` | Meta `description` dupliquée entre plusieurs pages publiques. |
-| **`R-ONPAGE-06`** | `low` | `(4, 7, 9)` | Longueur de la meta `description` hors de la plage recommandée (`150–160` caractères). |
-| **`R-ONPAGE-07`** | `high` | `(8, 9, 9)` | Absence de `<h1>` ou présence de plusieurs `<h1>` sur une même page. |
-| **`R-ONPAGE-08`** | `medium` | `(6, 9, 9)` | Image dépourvue d'attribut `alt` descriptif. |
-| **`R-ONPAGE-09`** | `low` | `(5, 9, 8)` | Saut de niveau dans la hiérarchie des titres (ex. `H1 -> H3` sans `H2`). |
-| **`R-ONPAGE-10`** | `medium` | `(7, 9, 8)` | Contenu de `<h1>` dupliqué à l'identique sur plusieurs pages publiques. |
-| **`R-ONPAGE-11`** | `medium` | `(6, 9, 8)` | Image sans attributs `width` et `height` explicites (prévention du `CLS`). |
-| **`R-ONPAGE-12`** | `low` | `(6, 9, 8)` | Lien interne avec texte d'ancre vide ou générique (`cliquez ici`, `lire la suite`, `here`). |
-| **`R-ONPAGE-13`** | `low` | `(5, 9, 8)` | Balises Open Graph incomplètes (`og:title`, `og:description`, `og:image`). |
-| **`R-ONPAGE-14`** | `medium` | `(7, 9, 7)` | Divergence du `<title>` ou du `<h1>` entre le code source et le HTML crawlé. |
-
-### 5.3 Familles `schema` (5 Règles), `local` (4 Règles) et `geo` (3 Règles)
-
-| ID | Catégorie | Sévérité | `(I, C, E)` | Condition détectée et Preuve |
-| :--- | :---: | :---: | :---: | :--- |
-| **`R-SCHEMA-01`** | `schema` | `high` | `(8, 9, 8)` | Bloc `JSON-LD` syntaxiquement invalide ou dépourvu de `@context` / `@type`. |
-| **`R-SCHEMA-02`** | `schema` | `medium` | `(6, 9, 8)` | Schéma `Organization` ou `WebSite` incomplet (`name` ou `url` manquant). |
-| **`R-SCHEMA-03`** | `schema` | `medium` | `(7, 9, 8)` | Schéma `Article` / `BlogPosting` incomplet (`headline`, `datePublished` ou `author` manquant). |
-| **`R-SCHEMA-04`** | `schema` | `high` | `(8, 10, 7)` | Schéma `Product` incomplet (`name` ou `offers`/`review`/`aggregateRating` manquant). |
-| **`R-SCHEMA-05`** | `schema` | `medium` | `(7, 9, 8)` | Schéma `FAQPage` ou `BreadcrumbList` avec `mainEntity` ou `itemListElement` vide. |
-| **`R-LOCAL-01`** | `local` | `high` | `(8, 10, 8)` | Schéma `LocalBusiness` dépourvu d'adresse postale structurée (`address`). |
-| **`R-LOCAL-02`** | `local` | `medium` | `(7, 10, 9)` | Schéma `LocalBusiness` dépourvu de numéro de téléphone (`telephone` / `NAP`). |
-| **`R-LOCAL-03`** | `local` | `low` | `(6, 9, 9)` | Numéro de téléphone `LocalBusiness` non formaté en international E.164 (`+...`). |
-| **`R-LOCAL-04`** | `local` | `low` | `(6, 8, 8)` | Schéma `LocalBusiness` sans horaires (`openingHoursSpecification`) ni coordonnées (`geo`). |
-| **`R-GEO-01`** | `geo` | `high` | `(8, 10, 8)` | Code de langue ou de région `hreflang` invalide (ex. `en-UK` au lieu de `en-GB`). |
-| **`R-GEO-02`** | `geo` | `medium` | `(7, 9, 8)` | Grappe `hreflang` sans lien auto-référent ou sans entrée `x-default`. |
-| **`R-GEO-03`** | `geo` | `low` | `(6, 8, 8)` | Directive `robots.txt` bloquant globalement l'indexation (`Disallow: /` sur `*`). |
+- **Technique (`R-TECH-01` à `R-TECH-14`, 14 règles)** : `robots.txt`, `sitemap.xml`, `noindex` code, route privée en sitemap, canonical manquant, page `'use client'` sans metadata serveur, erreur HTTP `4xx`/`5xx`, chaîne de redirections (`>= 2` sauts), en-tête `X-Robots-Tag: noindex`, contradiction canonical Code vs. Crawl, lien interne cassé, page orpheline, profondeur `> 3` clics, et attribut `<html lang>` manquant.
+- **On-Page (`R-ONPAGE-01` à `R-ONPAGE-14`, 14 règles)** : `<title>` manquant/dupliqué/hors calibre (`50–60` car.), `description` manquante/dupliquée/hors calibre (`150–160` car.), `<h1>` absent/multiple/dupliqué, image sans `alt`, saut de hiérarchie `H1 -> H3`, image sans `width`/`height` (`CLS`), ancre interne générique, Open Graph incomplet, et divergence `<title>`/`<h1>` Code vs. Crawl.
+- **Schema.org (`R-SCHEMA-01` à `R-SCHEMA-05`, 5 règles)** : `JSON-LD` invalide, `Organization`/`WebSite`, `Article`/`BlogPosting`, `Product`, et `FAQPage`/`BreadcrumbList`.
+- **SEO Local (`R-LOCAL-01` à `R-LOCAL-04`, 4 règles)** : `LocalBusiness` (`address`, `telephone` NAP, format international `E.164`, `openingHoursSpecification`/`geo`).
+- **GEO — International & IA (`R-GEO-01` à `R-GEO-03`, 3 règles)** : Validité `ISO 639-1`/`ISO 3166-1` des `hreflang`, réciprocité + `x-default`, et politique `robots.txt` explicite.
 
 ---
 
-## 6. Support Multi-Frameworks : Next.js, Laravel, Symfony, PHP/Laragon et Statique
+## 7. Support Multi-Frameworks : Next.js, Laravel, Symfony, PHP/Laragon et Statique
 
 Conformément à l'exigence constitutionnelle `F-S5`, **aucun interpréteur externe (`php`, `node`, `eval`) n'est jamais exécuté sur le code cible**.
 
@@ -409,39 +329,41 @@ Conformément à l'exigence constitutionnelle `F-S5`, **aucun interpréteur exte
 
 ---
 
-## 7. Skill Pack Bilingue (`11/11` Références) et Intégration Multi-IDE
+## 8. Skill Pack Bilingue (`11/11` Références) et Intégration Multi-IDE
 
 Lors de `seo-partner init`, l'outil installe automatiquement la variante linguistique choisie (`fr` ou `en`) dans l'emplacement natif de votre assistant de code (`.agents/skills/seo-partner/`, `.claude/skills/seo-partner/`, `.cursor/rules/`, `.gemini/skills/seo-partner/`, `.codex/skills/seo-partner/`) avec ses **11 guides de référence méthodologiques** vérifiés par `seo-partner doctor`.
 
 ---
 
-## 8. Guide Développeur et Référence SDK TypeScript
+## 9. Guide Développeur et Référence SDK TypeScript (8 Packages)
 
-### 8.1 Organisation des 6 Packages du Monorepo
+### 9.1 Organisation des 8 Packages du Monorepo
 
 ```text
 seo-partner/
 ├── assets/
 │   └── seo-partner-hero.svg        # Banniere vectorielle emeraude scintillante (zero glassmorphisme)
 ├── packages/
-│   ├── core/                       # @seo-partner/core : Types v0.2, Config Zod, Walker Incremental, Garde .gitignore
+│   ├── core/                       # @seo-partner/core : Types v0.3, Config Zod, Walker Incremental, Garde .gitignore
 │   ├── store/                      # @seo-partner/store : SQLite WAL v2 (FTS5, CrawlRepository, backup .v1.bak)
 │   ├── adapters/                   # @seo-partner/adapters : NextJsAdapter, PhpAdapter (Laravel/Symfony/Laragon), StaticAdapter
 │   ├── crawler/                    # @seo-partner/crawler : Crawler HTTP, Garde Anti-SSRF, robots.txt, Playwright optionnel
 │   ├── rules/                      # @seo-partner/rules : 40 Regles SEO, Score ICE, Rapports Markdown / HTML5 / JSON
-│   └── cli/                        # seo-partner : Binaire CLI (9 commandes) & 5 Installeurs d IDE
+│   ├── dashboard/                  # @seo-partner/dashboard : Composants ui/ & features/, client HTTP credentials: include, i18n FR/EN
+│   ├── server/                     # @seo-partner/server : Serveur local 127.0.0.1, OpenAPI 3.1, RFC 9457, auto-fallback port
+│   └── cli/                        # seo-partner : Binaire CLI (10 commandes dont serve) & 5 Installeurs d IDE
 ├── skills/
 │   └── seo-partner/                # Skill Pack Bilingue EN & FR (SKILL.md + 11 references)
 └── tests/
     ├── fixtures/                   # Projets temoins Next.js, Laravel, Symfony et PHP/Laragon
-    ├── unit/                       # Suites unitaires (scan incremental, FTS5, anti-SSRF, PhpAdapter, 40 regles, HTML)
-    └── integration/                # Workflows E2E v0.1 & v0.2 + Benchmark 10 000 fichiers
+    ├── unit/                       # Suites unitaires (scan, FTS5, anti-SSRF, PhpAdapter, 40 regles, serveur API, dashboard UI)
+    └── integration/                # Workflows E2E v0.1, v0.2 & v0.3 + Benchmark 10 000 fichiers
 ```
 
-### 8.2 Commandes de Build et de Vérification
+### 9.2 Commandes de Build et de Vérification
 
 ```powershell
-pnpm run build                        # Compiler les 6 packages TypeScript
+pnpm run build                        # Compiler les 8 packages TypeScript
 pnpm exec tsc --noEmit                # Verifier le typage strict (0 erreur sur tout le depot)
 pnpm exec vitest run tests/unit       # Executer les suites unitaires rapides
 pnpm run test:coverage                # Executer toutes les suites + benchmark 10k fichiers + couverture V8 (>= 80 %)
@@ -449,49 +371,43 @@ pnpm run test:coverage                # Executer toutes les suites + benchmark 1
 
 ---
 
-## 9. Sécurité, Anti-SSRF, Confidentialité et Garde-Fous `.gitignore`
+## 10. Sécurité, Anti-SSRF, Session `HttpOnly` et Garde-Fous `.gitignore`
 
 1. **Zéro Exécution du Code Cible (`F-S5`)** : Ni Node.js ni PHP ne sont exécutés sur les fichiers du projet audité.
-2. **Protection Anti-SSRF Stricte par Résolution DNS à Chaque Saut (`FR-004`)** : Par défaut, `seo-partner crawl` résout les adresses IP avant chaque requête et chaque saut de redirection (`redirect: 'manual'`) et bloque `127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `169.254.0.0/16`, `::1`, `fc00::/7`, `fe80::/10` ainsi que `localhost` et `*.test`. Le drapeau explicite `--allow-local` permet d'auditer un serveur local (Laragon, `artisan serve`, `symfony server`, `next dev`) tout en maintenant le blocage inconditionnel de l'IP de métadonnées cloud `169.254.169.254`.
-3. **Marquage des Contenus Externes & Échappement HTML** : Toute donnée extraite par le crawler est marquée `untrustedExternal: true` et intégralement échappée dans les rapports HTML5 et Markdown.
-4. **Sauvegarde Automatique lors des Migrations SQLite** : Lors du passage du schéma `v1` à `v2`, `.seo/index.db.v1.bak` est créé automatiquement avant migration.
+2. **Protection Anti-SSRF Stricte par Résolution DNS à Chaque Saut (`FR-004`)** : Par défaut, `seo-partner crawl` et `POST /api/v1/crawls` résolvent les adresses IP avant chaque requête et chaque saut de redirection (`redirect: 'manual'`) et bloquent `127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `169.254.0.0/16`, `::1`, `fc00::/7`, `fe80::/10` ainsi que `localhost` et `*.test`. L'option explicite `--allow-local` / `allowLocal: true` permet d'auditer un serveur local tout en maintenant le blocage inconditionnel de `169.254.169.254`.
+3. **Isolation Loopback (`127.0.0.1`) & Session `HttpOnly`** : Le serveur local rejette tout `Host` ou `Origin` externe (`403 Forbidden`) et protège toutes les mutations `POST /api/v1/*` par un cookie `HttpOnly; SameSite=Strict`.
+4. **Marquage des Contenus Externes & Échappement XSS** : Toute donnée extraite par le crawler est marquée `untrustedExternal: true` et intégralement échappée dans le Dashboard et les rapports HTML5/Markdown.
 
 ---
 
-## 10. Guide de Dépannage (Troubleshooting) et FAQ
+## 11. Guide de Dépannage (Troubleshooting) et FAQ
+
+<details>
+<summary><strong>Question : Que se passe-t-il si le port <code>4321</code> est déjà utilisé lorsque je lance <code>seo-partner serve</code> ?</strong></summary>
+
+Le serveur détecte automatiquement le conflit `EADDRINUSE` sur `127.0.0.1` et teste séquentiellement les ports suivants (`4322`, `4323`... jusqu'à `+20` ports). Dès qu'un port libre est trouvé, il recalibre ses contrôles de sécurité `Host`/`Origin` et sa spécification OpenAPI 3.1 sur ce port et affiche l'URL finale dans le terminal (ou dans `{ requestedPort, port, fallbackUsed: true, url }` en mode `--json`).
+</details>
 
 <details>
 <summary><strong>Question : Comment auditer mon projet PHP / Laravel hébergé localement sous Laragon (ex. <code>http://mon-app.test</code>) ?</strong></summary>
 
-Lancez d'abord `seo-partner scan` à la racine de votre projet PHP/Laravel, puis lancez le crawler avec le drapeau explicite `--allow-local` :
+Vous pouvez le faire en ligne de commande ou directement depuis l'onglet **Comparateur Code vs Crawl** du Dashboard (`seo-partner serve`) en cochant l'option `Autoriser le crawl local (--allow-local)` :
 ```powershell
 seo-partner scan
 seo-partner crawl http://mon-app.test --allow-local
-seo-partner audit
-seo-partner report --format html
-```
-</details>
-
-<details>
-<summary><strong>Question : Comment utiliser le rendu navigateur JavaScript (<code>--js</code>) lors d'un crawl ?</strong></summary>
-
-Afin de garder une installation légère par défaut, Playwright n'est chargé qu'à la demande lorsque `--js` est passé. Installez-le uniquement si vous en avez besoin :
-```powershell
-pnpm add -D playwright
-npx playwright install chromium
-seo-partner crawl https://example.com --js
+seo-partner serve
 ```
 </details>
 
 ---
 
-## 11. Feuille de Route (`v0.1` à `v1.0`) et Gouvernance Documentaire
+## 12. Feuille de Route (`v0.1` à `v1.0`) et Gouvernance Documentaire
 
 | Jalon | Statut | Périmètre Fonctionnel |
 | :--- | :---: | :--- |
 | **`v0.1` — Socle Fondamental** | **Livré** | Skill Pack bilingue (`11/11` réf. EN/FR), CLI 8 commandes, 5 installeurs IDE sans dépendance `PATH`, Scanner AST Next.js et Statique, SQLite WAL natif, 15 règles `Must`, score ICE (`F-R3`) et rapports 5 parties. |
 | **`v0.2` — Scan Incrémental, Crawler Anti-SSRF, PHP & 40 Règles** | **Livré** | Scan incrémental (`< 5 s`) + recherche plein texte `SQLite FTS5` (`< 100 ms`), Crawler HTTP anti-SSRF (`seo-partner crawl` + `--allow-local` Laragon), `PhpAdapter` (Laravel/Blade, Symfony/Twig, PHP natif/Laragon), extension à **40 règles SEO vérifiées** et export de rapports **HTML5 autonomes** (`--format html`). |
-| **`v0.3` — Dashboard Local et API OpenAPI 3.1** | Planifié | Serveur local `127.0.0.1` (Hono + Zod + erreurs RFC 9457) et interface SPA React/TailwindCSS WCAG 2.2 AA. |
+| **`v0.3` — Dashboard Local et API OpenAPI 3.1** | **Livré** | Serveur API local `127.0.0.1` (`seo-partner serve`, auto-fallback de port, OpenAPI 3.1 `/api/v1`, erreurs RFC 9457, sécurité `Host`/`Origin` + cookie `HttpOnly`) et Dashboard Web modulaire WCAG 2.2 AA (`components/ui/`, `components/features/`, comparateur Code vs. Crawl, recherche `FTS5`, backlog ICE). |
 | **`v0.4` — Serveur MCP et Mode `propose-patch`** | Planifié | Exposition des outils `packages/tools` via Model Context Protocol (`stdio`) et génération de correctifs Git sécurisés. |
 | **`v0.5` — Adapters Multi-Frameworks Additionnels** | Planifié | Support Astro, Nuxt, Remix / React Router v7, SvelteKit et Django/Jinja. |
 | **`v0.6`–`v1.0` — Mode Autonome et Release** | Planifié | Boucle d'agent interne multi-fournisseurs (Anthropic, OpenAI, Gemini), connecteurs GSC/CWV opt-in et binaires autonomes multi-OS. |

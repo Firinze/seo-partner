@@ -10,6 +10,8 @@
       "@seo-partner/adapters": ["./packages/adapters/src/index.ts"],
       "@seo-partner/crawler": ["./packages/crawler/src/index.ts"],
       "@seo-partner/rules": ["./packages/rules/src/index.ts"],
+      "@seo-partner/dashboard": ["./packages/dashboard/src/index.ts"],
+      "@seo-partner/server": ["./packages/server/src/index.ts"],
       "seo-partner": ["./packages/cli/src/index.ts"]
     }
   },

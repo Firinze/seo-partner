@@ -9,6 +9,8 @@ export default defineConfig({
       '@seo-partner/adapters': path.resolve(__dirname, 'packages/adapters/src/index.ts'),
       '@seo-partner/crawler': path.resolve(__dirname, 'packages/crawler/src/index.ts'),
       '@seo-partner/rules': path.resolve(__dirname, 'packages/rules/src/index.ts'),
+      '@seo-partner/dashboard': path.resolve(__dirname, 'packages/dashboard/src/index.ts'),
+      '@seo-partner/server': path.resolve(__dirname, 'packages/server/src/index.ts'),
       'seo-partner': path.resolve(__dirname, 'packages/cli/src/index.ts'),
     },
   },

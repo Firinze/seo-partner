@@ -289,3 +289,82 @@ export interface DecisionRecord {
   readonly findingId: string | null;
 }
 
+export interface ProblemDetails {
+  readonly type: string;
+  readonly title: string;
+  readonly status: number;
+  readonly detail: string;
+  readonly instance: string;
+}
+
+export interface ApiErrorData {
+  readonly problem: ProblemDetails;
+}
+
+export interface ApiResponseEnvelope<T> {
+  readonly success: boolean;
+  readonly data: T;
+  readonly error: string | null;
+}
+
+export interface DashboardOverview {
+  readonly project: ProjectRecord | null;
+  readonly stats: {
+    readonly filesScanned: number;
+    readonly routesCount: number;
+    readonly totalFindings: number;
+    readonly blockingIndexingCount: number;
+    readonly bySeverity: Record<SeverityLevel, number>;
+    readonly byCategory: Record<RuleCategory, number>;
+    readonly decisionsCount: number;
+  };
+  readonly latestCrawlRun: CrawlRun | null;
+}
+
+export interface CodeVsCrawlDivergence {
+  readonly field: 'canonical' | 'title' | 'h1' | 'robots' | 'htmlLang' | 'status';
+  readonly codeValue: string | null;
+  readonly crawlValue: string | null;
+  readonly severity: SeverityLevel;
+}
+
+export interface CodeVsCrawlComparisonRow {
+  readonly routePattern: string;
+  readonly filePath: string | null;
+  readonly crawledUrl: string | null;
+  readonly statusCode: number | null;
+  readonly responseTimeMs: number | null;
+  readonly redirectHops: number;
+  readonly code: {
+    readonly title: string | null;
+    readonly description: string | null;
+    readonly canonical: string | null;
+    readonly robots: string | null;
+    readonly h1: string | null;
+    readonly htmlLang: string | null;
+  } | null;
+  readonly crawl: {
+    readonly title: string | null;
+    readonly description: string | null;
+    readonly canonical: string | null;
+    readonly xRobotsTag: string | null;
+    readonly robotsMeta: string | null;
+    readonly h1: string | null;
+    readonly htmlLang: string | null;
+    readonly brokenLinksCount: number;
+  } | null;
+  readonly divergences: ReadonlyArray<CodeVsCrawlDivergence>;
+}
+
+export interface ServeCommandResult {
+  readonly projectId: string | null;
+  readonly host: '127.0.0.1';
+  readonly requestedPort: number;
+  readonly port: number;
+  readonly fallbackUsed: boolean;
+  readonly url: string;
+  readonly openApiUrl: string;
+  readonly lang?: SupportedLanguage;
+}
+
+

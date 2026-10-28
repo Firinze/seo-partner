@@ -17,6 +17,7 @@ import { runAuditCommand } from './commands/audit.js';
 import { runBacklogCommand } from './commands/backlog.js';
 import { runReportCommand } from './commands/report.js';
 import { runMemoryAddCommand, runMemoryListCommand } from './commands/memory.js';
+import { runServeCommand } from './commands/serve.js';
 
 export * from './ide-installers/index.js';
 export * from './commands/init.js';
@@ -28,6 +29,7 @@ export * from './commands/audit.js';
 export * from './commands/backlog.js';
 export * from './commands/report.js';
 export * from './commands/memory.js';
+export * from './commands/serve.js';
 
 export function wrapCliEnvelope<T>(data: T): CliEnvelope<T> {
   return {
@@ -83,6 +85,8 @@ export async function executeCli(
       title: { type: 'string' },
       rationale: { type: 'string' },
       finding: { type: 'string' },
+      port: { type: 'string' },
+      'no-open': { type: 'boolean' },
       json: { type: 'boolean' },
       offline: { type: 'boolean' },
       help: { type: 'boolean', short: 'h' },
@@ -100,7 +104,7 @@ export async function executeCli(
   try {
     if (command === 'help' || parsed.values['help']) {
       const helpText = [
-        'seo-partner v0.2.0 — Deterministic Local SEO Partner',
+        'seo-partner v0.3.0 — Deterministic Local SEO Partner',
         '',
         'Commands:',
         '  seo-partner init [--here] [--ide agy|claude|cursor|gemini|codex] [--lang en|fr] [--ignore-agent-tools] [--dry-run]',
@@ -110,6 +114,7 @@ export async function executeCli(
         '  seo-partner audit [--category technical|on-page|schema|local|geo] [--severity critical|high|medium|low] [--crawl-run <id>] [--json]',
         '  seo-partner backlog [--quick-wins] [--json]',
         '  seo-partner report [--type audit-complet|audit-technique|backlog] [--format md|html|json] [--output <path>] [--json]',
+        '  seo-partner serve [--port <number>] [--lang fr|en] [--no-open] [--json]',
         '  seo-partner memory list | add --title "..." --rationale "..." [--finding <id>] [--json]',
         '  seo-partner uninstall [--purge-data] [--dry-run] [--json]',
       ].join('\n');
@@ -299,6 +304,34 @@ export async function executeCli(
       return {
         exitCode: 0,
         stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(res), null, 2) : text,
+        stderr: '',
+      };
+    }
+
+    if (command === 'serve') {
+      const portArg =
+        typeof parsed.values['port'] === 'string'
+          ? Number(parsed.values['port'])
+          : 4321;
+      const langArg =
+        parsed.values['lang'] === 'en' || parsed.values['lang'] === 'fr'
+          ? parsed.values['lang']
+          : undefined;
+      const autoClose = Boolean(parsed.values['dry-run']);
+      const { result } = await runServeCommand({
+        projectRoot,
+        port: Number.isFinite(portArg) ? portArg : 4321,
+        lang: langArg,
+        noOpen: Boolean(parsed.values['no-open']),
+        autoClose,
+      });
+      const fallbackNotice = result.fallbackUsed
+        ? ` (port ${result.requestedPort} busy -> auto-fallback to ${result.port})`
+        : '';
+      const text = `Local Dashboard & API listening on ${result.url}${fallbackNotice} — OpenAPI: ${result.openApiUrl}`;
+      return {
+        exitCode: 0,
+        stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(result), null, 2) : text,
         stderr: '',
       };
     }
