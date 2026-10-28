@@ -28,6 +28,8 @@ specs/
 **/.seo/cache/
 **/.seo/patches/
 **/.seo/backups/
+**/.seo/*.sarif
+**/.seo/pr-body.md
 
 # ============================================================================
 # 3. Dependencies, Monorepo Build & Package Outputs

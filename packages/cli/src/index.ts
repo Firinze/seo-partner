@@ -23,6 +23,8 @@ import { runPatchCommand } from './commands/patch.js';
 import { runGscCommand } from './commands/gsc.js';
 import { runCwvCommand } from './commands/cwv.js';
 import { runAgentCommand } from './commands/agent.js';
+import { runCiCommand } from './commands/ci.js';
+import { runPrCommand } from './commands/pr.js';
 
 export * from './ide-installers/index.js';
 export * from './commands/init.js';
@@ -40,6 +42,9 @@ export * from './commands/patch.js';
 export * from './commands/gsc.js';
 export * from './commands/cwv.js';
 export * from './commands/agent.js';
+export * from './commands/watch.js';
+export * from './commands/ci.js';
+export * from './commands/pr.js';
 
 export function wrapCliEnvelope<T>(data: T): CliEnvelope<T> {
   return {
@@ -120,6 +125,16 @@ export async function executeCli(
       'base-url': { type: 'string' },
       'max-iterations': { type: 'string' },
       'auto-apply': { type: 'boolean' },
+      notify: { type: 'boolean' },
+      'debounce-ms': { type: 'string' },
+      'fail-on-blockers': { type: 'boolean' },
+      'max-critical': { type: 'string' },
+      'max-high': { type: 'string' },
+      'min-score': { type: 'string' },
+      baseline: { type: 'string' },
+      branch: { type: 'string' },
+      base: { type: 'string' },
+      publish: { type: 'boolean' },
       help: { type: 'boolean', short: 'h' },
     },
   });
@@ -135,7 +150,7 @@ export async function executeCli(
   try {
     if (command === 'help' || parsed.values['help']) {
       const helpText = [
-        'seo-partner v0.6.0 — Deterministic Local SEO Partner',
+        'seo-partner v0.7.0 — Deterministic Local SEO Partner',
         '',
         'Commands:',
         '  seo-partner init [--here] [--ide agy|claude|cursor|gemini|codex] [--with-mcp] [--lang en|fr] [--ignore-agent-tools] [--dry-run]',
@@ -149,6 +164,9 @@ export async function executeCli(
         '  seo-partner gsc inspect --url <url> [--site <url>] [--credentials <path>] [--json]',
         '  seo-partner cwv fetch --url <url> [--form-factor PHONE|DESKTOP|ALL] [--refresh] [--offline] [--json]',
         '  seo-partner agent run --goal "..." [--provider anthropic|openai|gemini|custom] [--model <name>] [--base-url <url>] [--max-iterations <n>] [--auto-apply] [--json]',
+        '  seo-partner watch [--scope <dir>] [--notify] [--debounce-ms <ms>]',
+        '  seo-partner ci [--fail-on-blockers] [--max-critical <n>] [--max-high <n>] [--min-score <n>] [--format sarif|json] [--output <path>] [--json]',
+        '  seo-partner pr [--branch <name>] [--base <name>] [--title <title>] [--publish] [--force] [--dry-run] [--json]',
         '  seo-partner report [--type audit-complet|audit-technique|backlog] [--format md|html|json] [--output <path>] [--json]',
         '  seo-partner serve [--port <number>] [--lang fr|en] [--no-open] [--json]',
         '  seo-partner memory list | add --title "..." --rationale "..." [--finding <id>] [--json]',
@@ -567,6 +585,107 @@ export async function executeCli(
       return {
         exitCode: 0,
         stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(res), null, 2) : text,
+        stderr: '',
+      };
+    }
+
+    if (command === 'watch') {
+      const debounceVal =
+        typeof parsed.values['debounce-ms'] === 'string'
+          ? Number(parsed.values['debounce-ms'])
+          : undefined;
+
+      const res = {
+        status: 'active',
+        projectRoot,
+        scope: typeof parsed.values['scope'] === 'string' ? parsed.values['scope'] : null,
+        notify: Boolean(parsed.values['notify']),
+        debounceMs: debounceVal ?? 300,
+      };
+
+      return {
+        exitCode: 0,
+        stdout: jsonMode
+          ? JSON.stringify(wrapCliEnvelope(res), null, 2)
+          : `seo-partner watch active on ${projectRoot} (debounce: ${res.debounceMs}ms, notify: ${res.notify ? 'enabled' : 'disabled'})`,
+        stderr: '',
+      };
+    }
+
+    if (command === 'ci') {
+      const failOnBlockers =
+        parsed.values['fail-on-blockers'] !== undefined
+          ? Boolean(parsed.values['fail-on-blockers'])
+          : true;
+      const maxCritical =
+        typeof parsed.values['max-critical'] === 'string'
+          ? Number(parsed.values['max-critical'])
+          : undefined;
+      const maxHigh =
+        typeof parsed.values['max-high'] === 'string'
+          ? Number(parsed.values['max-high'])
+          : undefined;
+      const minScore =
+        typeof parsed.values['min-score'] === 'string'
+          ? Number(parsed.values['min-score'])
+          : undefined;
+
+      const formatArg = parsed.values['format'] === 'sarif' ? 'sarif' : 'json';
+      const outputArg =
+        typeof parsed.values['output'] === 'string' ? parsed.values['output'] : undefined;
+
+      const res = await runCiCommand({
+        projectRoot,
+        failOnBlockers,
+        maxCritical,
+        maxHigh,
+        minScore,
+        baseline: typeof parsed.values['baseline'] === 'string' ? parsed.values['baseline'] : undefined,
+        format: formatArg,
+        output: outputArg,
+        json: jsonMode,
+      });
+
+      return {
+        exitCode: res.exitCode,
+        stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(res), null, 2) : res.markdownSummary,
+        stderr: res.passed ? '' : res.thresholdsViolated.join('\n'),
+      };
+    }
+
+    if (command === 'pr') {
+      const branch =
+        typeof parsed.values['branch'] === 'string'
+          ? parsed.values['branch']
+          : undefined;
+      const base =
+        typeof parsed.values['base'] === 'string'
+          ? parsed.values['base']
+          : undefined;
+      const title =
+        typeof parsed.values['title'] === 'string'
+          ? parsed.values['title']
+          : undefined;
+      const publish = Boolean(parsed.values['publish']);
+      const force = Boolean(parsed.values['force']);
+      const dryRun = Boolean(parsed.values['dry-run']);
+
+      const proposal = await runPrCommand({
+        projectRoot,
+        branch,
+        base,
+        title,
+        publish,
+        force,
+        dryRun,
+        json: jsonMode,
+      });
+
+      return {
+        exitCode: 0,
+        stdout: jsonMode
+          ? JSON.stringify(wrapCliEnvelope(proposal), null, 2)
+          : proposal.bodyMarkdown,
         stderr: '',
       };
     }

@@ -75,6 +75,7 @@ import {
 } from './validator.js';
 import { buildOpenApiSpec } from './openapi.js';
 import { compareCodeVsCrawl } from './comparator.js';
+import { globalSseBroadcaster } from './sse.js';
 
 export interface LocalApiAppOptions {
   readonly projectRoot: string;
@@ -421,6 +422,49 @@ export function createLocalApiApp(options: LocalApiAppOptions): LocalApiApp {
         } finally {
           store.close();
         }
+      }
+
+      if (method === 'GET' && pathname === '/api/v1/events') {
+        const encoder = new TextEncoder();
+        let unsubscribe: (() => void) | null = null;
+        let heartbeatTimer: NodeJS.Timeout | null = null;
+
+        const stream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode(`event: ping\ndata: "connected"\n\n`));
+
+            unsubscribe = globalSseBroadcaster.subscribe((payload) => {
+              try {
+                const msg = `event: ${payload.type}\ndata: ${JSON.stringify(payload.data)}\n\n`;
+                controller.enqueue(encoder.encode(msg));
+              } catch {
+                // stream closed
+              }
+            });
+
+            heartbeatTimer = setInterval(() => {
+              try {
+                controller.enqueue(encoder.encode(`event: ping\ndata: "heartbeat"\n\n`));
+              } catch {
+                // stream closed
+              }
+            }, 15000);
+          },
+          cancel() {
+            if (unsubscribe) unsubscribe();
+            if (heartbeatTimer) clearInterval(heartbeatTimer);
+          },
+        });
+
+        return new Response(stream, {
+          status: 200,
+          headers: {
+            'Content-Type': 'text/event-stream; charset=utf-8',
+            'Cache-Control': 'no-cache, no-transform',
+            'Connection': 'keep-alive',
+            ...buildCorsHeaders(originHeader, activePort),
+          },
+        });
       }
 
       if (method === 'GET' && pathname === '/api/v1/search') {

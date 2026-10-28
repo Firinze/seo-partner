@@ -1,5 +1,6 @@
 export * from './lib/i18n.js';
 export * from './lib/api-client.js';
+export * from './lib/sse-client.js';
 export * from './components/ui/index.js';
 export * from './components/features/overview-feature.js';
 export * from './components/features/routes-search-feature.js';

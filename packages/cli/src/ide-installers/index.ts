@@ -42,7 +42,12 @@ export interface IdeInstallerAdapter {
 }
 
 export function resolveBundledSkillSourceDir(lang: SupportedLanguage): string {
-  const currentFile = fileURLToPath(import.meta.url);
+  const currentFile =
+    typeof __filename !== 'undefined'
+      ? __filename
+      : (typeof import.meta !== 'undefined' && import.meta.url
+          ? fileURLToPath(import.meta.url)
+          : process.cwd());
   const currentDir = path.dirname(currentFile);
   // Works both from packages/cli/src/ide-installers and packages/cli/dist/ide-installers
   const repoRoot = path.resolve(currentDir, '..', '..', '..', '..');

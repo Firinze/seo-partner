@@ -567,6 +567,168 @@ export interface AgentStepLog {
   readonly createdAt: string;
 }
 
+// ============================================================================
+// Milestone v0.7: Watcher, CI/CD Engine & PR Bot Types
+// ============================================================================
+
+export type WatchEventType = 'change' | 'rename' | 'unlink' | 'add';
+
+export interface WatchEvent {
+  readonly filePath: string;
+  readonly eventType: WatchEventType;
+  readonly timestamp: string;
+}
+
+export type SseEventType =
+  | 'audit:started'
+  | 'audit:completed'
+  | 'route:updated'
+  | 'finding:blocking'
+  | 'ping';
+
+export interface SsePayload<T = unknown> {
+  readonly type: SseEventType;
+  readonly data: T;
+  readonly timestamp: string;
+}
+
+export interface SseAuditCompletedData {
+  readonly filesScanned: number;
+  readonly routesCount: number;
+  readonly totalFindings: number;
+  readonly blockingIndexingCount: number;
+  readonly bySeverity: Record<'critical' | 'high' | 'medium' | 'low', number>;
+  readonly durationMs: number;
+}
+
+export interface CiThresholds {
+  readonly failOnBlockers?: boolean;
+  readonly maxCritical?: number;
+  readonly maxHigh?: number;
+  readonly minScore?: number;
+  readonly baselineCommit?: string;
+}
+
+export interface CiFindingSummary {
+  readonly ruleId: string;
+  readonly ruleTitle: string;
+  readonly severity: 'critical' | 'high' | 'medium' | 'low';
+  readonly category: RuleCategory;
+  readonly blocksIndexing: boolean;
+  readonly iceScore: number;
+  readonly filePath?: string;
+  readonly lineNumber?: number;
+  readonly message: string;
+}
+
+export interface CiEvaluationResult {
+  readonly passed: boolean;
+  readonly exitCode: 0 | 1;
+  readonly evaluatedAt: string;
+  readonly totalFindings: number;
+  readonly blockingIndexingCount: number;
+  readonly criticalCount: number;
+  readonly highCount: number;
+  readonly mediumCount: number;
+  readonly lowCount: number;
+  readonly thresholdsViolated: readonly string[];
+  readonly findings: readonly CiFindingSummary[];
+  readonly sarifPath?: string;
+  readonly markdownSummary: string;
+}
+
+export interface SarifPhysicalLocation {
+  readonly artifactLocation: {
+    readonly uri: string;
+    readonly uriBaseId?: string;
+  };
+  readonly region?: {
+    readonly startLine: number;
+    readonly startColumn?: number;
+    readonly endLine?: number;
+    readonly endColumn?: number;
+  };
+}
+
+export interface SarifResult {
+  readonly ruleId: string;
+  readonly level: 'error' | 'warning' | 'note';
+  readonly message: { readonly text: string };
+  readonly locations: ReadonlyArray<{
+    readonly physicalLocation: SarifPhysicalLocation;
+  }>;
+  readonly properties?: {
+    readonly category: RuleCategory;
+    readonly severity: SeverityLevel;
+    readonly blocksIndexing: boolean;
+    readonly iceScore: number;
+  };
+}
+
+export interface SarifRuleDefinition {
+  readonly id: string;
+  readonly name: string;
+  readonly shortDescription: { readonly text: string };
+  readonly helpUri?: string;
+  readonly defaultConfiguration: {
+    readonly level: 'error' | 'warning' | 'note' | 'none';
+  };
+}
+
+export interface SarifRun {
+  readonly tool: {
+    readonly driver: {
+      readonly name: string;
+      readonly semanticVersion: string;
+      readonly informationUri: string;
+      readonly rules: readonly SarifRuleDefinition[];
+    };
+  };
+  readonly results: readonly SarifResult[];
+}
+
+export interface SarifLog {
+  readonly $schema: string;
+  readonly version: '2.1.0';
+  readonly runs: readonly SarifRun[];
+}
+
+export interface PrOptions {
+  readonly branch?: string;
+  readonly base?: string;
+  readonly title?: string;
+  readonly publish?: boolean;
+  readonly force?: boolean;
+  readonly dryRun?: boolean;
+}
+
+export interface PrProposal {
+  readonly branchName: string;
+  readonly baseBranch: string;
+  readonly title: string;
+  readonly bodyMarkdown: string;
+  readonly patchesAppliedCount: number;
+  readonly filesModified: readonly string[];
+  readonly rulesRemediated: readonly string[];
+  readonly averageIceScore: number;
+  readonly publishedUrl?: string;
+}
+
+export interface BinaryTarget {
+  readonly platform: 'win32' | 'linux' | 'darwin';
+  readonly arch: 'x64' | 'arm64';
+  readonly filename: string;
+  readonly sizeBytes: number;
+  readonly sha256: string;
+}
+
+export interface BinaryManifest {
+  readonly version: string;
+  readonly builtAt: string;
+  readonly binaries: readonly BinaryTarget[];
+}
+
+
 
 
 
