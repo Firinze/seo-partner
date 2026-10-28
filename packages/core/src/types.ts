@@ -367,4 +367,111 @@ export interface ServeCommandResult {
   readonly lang?: SupportedLanguage;
 }
 
+// ============================================================================
+// v0.4 Shared Tools, MCP and Deterministic Patch Types
+// ============================================================================
+
+export type ToolName =
+  | 'scan'
+  | 'audit'
+  | 'backlog'
+  | 'search_fts'
+  | 'compare_code_crawl'
+  | 'record_decision'
+  | 'propose_patch';
+
+export interface ToolContext {
+  readonly projectRoot: string;
+  readonly allowApply: boolean;
+  readonly lang: SupportedLanguage;
+}
+
+export interface ToolResult {
+  readonly ok: boolean;
+  readonly data: unknown;
+  readonly summary: string;
+  readonly initialScanPerformed: boolean;
+}
+
+export interface PatchHunk {
+  readonly oldStart: number;
+  readonly oldLines: number;
+  readonly newStart: number;
+  readonly newLines: number;
+  readonly lines: ReadonlyArray<string>;
+}
+
+export interface PatchProposal {
+  readonly id: string;
+  readonly findingId: string;
+  readonly ruleId: string;
+  readonly filePath: string;
+  readonly kind: 'modify' | 'create';
+  readonly hunks: ReadonlyArray<PatchHunk>;
+  readonly diff: string;
+  readonly manualReviewRequired: boolean;
+  readonly todoMarkers: number;
+}
+
+export type PatchSkippedReason =
+  | 'unsupported-rule'
+  | 'context-not-found'
+  | 'unsafe-path'
+  | 'file-too-large'
+  | 'framework-metadata';
+
+export interface PatchSkipped {
+  readonly findingId: string;
+  readonly ruleId: string;
+  readonly reason: PatchSkippedReason;
+  readonly message: string;
+}
+
+export interface PatchBatchResult {
+  readonly batchId: string;
+  readonly createdAt: string;
+  readonly diffPath: string;
+  readonly filesCovered: number;
+  readonly proposals: ReadonlyArray<PatchProposal>;
+  readonly skipped: ReadonlyArray<PatchSkipped>;
+  readonly applied: boolean;
+  readonly appliedAt: string | null;
+  readonly backupDir: string | null;
+  readonly todoMarkersRemaining: number;
+  readonly initialScanPerformed: boolean;
+}
+
+export type ApplyRefusalCode =
+  | 'git-dirty'
+  | 'context-mismatch'
+  | 'unsafe-path'
+  | 'apply-not-allowed';
+
+export interface ApplyRefusal {
+  readonly code: ApplyRefusalCode;
+  readonly files: ReadonlyArray<string>;
+  readonly message: string;
+}
+
+export interface McpConfigSnippet {
+  readonly ide: IdeTarget;
+  readonly relativePath: string;
+  readonly format: 'json' | 'toml';
+  readonly content: string;
+  readonly written: boolean;
+  readonly warning: string | null;
+}
+
+export interface InitCommandResult {
+  readonly projectRoot: string;
+  readonly ideTargets: ReadonlyArray<IdeTarget>;
+  readonly lang: SupportedLanguage;
+  readonly createdFiles: ReadonlyArray<string>;
+  readonly gitignoreUpdated: boolean;
+  readonly gitignoreAddedEntries: ReadonlyArray<string>;
+  readonly dryRun: boolean;
+  readonly mcpSnippets?: ReadonlyArray<McpConfigSnippet>;
+}
+
+
 

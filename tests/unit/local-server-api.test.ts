@@ -54,6 +54,7 @@ export default function HomePage() {
       port: number;
     }>;
     expect(healthJson.success).toBe(true);
+    expect(healthJson.data.version).toBe('0.4.0');
     expect(healthJson.data.host).toBe('127.0.0.1');
     expect(healthJson.data.port).toBe(4321);
     expect(healthJson.error).toBeNull();
@@ -62,10 +63,13 @@ export default function HomePage() {
     expect(openApiRes.status).toBe(200);
     const openApiJson = (await openApiRes.json()) as ApiResponseEnvelope<{
       openapi: string;
+      info: { version: string };
       paths: Record<string, unknown>;
     }>;
     expect(openApiJson.data.openapi).toBe('3.1.0');
-    expect(Object.keys(openApiJson.data.paths).length).toBeGreaterThanOrEqual(13);
+    expect(openApiJson.data.info.version).toBe('0.4.0');
+    expect(Object.keys(openApiJson.data.paths).length).toBeGreaterThanOrEqual(14);
+    expect(openApiJson.data.paths['/api/v1/patches']).toBeDefined();
 
     const sessionRes = await app.request('/api/v1/session');
     expect(sessionRes.status).toBe(200);
@@ -320,5 +324,89 @@ export default function HomePage() {
       await server2.close();
       await server1.close();
     }
+  });
+
+  it('handles GET and POST /api/v1/patches with session guard and security rejections', async () => {
+    const app = createLocalApiApp({ projectRoot: tmpDir, port: 4321, defaultLang: 'fr' });
+    const token = app.getSessionToken();
+    const cookieHeader = `${SESSION_COOKIE_NAME}=${token}`;
+
+    // 1. GET /api/v1/patches empty list
+    const getEmptyRes = await app.request('/api/v1/patches');
+    expect(getEmptyRes.status).toBe(200);
+    const getEmptyJson = (await getEmptyRes.json()) as ApiResponseEnvelope<{
+      total: number;
+      batches: unknown[];
+    }>;
+    expect(getEmptyJson.success).toBe(true);
+    expect(getEmptyJson.data.total).toBe(0);
+
+    // 2. GET /api/v1/patches?batchId=nonexistent returns 404
+    const get404Res = await app.request('/api/v1/patches?batchId=unknown_batch_123');
+    expect(get404Res.status).toBe(404);
+    const get404Json = (await get404Res.json()) as ApiResponseEnvelope<ApiErrorData>;
+    expect(get404Json.success).toBe(false);
+    expect(get404Json.data.problem.type).toContain('patch-batch-not-found');
+
+    // 3. POST /api/v1/patches without session returns 401
+    const postNoAuthRes = await app.request('/api/v1/patches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    expect(postNoAuthRes.status).toBe(401);
+
+    // 4. POST /api/v1/patches with apply: true returns 422 forbidden
+    const postApplyForbiddenRes = await app.request('/api/v1/patches', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: cookieHeader,
+      },
+      body: JSON.stringify({ apply: true }),
+    });
+    expect(postApplyForbiddenRes.status).toBe(422);
+    const postApplyForbiddenJson = (await postApplyForbiddenRes.json()) as ApiResponseEnvelope<ApiErrorData>;
+    expect(postApplyForbiddenJson.data.problem.type).toContain('apply-via-rest-forbidden');
+
+    // 5. POST /api/v1/patches with invalid ruleId returns 422
+    const postInvalidRuleRes = await app.request('/api/v1/patches', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: cookieHeader,
+      },
+      body: JSON.stringify({ ruleId: 'INVALID-RULE-99' }),
+    });
+    expect(postInvalidRuleRes.status).toBe(422);
+
+    // 6. POST /api/v1/patches with valid session returns 200 with PatchBatchResult
+    const postValidRes = await app.request('/api/v1/patches', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: cookieHeader,
+      },
+      body: JSON.stringify({}),
+    });
+    expect(postValidRes.status).toBe(200);
+    const postValidJson = (await postValidRes.json()) as ApiResponseEnvelope<{
+      batchId: string;
+      diffPath: string;
+      proposals: unknown[];
+      applied: boolean;
+    }>;
+    expect(postValidJson.success).toBe(true);
+    expect(postValidJson.data.batchId).toBeDefined();
+    expect(postValidJson.data.applied).toBe(false);
+
+    // 7. GET /api/v1/patches?batchId=... returns 200 with the batch
+    const getBatchRes = await app.request(`/api/v1/patches?batchId=${postValidJson.data.batchId}`);
+    expect(getBatchRes.status).toBe(200);
+    const getBatchJson = (await getBatchRes.json()) as ApiResponseEnvelope<{
+      batchId: string;
+      diffPath: string;
+    }>;
+    expect(getBatchJson.data.batchId).toBe(postValidJson.data.batchId);
   });
 });

@@ -10,6 +10,7 @@ export interface DashboardDictionary {
   readonly tabBacklog: string;
   readonly tabCrawl: string;
   readonly tabDecisions: string;
+  readonly tabPatches: string;
   readonly kpiRoutes: string;
   readonly kpiFiles: string;
   readonly kpiBlockers: string;
@@ -58,6 +59,19 @@ export interface DashboardDictionary {
   readonly reportsTitle: string;
   readonly reportFormatLabel: string;
   readonly reportExportButton: string;
+  readonly patchesTitle: string;
+  readonly patchesProposeButton: string;
+  readonly patchesDiffTitle: string;
+  readonly patchesBackupLabel: string;
+  readonly patchesNoBatches: string;
+  readonly patchesBatchId: string;
+  readonly patchesTimestamp: string;
+  readonly patchesProposals: string;
+  readonly patchesSkipped: string;
+  readonly patchesApplied: string;
+  readonly patchesTodoSeoCount: string;
+  readonly patchesRuleIds: string;
+  readonly patchesViewDiff: string;
   readonly emptyStateMessage: string;
   readonly blockerBadge: string;
 }
@@ -72,6 +86,7 @@ const FR_DICT: DashboardDictionary = {
   tabBacklog: '4. Backlog ICE (F-R3)',
   tabCrawl: '5. Comparateur Code vs. Crawl',
   tabDecisions: '6. Decisions & Rapports',
+  tabPatches: '7. Correctifs Automatiques',
   kpiRoutes: 'Routes Decouvertes',
   kpiFiles: 'Fichiers Scannes',
   kpiBlockers: 'Bloquants Indexation (F-R3)',
@@ -120,6 +135,19 @@ const FR_DICT: DashboardDictionary = {
   reportsTitle: 'Export de Rapports Executifs 5 Parties',
   reportFormatLabel: 'Format d export',
   reportExportButton: 'Generer & Telecharger le Rapport',
+  patchesTitle: 'Remediation Deterministe & Patchs Unifies (.seo/patches/)',
+  patchesProposeButton: 'Proposer des correctifs',
+  patchesDiffTitle: 'Diff unifie',
+  patchesBackupLabel: 'Dossier de sauvegarde',
+  patchesNoBatches: 'Aucun lot de correctifs disponible. Cliquez sur "Proposer des correctifs" pour generer une proposition verifiable.',
+  patchesBatchId: 'Identifiant du lot',
+  patchesTimestamp: 'Date & Heure',
+  patchesProposals: 'Propositions',
+  patchesSkipped: 'Ignores',
+  patchesApplied: 'Applique',
+  patchesTodoSeoCount: 'Marqueurs TODO-SEO',
+  patchesRuleIds: 'Regles concernees',
+  patchesViewDiff: 'Afficher le diff',
   emptyStateMessage: 'Aucune donnee a afficher pour les filtres actuels.',
   blockerBadge: 'BLOQUANT',
 };
@@ -134,6 +162,7 @@ const EN_DICT: DashboardDictionary = {
   tabBacklog: '4. ICE Backlog (F-R3)',
   tabCrawl: '5. Code vs. Crawl Comparator',
   tabDecisions: '6. Decisions & Reports',
+  tabPatches: '7. Automated Patches',
   kpiRoutes: 'Discovered Routes',
   kpiFiles: 'Scanned Files',
   kpiBlockers: 'Indexing Blockers (F-R3)',
@@ -182,6 +211,19 @@ const EN_DICT: DashboardDictionary = {
   reportsTitle: '5-Section Executive Report Export',
   reportFormatLabel: 'Export format',
   reportExportButton: 'Generate & Download Report',
+  patchesTitle: 'Deterministic Remediation & Unified Patches (.seo/patches/)',
+  patchesProposeButton: 'Propose patches',
+  patchesDiffTitle: 'Unified diff',
+  patchesBackupLabel: 'Backup directory',
+  patchesNoBatches: 'No patch batches available. Click "Propose patches" to generate a verifiable proposal.',
+  patchesBatchId: 'Batch ID',
+  patchesTimestamp: 'Date & Time',
+  patchesProposals: 'Proposals',
+  patchesSkipped: 'Skipped',
+  patchesApplied: 'Applied',
+  patchesTodoSeoCount: 'TODO-SEO markers',
+  patchesRuleIds: 'Touched rules',
+  patchesViewDiff: 'View diff',
   emptyStateMessage: 'No data matches the current filters.',
   blockerBadge: 'BLOCKER',
 };

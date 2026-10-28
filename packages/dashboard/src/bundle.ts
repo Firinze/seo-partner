@@ -4,6 +4,7 @@ import type {
   DecisionRecord,
   ExtractedRouteData,
   Finding,
+  PatchBatchResult,
   PrioritizedAction,
   SupportedLanguage,
 } from '@seo-partner/core';
@@ -15,6 +16,7 @@ import { renderFindingsFeature } from './components/features/findings-feature.js
 import { renderBacklogFeature } from './components/features/backlog-feature.js';
 import { renderCrawlComparatorFeature } from './components/features/crawl-comparator-feature.js';
 import { renderDecisionsReportsFeature } from './components/features/decisions-reports-feature.js';
+import { renderPatchesFeature } from './components/features/patches-feature.js';
 
 export interface DashboardInitialState {
   readonly lang: SupportedLanguage;
@@ -24,6 +26,7 @@ export interface DashboardInitialState {
   readonly backlog: ReadonlyArray<PrioritizedAction>;
   readonly comparisonRows: ReadonlyArray<CodeVsCrawlComparisonRow>;
   readonly decisions: ReadonlyArray<DecisionRecord>;
+  readonly patches?: ReadonlyArray<PatchBatchResult>;
 }
 
 export function renderDashboardCss(): string {
@@ -445,6 +448,81 @@ a {
 .tab-panel[hidden] {
   display: none;
 }
+.patch-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.patch-diffs-container {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.patch-batch-details {
+  border: 1px solid var(--border-emerald);
+  background-color: var(--bg-panel);
+}
+.patch-batch-summary {
+  padding: 12px 16px;
+  cursor: pointer;
+  background-color: var(--bg-elevated);
+  color: var(--text-main);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+.patch-batch-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.patch-proposal-card {
+  border: 1px solid var(--border-emerald);
+  background-color: #050b08;
+}
+.patch-proposal-meta {
+  padding: 8px 12px;
+  background-color: #07150e;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-emerald);
+}
+.patch-diff-pre {
+  margin: 0;
+  padding: 12px;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  background-color: #040806;
+}
+.diff-line {
+  display: block;
+}
+.diff-add {
+  background-color: #052e16;
+  color: #4ade80;
+}
+.diff-del {
+  background-color: #450a0a;
+  color: #f87171;
+}
+.diff-hunk {
+  color: #38bdf8;
+}
+.diff-ctx {
+  color: #94a3b8;
+}
+.patch-skipped-list {
+  padding: 12px;
+  background-color: #1a0f0a;
+  border: 1px solid #7c2d12;
+  font-size: 13px;
+}
 `.trim();
 }
 
@@ -620,6 +698,24 @@ export function renderDashboardClientScript(): string {
       }
     });
   }
+
+  const proposeBtn = document.getElementById('btn-propose-patches');
+  if (proposeBtn) {
+    proposeBtn.addEventListener('click', async function() {
+      proposeBtn.setAttribute('aria-busy', 'true');
+      const statusEl = document.getElementById('patches-action-status');
+      if (statusEl) statusEl.textContent = 'Calcul des correctifs deterministes en cours...';
+      const payload = await apiCall('/api/v1/patches', {
+        method: 'POST',
+        body: JSON.stringify({})
+      });
+      if (payload && payload.success) {
+        window.location.reload();
+      } else if (statusEl) {
+        statusEl.textContent = (payload && payload.error) || 'Erreur lors de la generation des correctifs';
+      }
+    });
+  }
 })();
 `.trim();
 }
@@ -634,6 +730,7 @@ export function renderDashboardSpaHtml(state: DashboardInitialState): string {
     { id: 'tab-btn-backlog', label: dict.tabBacklog, panelId: 'panel-backlog' },
     { id: 'tab-btn-crawl', label: dict.tabCrawl, panelId: 'panel-crawl' },
     { id: 'tab-btn-decisions', label: dict.tabDecisions, panelId: 'panel-decisions' },
+    { id: 'tab-btn-patches', label: dict.tabPatches, panelId: 'panel-patches' },
   ]);
 
   const langSwitcherHtml = renderSelectFilter({
@@ -656,13 +753,17 @@ export function renderDashboardSpaHtml(state: DashboardInitialState): string {
     state.lang,
   );
   const decisionsPanel = renderDecisionsReportsFeature(state.decisions, state.lang);
+  const patchesPanel = renderPatchesFeature({
+    lang: state.lang,
+    patches: state.patches,
+  });
 
   return `<!DOCTYPE html>
 <html lang="${escapeHtml(state.lang)}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SEO PARTNER v0.3 — Local Dashboard (${escapeHtml(state.overview.project?.name ?? 'seo-project')})</title>
+  <title>SEO PARTNER v0.4 — Local Dashboard (${escapeHtml(state.overview.project?.name ?? 'seo-project')})</title>
   <style>${renderDashboardCss()}</style>
 </head>
 <body>
@@ -695,6 +796,9 @@ export function renderDashboardSpaHtml(state: DashboardInitialState): string {
       </div>
       <div id="panel-decisions" role="tabpanel" aria-labelledby="tab-btn-decisions" class="tab-panel" hidden>
         ${decisionsPanel}
+      </div>
+      <div id="panel-patches" role="tabpanel" aria-labelledby="tab-btn-patches" class="tab-panel" hidden>
+        ${patchesPanel}
       </div>
     </main>
   </div>

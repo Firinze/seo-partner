@@ -14,6 +14,8 @@ export const REQUIRED_GITIGNORE_ENTRIES: ReadonlyArray<string> = [
   '.seo/index.db-wal',
   '.seo/logs/',
   '.seo/cache/',
+  '.seo/patches/',
+  '.seo/backups/',
 ];
 
 const SECRET_FILE_PATTERNS: ReadonlyArray<RegExp> = [

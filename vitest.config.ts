@@ -11,6 +11,8 @@ export default defineConfig({
       '@seo-partner/rules': path.resolve(__dirname, 'packages/rules/src/index.ts'),
       '@seo-partner/dashboard': path.resolve(__dirname, 'packages/dashboard/src/index.ts'),
       '@seo-partner/server': path.resolve(__dirname, 'packages/server/src/index.ts'),
+      '@seo-partner/tools': path.resolve(__dirname, 'packages/tools/src/index.ts'),
+      '@seo-partner/mcp': path.resolve(__dirname, 'packages/mcp/src/index.ts'),
       'seo-partner': path.resolve(__dirname, 'packages/cli/src/index.ts'),
     },
   },

@@ -12,6 +12,8 @@
       "@seo-partner/rules": ["./packages/rules/src/index.ts"],
       "@seo-partner/dashboard": ["./packages/dashboard/src/index.ts"],
       "@seo-partner/server": ["./packages/server/src/index.ts"],
+      "@seo-partner/tools": ["./packages/tools/src/index.ts"],
+      "@seo-partner/mcp": ["./packages/mcp/src/index.ts"],
       "seo-partner": ["./packages/cli/src/index.ts"]
     }
   },

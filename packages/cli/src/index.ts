@@ -18,6 +18,8 @@ import { runBacklogCommand } from './commands/backlog.js';
 import { runReportCommand } from './commands/report.js';
 import { runMemoryAddCommand, runMemoryListCommand } from './commands/memory.js';
 import { runServeCommand } from './commands/serve.js';
+import { runMcpCommand } from './commands/mcp.js';
+import { runPatchCommand } from './commands/patch.js';
 
 export * from './ide-installers/index.js';
 export * from './commands/init.js';
@@ -30,6 +32,8 @@ export * from './commands/backlog.js';
 export * from './commands/report.js';
 export * from './commands/memory.js';
 export * from './commands/serve.js';
+export * from './commands/mcp.js';
+export * from './commands/patch.js';
 
 export function wrapCliEnvelope<T>(data: T): CliEnvelope<T> {
   return {
@@ -85,6 +89,11 @@ export async function executeCli(
       title: { type: 'string' },
       rationale: { type: 'string' },
       finding: { type: 'string' },
+      rule: { type: 'string' },
+      apply: { type: 'boolean' },
+      force: { type: 'boolean' },
+      'with-mcp': { type: 'boolean' },
+      'allow-apply': { type: 'boolean' },
       port: { type: 'string' },
       'no-open': { type: 'boolean' },
       json: { type: 'boolean' },
@@ -104,18 +113,20 @@ export async function executeCli(
   try {
     if (command === 'help' || parsed.values['help']) {
       const helpText = [
-        'seo-partner v0.3.0 — Deterministic Local SEO Partner',
+        'seo-partner v0.4.0 — Deterministic Local SEO Partner',
         '',
         'Commands:',
-        '  seo-partner init [--here] [--ide agy|claude|cursor|gemini|codex] [--lang en|fr] [--ignore-agent-tools] [--dry-run]',
+        '  seo-partner init [--here] [--ide agy|claude|cursor|gemini|codex] [--with-mcp] [--lang en|fr] [--ignore-agent-tools] [--dry-run]',
         '  seo-partner doctor [--json]',
         '  seo-partner scan [--scope <dir>] [--rebuild] [--max-size <kb>] [--json]',
         '  seo-partner crawl <url> [--allow-local] [--max-pages <n>] [--max-depth <n>] [--concurrency <n>] [--rate-limit-ms <ms>] [--js] [--resume <runId>] [--offline] [--json]',
         '  seo-partner audit [--category technical|on-page|schema|local|geo] [--severity critical|high|medium|low] [--crawl-run <id>] [--json]',
         '  seo-partner backlog [--quick-wins] [--json]',
+        '  seo-partner patch [--finding <id>] [--rule <ruleId>] [--apply] [--force] [--lang fr|en] [--json]',
         '  seo-partner report [--type audit-complet|audit-technique|backlog] [--format md|html|json] [--output <path>] [--json]',
         '  seo-partner serve [--port <number>] [--lang fr|en] [--no-open] [--json]',
         '  seo-partner memory list | add --title "..." --rationale "..." [--finding <id>] [--json]',
+        '  seo-partner mcp [--allow-apply] [--cwd <dir>]',
         '  seo-partner uninstall [--purge-data] [--dry-run] [--json]',
       ].join('\n');
       return {
@@ -123,6 +134,12 @@ export async function executeCli(
         stdout: jsonMode ? JSON.stringify(wrapCliEnvelope({ help: helpText }), null, 2) : helpText,
         stderr: '',
       };
+    }
+
+    if (command === 'mcp') {
+      throw new Error(
+        "The 'mcp' command runs a persistent JSON-RPC stdio server and cannot be invoked via executeCli(). Run 'seo-partner mcp' directly as a subprocess.",
+      );
     }
 
     if (command === 'init') {
@@ -139,8 +156,17 @@ export async function executeCli(
         terminalOnly: Boolean(parsed.values['terminal-only']),
         dryRun: Boolean(parsed.values['dry-run']),
         ignoreAgentTools: Boolean(parsed.values['ignore-agent-tools'] ?? true),
+        withMcp: Boolean(parsed.values['with-mcp']),
       });
-      const text = `Project ready. Installed for [${res.ideTargets.join(', ')}] (lang: ${res.lang}). Files: ${res.createdFiles.length}`;
+      let text = `Project ready. Installed for [${res.ideTargets.join(', ')}] (lang: ${res.lang}). Files: ${res.createdFiles.length}`;
+      if (res.mcpSnippets && res.mcpSnippets.length > 0) {
+        if (parsed.values['with-mcp']) {
+          const writtenList = res.mcpSnippets.filter((s) => s.written).map((s) => s.relativePath);
+          text += `\nMCP configurations written to: ${writtenList.join(', ')}`;
+        } else {
+          text += `\nTip: run with --with-mcp to auto-configure MCP servers, or copy snippets for [${res.mcpSnippets.map((s) => s.ide).join(', ')}].`;
+        }
+      }
       return {
         exitCode: 0,
         stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(res), null, 2) : text,
@@ -308,6 +334,35 @@ export async function executeCli(
       };
     }
 
+    if (command === 'patch') {
+      const langArg =
+        parsed.values['lang'] === 'fr' || parsed.values['lang'] === 'en'
+          ? (parsed.values['lang'] as SupportedLanguage)
+          : undefined;
+      const res = await runPatchCommand({
+        projectRoot,
+        findingId:
+          typeof parsed.values['finding'] === 'string'
+            ? parsed.values['finding']
+            : undefined,
+        ruleId:
+          typeof parsed.values['rule'] === 'string'
+            ? parsed.values['rule']
+            : undefined,
+        apply: Boolean(parsed.values['apply']),
+        force: Boolean(parsed.values['force']),
+        lang: langArg,
+      });
+
+      return {
+        exitCode: 0,
+        stdout: jsonMode
+          ? JSON.stringify(wrapCliEnvelope(res.batch), null, 2)
+          : res.outputText,
+        stderr: '',
+      };
+    }
+
     if (command === 'serve') {
       const portArg =
         typeof parsed.values['port'] === 'string'
@@ -373,7 +428,9 @@ export async function executeCli(
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     const isSecurityOrOfflineBlock =
-      err instanceof SsrfBlockedError || message.includes('--offline');
+      err instanceof SsrfBlockedError ||
+      message.includes('--offline') ||
+      (err && typeof err === 'object' && 'refusal' in err && (err as any).refusal?.code === 'unsafe-path');
     const exitCode = isSecurityOrOfflineBlock ? 3 : 1;
 
     if (jsonMode) {

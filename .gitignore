@@ -26,6 +26,8 @@ specs/
 .seo/index.db.*.bak
 .seo/logs/
 .seo/cache/
+.seo/patches/
+.seo/backups/
 
 # ============================================================================
 # 3. Dependencies, Monorepo Build & Package Outputs

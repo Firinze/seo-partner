@@ -7,5 +7,6 @@ export * from './components/features/findings-feature.js';
 export * from './components/features/backlog-feature.js';
 export * from './components/features/crawl-comparator-feature.js';
 export * from './components/features/decisions-reports-feature.js';
+export * from './components/features/patches-feature.js';
 export * from './bundle.js';
 

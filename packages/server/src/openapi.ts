@@ -8,7 +8,7 @@ export function buildOpenApiSpec(options: OpenApiSpecOptions): Record<string, un
     openapi: '3.1.0',
     info: {
       title: 'seo-partner Local REST API',
-      version: '0.3.0',
+      version: '0.4.0',
       description:
         'Deterministic Local-First SEO API with RFC 9457 Problem Details, Host/Origin loopback protection, and HttpOnly session authentication.',
     },
@@ -156,6 +156,57 @@ export function buildOpenApiSpec(options: OpenApiSpecOptions): Record<string, un
           summary: 'Generate and return a 5-section executive report (html, md, or json)',
           security: [{ SessionCookie: [] }],
           responses: { '200': { description: 'Report generated' } },
+        },
+      },
+      '/api/v1/patches': {
+        get: {
+          summary: 'List proposed patch batches or retrieve a batch by batchId',
+          parameters: [
+            {
+              name: 'batchId',
+              in: 'query',
+              required: false,
+              schema: { type: 'string' },
+              description: 'Optional batch ID to retrieve full patch details',
+            },
+          ],
+          responses: {
+            '200': { description: 'PatchBatchResult list or single batch' },
+            '404': { description: 'Batch not found (RFC 9457)' },
+          },
+        },
+        post: {
+          summary: 'Propose unified diff patches for actionable findings (non-destructive propose-patch)',
+          security: [{ SessionCookie: [] }],
+          requestBody: {
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    findingId: { type: 'string' },
+                    ruleId: {
+                      type: 'string',
+                      enum: [
+                        'R-TECH-01',
+                        'R-TECH-02',
+                        'R-TECH-03',
+                        'R-TECH-05',
+                        'R-TECH-14',
+                        'R-ONPAGE-01',
+                        'R-ONPAGE-04',
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '200': { description: 'Proposed patch batch created' },
+            '401': { description: 'Authentication required' },
+            '422': { description: 'Validation error or apply rejected via API' },
+          },
         },
       },
     },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { DashboardOverview } from '@seo-partner/core';
+import type { DashboardOverview, PatchBatchResult } from '@seo-partner/core';
 import {
   DashboardApiClient,
   escapeHtml,
@@ -16,6 +16,7 @@ import {
   renderDecisionsReportsFeature,
   renderFindingsFeature,
   renderOverviewFeature,
+  renderPatchesFeature,
   renderRoutesSearchFeature,
   renderSearchInput,
   renderSelectFilter,
@@ -197,5 +198,102 @@ describe('Dashboard UI Components, Features & Unified HTTP Client (@seo-partner/
     expect(res.success).toBe(false);
     expect(seenCredentials[0]).toBe('include');
     expect(interceptedStatuses).toEqual([401]);
+  });
+
+  it('renders Patches feature with empty and populated batches, XSS escaping, diff colors, and zero emojis', () => {
+    // 1. Empty state
+    const emptyFr = renderPatchesFeature({ lang: 'fr', patches: [] });
+    expect(emptyFr).toContain(escapeHtml(getDashboardDictionary('fr').patchesNoBatches));
+    expect(emptyFr).toContain('btn-propose-patches');
+
+    const emptyEn = renderPatchesFeature({ lang: 'en', patches: [] });
+    expect(emptyEn).toContain(escapeHtml(getDashboardDictionary('en').patchesNoBatches));
+
+    // 2. Populated state with malicious XSS diff line
+    const sampleBatch: PatchBatchResult = {
+      batchId: 'patch_20261028-120000_abcdef',
+      createdAt: '2026-10-28T12:00:00Z',
+      diffPath: '.seo/patches/patch_20261028-120000_abcdef.diff',
+      filesCovered: 1,
+      proposals: [
+        {
+          id: 'prop-1',
+          findingId: 'find-1',
+          ruleId: 'R-ONPAGE-01',
+          filePath: 'app/page.tsx',
+          kind: 'modify',
+          hunks: [
+            {
+              oldStart: 1,
+              oldLines: 1,
+              newStart: 1,
+              newLines: 2,
+              lines: [' <main>', '+<title><script>alert("xss")</script> & "val"</title>'],
+            },
+          ],
+          diff: '@@ -1,1 +1,2 @@\n <main>\n+<title><script>alert("xss")</script> & "val"</title>',
+          manualReviewRequired: false,
+          todoMarkers: 1,
+        },
+      ],
+      skipped: [
+        {
+          findingId: 'find-2',
+          ruleId: 'R-TECH-03',
+          reason: 'framework-metadata',
+          message: 'No literal noindex found',
+        },
+      ],
+      applied: false,
+      appliedAt: null,
+      backupDir: null,
+      todoMarkersRemaining: 1,
+      initialScanPerformed: true,
+    };
+
+    const populatedFr = renderPatchesFeature({ lang: 'fr', patches: [sampleBatch] });
+    expect(populatedFr).toContain('patch_20261028-120000_abcdef');
+    expect(populatedFr).toContain('app/page.tsx');
+    expect(populatedFr).toContain('R-ONPAGE-01');
+    expect(populatedFr).toContain('diff-add');
+    expect(populatedFr).toContain('diff-ctx');
+
+    // Verify strict XSS escaping in diff output
+    expect(populatedFr).toContain('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp; &quot;val&quot;');
+    expect(populatedFr).not.toContain('<script>alert("xss")</script>');
+
+    // 3. Verify Full SPA HTML includes 7th tab
+    const overview: DashboardOverview = {
+      project: null,
+      stats: {
+        filesScanned: 0,
+        routesCount: 0,
+        totalFindings: 0,
+        blockingIndexingCount: 0,
+        bySeverity: { critical: 0, high: 0, medium: 0, low: 0 },
+        byCategory: { technical: 0, 'on-page': 0, schema: 0, local: 0, geo: 0 },
+        decisionsCount: 0,
+      },
+      latestCrawlRun: null,
+    };
+    const fullSpa = renderDashboardSpaHtml({
+      lang: 'fr',
+      overview,
+      routes: [],
+      findings: [],
+      backlog: [],
+      comparisonRows: [],
+      decisions: [],
+      patches: [sampleBatch],
+    });
+    expect(fullSpa).toContain('tab-btn-patches');
+    expect(fullSpa).toContain('panel-patches');
+    expect(fullSpa).toContain('patch_20261028-120000_abcdef');
+
+    // Anti-regression: 0 emojis, 0 backdrop-filter, 0 lateral borders
+    expect(/[\u{1F300}-\u{1FAFF}]/u.test(fullSpa)).toBe(false);
+    expect(fullSpa).not.toContain('backdrop-filter');
+    expect(fullSpa).not.toContain('border-l-');
+    expect(fullSpa).not.toContain('border-r-');
   });
 });

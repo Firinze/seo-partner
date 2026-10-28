@@ -8,12 +8,42 @@ importers:
 
   .:
     devDependencies:
+      '@seo-partner/adapters':
+        specifier: workspace:*
+        version: link:packages/adapters
+      '@seo-partner/core':
+        specifier: workspace:*
+        version: link:packages/core
+      '@seo-partner/crawler':
+        specifier: workspace:*
+        version: link:packages/crawler
+      '@seo-partner/dashboard':
+        specifier: workspace:*
+        version: link:packages/dashboard
+      '@seo-partner/mcp':
+        specifier: workspace:*
+        version: link:packages/mcp
+      '@seo-partner/rules':
+        specifier: workspace:*
+        version: link:packages/rules
+      '@seo-partner/server':
+        specifier: workspace:*
+        version: link:packages/server
+      '@seo-partner/store':
+        specifier: workspace:*
+        version: link:packages/store
+      '@seo-partner/tools':
+        specifier: workspace:*
+        version: link:packages/tools
       '@types/node':
         specifier: ^22.10.0
         version: 22.20.5
       '@vitest/coverage-v8':
         specifier: ^3.0.0
         version: 3.2.7(vitest@3.2.7(@types/node@22.20.5))
+      seo-partner:
+        specifier: workspace:*
+        version: link:packages/cli
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -38,14 +68,53 @@ importers:
       '@seo-partner/core':
         specifier: workspace:*
         version: link:../core
+      '@seo-partner/crawler':
+        specifier: workspace:*
+        version: link:../crawler
+      '@seo-partner/dashboard':
+        specifier: workspace:*
+        version: link:../dashboard
+      '@seo-partner/mcp':
+        specifier: workspace:*
+        version: link:../mcp
       '@seo-partner/rules':
         specifier: workspace:*
         version: link:../rules
+      '@seo-partner/server':
+        specifier: workspace:*
+        version: link:../server
+      '@seo-partner/store':
+        specifier: workspace:*
+        version: link:../store
+      '@seo-partner/tools':
+        specifier: workspace:*
+        version: link:../tools
+
+  packages/core: {}
+
+  packages/crawler:
+    dependencies:
+      '@seo-partner/core':
+        specifier: workspace:*
+        version: link:../core
       '@seo-partner/store':
         specifier: workspace:*
         version: link:../store
 
-  packages/core: {}
+  packages/dashboard:
+    dependencies:
+      '@seo-partner/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/mcp:
+    dependencies:
+      '@seo-partner/core':
+        specifier: workspace:*
+        version: link:../core
+      '@seo-partner/tools':
+        specifier: workspace:*
+        version: link:../tools
 
   packages/rules:
     dependencies:
@@ -53,11 +122,53 @@ importers:
         specifier: workspace:*
         version: link:../core
 
+  packages/server:
+    dependencies:
+      '@seo-partner/adapters':
+        specifier: workspace:*
+        version: link:../adapters
+      '@seo-partner/core':
+        specifier: workspace:*
+        version: link:../core
+      '@seo-partner/crawler':
+        specifier: workspace:*
+        version: link:../crawler
+      '@seo-partner/dashboard':
+        specifier: workspace:*
+        version: link:../dashboard
+      '@seo-partner/rules':
+        specifier: workspace:*
+        version: link:../rules
+      '@seo-partner/store':
+        specifier: workspace:*
+        version: link:../store
+      '@seo-partner/tools':
+        specifier: workspace:*
+        version: link:../tools
+
   packages/store:
     dependencies:
       '@seo-partner/core':
         specifier: workspace:*
         version: link:../core
+
+  packages/tools:
+    dependencies:
+      '@seo-partner/adapters':
+        specifier: workspace:*
+        version: link:../adapters
+      '@seo-partner/core':
+        specifier: workspace:*
+        version: link:../core
+      '@seo-partner/crawler':
+        specifier: workspace:*
+        version: link:../crawler
+      '@seo-partner/rules':
+        specifier: workspace:*
+        version: link:../rules
+      '@seo-partner/store':
+        specifier: workspace:*
+        version: link:../store
 
 packages:
 

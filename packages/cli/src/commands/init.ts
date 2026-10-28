@@ -8,11 +8,18 @@ import {
   VALID_LANGUAGES,
   type IdeTarget,
   type SupportedLanguage,
+  type InitCommandResult,
 } from '@seo-partner/core';
 import {
   detectWorkspaceIdeTargets,
   IDE_INSTALLERS,
 } from '../ide-installers/index.js';
+import {
+  buildMcpConfigSnippets,
+  writeMcpConfig,
+} from './mcp.js';
+
+export type { InitCommandResult };
 
 export interface InitCommandOptions {
   readonly projectRoot: string;
@@ -21,16 +28,7 @@ export interface InitCommandOptions {
   readonly terminalOnly?: boolean;
   readonly dryRun?: boolean;
   readonly ignoreAgentTools?: boolean;
-}
-
-export interface InitCommandResult {
-  readonly projectRoot: string;
-  readonly ideTargets: ReadonlyArray<IdeTarget>;
-  readonly lang: SupportedLanguage;
-  readonly createdFiles: ReadonlyArray<string>;
-  readonly gitignoreUpdated: boolean;
-  readonly gitignoreAddedEntries: ReadonlyArray<string>;
-  readonly dryRun: boolean;
+  readonly withMcp?: boolean;
 }
 
 export function runInitCommand(options: InitCommandOptions): InitCommandResult {
@@ -91,6 +89,16 @@ export function runInitCommand(options: InitCommandOptions): InitCommandResult {
     createdFiles.push('.gitignore');
   }
 
+  let mcpSnippets = buildMcpConfigSnippets(ideTargets);
+  if (options.withMcp && !dryRun && ideTargets.length > 0) {
+    mcpSnippets = writeMcpConfig(projectRoot, mcpSnippets);
+    for (const snip of mcpSnippets) {
+      if (snip.written && !createdFiles.includes(snip.relativePath)) {
+        createdFiles.push(snip.relativePath);
+      }
+    }
+  }
+
   return {
     projectRoot,
     ideTargets,
@@ -99,6 +107,7 @@ export function runInitCommand(options: InitCommandOptions): InitCommandResult {
     gitignoreUpdated: gitignoreRes.updated,
     gitignoreAddedEntries: gitignoreRes.addedEntries,
     dryRun,
+    mcpSnippets,
   };
 }
 

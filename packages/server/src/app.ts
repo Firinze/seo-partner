@@ -41,6 +41,14 @@ import {
 } from '@seo-partner/rules';
 import { renderDashboardSpaHtml } from '@seo-partner/dashboard';
 import {
+  runScanCommand,
+  runAuditCommand,
+  getPatchBatch,
+  listPatchBatches,
+  proposePatches,
+  PatchesRequestSchema,
+} from '@seo-partner/tools';
+import {
   buildCorsHeaders,
   buildErrorEnvelope,
   buildSessionSetCookieHeader,
@@ -102,193 +110,22 @@ function computeProjectId(projectRoot: string): string {
 async function executeProjectScan(
   projectRoot: string,
   options?: { readonly rebuild?: boolean; readonly scopeDir?: string },
-): Promise<{
-  readonly projectId: string;
-  readonly projectName: string;
-  readonly frameworks: ReadonlyArray<string>;
-  readonly incremental: boolean;
-  readonly durationMs: number;
-  readonly filesScanned: number;
-  readonly routesDiscovered: number;
-}> {
-  const startTime = Date.now();
-  const resolvedRoot = path.resolve(projectRoot);
-  const config = loadSeoConfig(resolvedRoot);
-  const projectId = computeProjectId(resolvedRoot);
-  const projectName = config?.projectName ?? (path.basename(resolvedRoot) || 'seo-project');
-
-  const store = SeoDatabase.open(resolvedRoot, { rebuild: options?.rebuild });
-  try {
-    const projectRepo = new ProjectRepository(store);
-    const routeRepo = new RouteRepository(store);
-
-    const existingFilesByPath: Map<string, ScannedFile> = options?.rebuild
-      ? new Map()
-      : projectRepo.getExistingFilesByPath(projectId);
-    const incremental = !options?.rebuild && existingFilesByPath.size > 0;
-
-    const walkRes = await walkProjectFiles({
-      projectRoot: resolvedRoot,
-      projectId,
-      scopeDir: options?.scopeDir,
-      maxFileSizeKb: config?.maxFileSizeKb ?? 1024,
-      extraExcludePatterns: config?.excludePatterns,
-      existingFilesByPath: incremental ? existingFilesByPath : undefined,
-    });
-
-    const filePaths = walkRes.files.map((f) => f.path);
-    const robotsInfo = parseRobotsFiles(filePaths, walkRes.contentsByPath);
-    const sitemapInfo = parseSitemapFiles(filePaths, walkRes.contentsByPath);
-
-    const activeAdapters = await detectActiveAdapters(
-      resolvedRoot,
-      filePaths,
-      walkRes.contentsByPath,
-    );
-
-    const extractedRoutes: ExtractedRouteData[] = [];
-    const seenRouteKeys = new Set<string>();
-
-    for (const adapter of activeAdapters) {
-      const discovered = await adapter.discoverRoutes(
-        resolvedRoot,
-        filePaths,
-        walkRes.contentsByPath,
-        sitemapInfo.routePaths,
-      );
-      for (const route of discovered) {
-        const key = `${route.routerKind}:${route.pattern}`;
-        if (seenRouteKeys.has(key)) continue;
-        seenRouteKeys.add(key);
-
-        const content = walkRes.contentsByPath.get(route.filePath) ?? '';
-        const extracted = await adapter.extractRoute(resolvedRoot, route, content);
-        extractedRoutes.push(extracted);
-      }
-    }
-
-    const now = new Date().toISOString();
-    const projectRecord: ProjectRecord = {
-      id: projectId,
-      rootPath: resolvedRoot,
-      name: projectName,
-      frameworks: activeAdapters.map((a) => a.id),
-      hasRobotsTxt: robotsInfo.exists,
-      hasSitemap: sitemapInfo.exists,
-      createdAt: config?.createdAt ?? now,
-      lastScannedAt: now,
-    };
-
-    store.runInTransaction(() => {
-      projectRepo.upsertProject(projectRecord);
-      const fileIdByPath = projectRepo.replaceProjectFiles(projectId, walkRes.files);
-      routeRepo.replaceExtractedRoutes(projectId, fileIdByPath, extractedRoutes);
-    });
-
-    return {
-      projectId,
-      projectName,
-      frameworks: projectRecord.frameworks,
-      incremental,
-      durationMs: Date.now() - startTime,
-      filesScanned: walkRes.files.length,
-      routesDiscovered: extractedRoutes.length,
-    };
-  } finally {
-    store.close();
-  }
+) {
+  return runScanCommand({
+    projectRoot,
+    rebuild: options?.rebuild,
+    scopeDir: options?.scopeDir,
+  });
 }
 
 async function executeProjectAudit(
   projectRoot: string,
   crawlRunId?: string,
-): Promise<{
-  readonly projectId: string;
-  readonly crawlRunId: string | null;
-  readonly activeRulesCount: number;
-  readonly totalFindings: number;
-  readonly blockingIndexingCount: number;
-  readonly bySeverity: Record<SeverityLevel, number>;
-}> {
-  const resolvedRoot = path.resolve(projectRoot);
-  let store = SeoDatabase.open(resolvedRoot);
-  let project = new ProjectRepository(store).getLatestProject();
-  store.close();
-
-  if (!project) {
-    await executeProjectScan(resolvedRoot);
-    store = SeoDatabase.open(resolvedRoot);
-    project = new ProjectRepository(store).getLatestProject();
-    store.close();
-  }
-
-  if (!project) {
-    throw new Error('Could not initialize project index for audit');
-  }
-
-  store = SeoDatabase.open(resolvedRoot);
-  try {
-    const projectRepo = new ProjectRepository(store);
-    const routeRepo = new RouteRepository(store);
-    const crawlRepo = new CrawlRepository(store);
-    const findingRepo = new FindingRepository(store);
-
-    const files = projectRepo.listProjectFiles(project.id);
-    const sitemapFile = files.find((f) => f.kind === 'sitemap')?.path ?? null;
-    const robotsFile = files.find((f) => f.kind === 'robots')?.path ?? null;
-    let robotsTxtContent: string | null = null;
-    if (robotsFile && robotsFile.endsWith('.txt')) {
-      try {
-        robotsTxtContent = fs.readFileSync(path.join(resolvedRoot, robotsFile), 'utf-8');
-      } catch {
-        robotsTxtContent = null;
-      }
-    }
-
-    const routes = routeRepo.loadExtractedRoutes(project.id);
-    const activeCrawlRun = crawlRunId
-      ? crawlRepo.getCrawlRunById(crawlRunId)
-      : crawlRepo.getLatestCompletedCrawlRun(project.id);
-    const crawlPages = activeCrawlRun ? crawlRepo.getCrawlPages(activeCrawlRun.id) : [];
-
-    const evaluatedFindings = runRulesEngine({
-      project,
-      routes,
-      sitemapFilePath: sitemapFile,
-      crawlPages,
-      robotsTxtContent,
-      robotsFilePath: robotsFile,
-    });
-
-    store.runInTransaction(() => {
-      findingRepo.syncRulesCatalog(ALL_V02_RULES);
-      findingRepo.syncFindingsAndActions(evaluatedFindings);
-    });
-
-    const allFindings = findingRepo.listFindings();
-    const bySeverity: Record<SeverityLevel, number> = {
-      critical: 0,
-      high: 0,
-      medium: 0,
-      low: 0,
-    };
-    let blockingIndexingCount = 0;
-    for (const f of allFindings) {
-      bySeverity[f.severity] += 1;
-      if (f.blocksIndexing) blockingIndexingCount += 1;
-    }
-
-    return {
-      projectId: project.id,
-      crawlRunId: activeCrawlRun?.id ?? null,
-      activeRulesCount: ALL_V02_RULES.length,
-      totalFindings: allFindings.length,
-      blockingIndexingCount,
-      bySeverity,
-    };
-  } finally {
-    store.close();
-  }
+) {
+  return runAuditCommand({
+    projectRoot,
+    crawlRunId,
+  });
 }
 
 export function createLocalApiApp(options: LocalApiAppOptions): LocalApiApp {
@@ -437,6 +274,7 @@ export function createLocalApiApp(options: LocalApiAppOptions): LocalApiApp {
           : [];
         const comparisonRows = compareCodeVsCrawl(routes, crawlPages);
         const decisions = new DecisionRepository(store).listDecisions();
+        const patches = listPatchBatches(projectRoot);
 
         html = renderDashboardSpaHtml({
           lang: resolvedLang,
@@ -446,6 +284,7 @@ export function createLocalApiApp(options: LocalApiAppOptions): LocalApiApp {
           backlog,
           comparisonRows,
           decisions,
+          patches,
         });
       } finally {
         store.close();
@@ -493,7 +332,7 @@ export function createLocalApiApp(options: LocalApiAppOptions): LocalApiApp {
           200,
           buildSuccessEnvelope({
             status: 'ok',
-            version: '0.3.0',
+            version: '0.4.0',
             host: '127.0.0.1',
             port: activePort,
           }),
@@ -1058,6 +897,83 @@ export function createLocalApiApp(options: LocalApiAppOptions): LocalApiApp {
         } finally {
           store.close();
         }
+      }
+
+      if (method === 'GET' && pathname === '/api/v1/patches') {
+        const batchId = url.searchParams.get('batchId');
+        if (batchId) {
+          const batch = getPatchBatch(projectRoot, batchId);
+          if (!batch) {
+            return jsonResponse(
+              404,
+              buildErrorEnvelope({
+                typeSlug: 'patch-batch-not-found',
+                title: 'Patch Batch Not Found',
+                status: 404,
+                detail: `Patch batch '${batchId}' does not exist on disk.`,
+                instance: pathname,
+              }),
+              originHeader,
+            );
+          }
+          return jsonResponse(200, buildSuccessEnvelope(batch), originHeader);
+        }
+
+        const batches = listPatchBatches(projectRoot);
+        return jsonResponse(
+          200,
+          buildSuccessEnvelope({
+            total: batches.length,
+            batches,
+          }),
+          originHeader,
+        );
+      }
+
+      if (method === 'POST' && pathname === '/api/v1/patches') {
+        const rawBody = await req.json().catch(() => ({}));
+        if (
+          rawBody &&
+          typeof rawBody === 'object' &&
+          (rawBody as Record<string, unknown>).apply === true
+        ) {
+          return jsonResponse(
+            422,
+            buildErrorEnvelope({
+              typeSlug: 'apply-via-rest-forbidden',
+              title: 'Applying Patches Via REST API Is Forbidden',
+              status: 422,
+              detail:
+                'Applying patches via REST API is forbidden for security. Use CLI `seo-partner patch --apply` or MCP `propose_patch` with `--allow-apply`.',
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+
+        const parsedBody = PatchesRequestSchema.safeParse(rawBody);
+        if (!parsedBody.success) {
+          return jsonResponse(
+            422,
+            buildErrorEnvelope({
+              typeSlug: 'validation-error',
+              title: 'Invalid Patches Request Body',
+              status: 422,
+              detail: parsedBody.error,
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+
+        const result = await proposePatches({
+          projectRoot,
+          findingId: parsedBody.data.findingId,
+          ruleId: parsedBody.data.ruleId,
+          lang: defaultLang,
+        });
+
+        return jsonResponse(200, buildSuccessEnvelope(result), originHeader);
       }
 
       return jsonResponse(
