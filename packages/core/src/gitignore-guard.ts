@@ -3,19 +3,18 @@ import path from 'node:path';
 import { DEFAULT_EXCLUDE_PATTERNS } from './config.js';
 
 export const REQUIRED_GITIGNORE_ENTRIES: ReadonlyArray<string> = [
+  '.seo/',
+  '.seo-partner/',
+  '.mcp.json',
+  'seo-report.md',
+  '*-audit-*.md',
   '.agents/',
   '.claude/',
   '.cursor/',
   '.gemini/',
   '.codex/',
+  '.windsurf/',
   'specs/',
-  '.seo/index.db',
-  '.seo/index.db-shm',
-  '.seo/index.db-wal',
-  '.seo/logs/',
-  '.seo/cache/',
-  '.seo/patches/',
-  '.seo/backups/',
 ];
 
 const SECRET_FILE_PATTERNS: ReadonlyArray<RegExp> = [
