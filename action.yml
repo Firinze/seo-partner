@@ -1,6 +1,6 @@
-name: 'seo-partner Audit'
-description: 'Audit SEO deterministe, controle qualite CI/CD et export SARIF pour GitHub Code Scanning'
-author: 'Firinze Gbenito Dossou'
+name: 'SEO Partner — Contrôle Qualité SEO'
+description: 'Auditez le SEO de vos applications web en CI/CD, bloquez les régressions d indexation et intégrez les alertes SARIF dans GitHub Security.'
+author: 'Firinze Gbènito Dossou'
 
 branding:
   icon: 'search'
