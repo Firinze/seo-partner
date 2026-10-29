@@ -1,6 +1,6 @@
 {
   "name": "seo-partner-monorepo",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "description": "Deterministic local SEO scanner, anti-SSRF HTTP crawler, multi-framework adapters, GSC & CWV connectors, autonomous agent loop, local API & Dashboard",
   "license": "MIT",
@@ -42,4 +42,3 @@
     "vitest": "^3.0.0"
   }
 }
-

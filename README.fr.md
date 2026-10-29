@@ -4,7 +4,7 @@
 
 <br />
 
-[![Version](https://img.shields.io/badge/version-1.0.2-10b981?style=for-the-badge&logoColor=white)](./package.json)
+[![Version](https://img.shields.io/badge/version-1.0.3-10b981?style=for-the-badge&logoColor=white)](./package.json)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-059669?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7_Strict-047857?style=for-the-badge&logo=typescript&logoColor=white)](./tsconfig.base.json)
 [![Workspaces](https://img.shields.io/badge/Architecture-12_Packages-34d399?style=for-the-badge)](./package.json)
@@ -32,7 +32,7 @@
 ---
 
 > [!NOTE]
-> **Version 1.0.2 Disponible** : SEO Partner est desormais stabilise en version finale pour la production. Il s'installe en quelques secondes via `npx seo-partner init`, fonctionne a 100 % en local sur votre poste (sans envoyer vos fichiers a des serveurs tiers), et ne necessite aucune dependance cloud obligatoire.
+> **Version 1.0.3 Disponible** : SEO Partner est desormais stabilise en version finale pour la production. Il s'installe en quelques secondes via `npx seo-partner init`, fonctionne a 100 % en local sur votre poste (sans envoyer vos fichiers a des serveurs tiers), et ne necessite aucune dependance cloud obligatoire.
 
 ---
 
