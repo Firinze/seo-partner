@@ -1,6 +1,6 @@
 {
   "name": "seo-partner-monorepo",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Deterministic local SEO scanner, anti-SSRF HTTP crawler, multi-framework adapters, GSC & CWV connectors, autonomous agent loop, local API & Dashboard",
   "license": "MIT",
@@ -15,6 +15,10 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "pnpm -r typecheck",
     "build:sea": "node scripts/build-sea.mjs",
+    "generate:sbom": "node scripts/generate-sbom.mjs",
+    "verify:secrets": "node scripts/verify-no-secrets.mjs",
+    "audit:deps": "pnpm audit --prod",
+    "release:check": "node scripts/release-check.mjs",
     "seo-partner": "node packages/cli/dist/bin.js"
   },
   "devDependencies": {

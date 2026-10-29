@@ -1,6 +1,6 @@
 {
   "name": "@seo-partner/crawler",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,6 +17,10 @@
   "dependencies": {
     "@seo-partner/core": "workspace:*",
     "@seo-partner/store": "workspace:*"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "Firinze Gbènito Dossou"
 }
-

@@ -1,0 +1,8 @@
+{
+  "name": "real-world-nuxt",
+  "version": "1.0.0",
+  "dependencies": {
+    "nuxt": "^3.12.0",
+    "vue": "^3.4.0"
+  }
+}

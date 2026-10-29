@@ -90,6 +90,16 @@ export function parseLaravelRoutes(
         mappedFiles.add(filePath);
       }
     }
+
+    // 3. Controller-based routes: Route::get('/uri', [Controller::class, 'method'])
+    const routeControllerRegex =
+      /Route::(?:get|any)\s*\(\s*['"]([^'"]+)['"]\s*,\s*(?:\[|\w+Controller)/g;
+    while ((m = routeControllerRegex.exec(webPhp)) !== null) {
+      const pattern = normalizeRoutePattern(m[1] ?? '/');
+      if (!results.some((r) => r.pattern === pattern)) {
+        results.push({ pattern, filePath: 'routes/web.php', flavor: 'laravel' });
+      }
+    }
   }
 
   // Fallback for any public Blade view not explicitly matched in routes/web.php

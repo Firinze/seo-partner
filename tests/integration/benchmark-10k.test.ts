@@ -75,4 +75,23 @@ describe('SC-002: 10,000-File Cold Scan Performance & Memory Benchmark', () => {
     },
     60000,
   );
+
+  it(
+    'executes incremental scan on 5 modified files in under 5 seconds',
+    async () => {
+      // Modify 5 files
+      for (let i = 1; i <= 5; i++) {
+        const filePath = path.join(root, 'src', 'mod_0', `util_${i}.ts`);
+        fs.appendFileSync(filePath, `\n// modified timestamp: ${Date.now()}\n`, 'utf-8');
+      }
+
+      const incRes = await runScanCommand({ projectRoot: root });
+
+      expect(incRes.incremental).toBe(true);
+      expect(incRes.filesParsed).toBe(5);
+      expect(incRes.filesReused).toBeGreaterThanOrEqual(9995);
+      expect(incRes.durationMs).toBeLessThan(5000);
+    },
+    15000,
+  );
 });

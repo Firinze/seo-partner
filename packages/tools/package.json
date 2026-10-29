@@ -1,6 +1,6 @@
 {
   "name": "@seo-partner/tools",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -21,6 +21,10 @@
     "@seo-partner/connectors": "workspace:*",
     "@seo-partner/crawler": "workspace:*",
     "@seo-partner/rules": "workspace:*"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "Firinze Gbènito Dossou"
 }
-

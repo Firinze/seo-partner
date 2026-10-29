@@ -117,9 +117,10 @@ async function main() {
 
   const sha256Content = checksumLines.join('\n') + '\n';
   fs.writeFileSync(path.join(BIN_DIR, 'SHA256SUMS'), sha256Content, 'utf-8');
+  fs.writeFileSync(path.join(BIN_DIR, 'SHA256SUMS.txt'), sha256Content, 'utf-8');
 
   const manifest = {
-    version: '0.7.0',
+    version: '1.0.0',
     builtAt: new Date().toISOString(),
     binaries: binaryTargets,
   };

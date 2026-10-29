@@ -8,7 +8,7 @@ export function buildOpenApiSpec(options: OpenApiSpecOptions): Record<string, un
     openapi: '3.1.0',
     info: {
       title: 'seo-partner Local REST API',
-      version: '0.4.0',
+      version: '1.0.0',
       description:
         'Deterministic Local-First SEO API with RFC 9457 Problem Details, Host/Origin loopback protection, and HttpOnly session authentication.',
     },
@@ -95,7 +95,7 @@ export function buildOpenApiSpec(options: OpenApiSpecOptions): Record<string, un
       },
       '/api/v1/findings': {
         get: {
-          summary: 'Filterable list of SEO findings across 40 verified rules',
+          summary: 'Filterable list of SEO findings across 44 verified rules',
           responses: { '200': { description: 'Filtered findings' } },
         },
       },
@@ -111,7 +111,7 @@ export function buildOpenApiSpec(options: OpenApiSpecOptions): Record<string, un
           responses: { '200': { description: 'CrawlRun list' } },
         },
         post: {
-          summary: 'Trigger a new anti-SSRF HTTP crawl and re-run 40 rules audit',
+          summary: 'Trigger a new anti-SSRF HTTP crawl and re-run 44 rules audit',
           security: [{ SessionCookie: [] }],
           responses: {
             '200': { description: 'Crawl completed' },
@@ -135,7 +135,7 @@ export function buildOpenApiSpec(options: OpenApiSpecOptions): Record<string, un
       },
       '/api/v1/audit': {
         post: {
-          summary: 'Trigger the 40-rule SEO audit',
+          summary: 'Trigger the 44-rule SEO audit',
           security: [{ SessionCookie: [] }],
           responses: { '200': { description: 'Audit completed' } },
         },
@@ -161,55 +161,79 @@ export function buildOpenApiSpec(options: OpenApiSpecOptions): Record<string, un
       '/api/v1/patches': {
         get: {
           summary: 'List proposed patch batches or retrieve a batch by batchId',
-          parameters: [
-            {
-              name: 'batchId',
-              in: 'query',
-              required: false,
-              schema: { type: 'string' },
-              description: 'Optional batch ID to retrieve full patch details',
-            },
-          ],
-          responses: {
-            '200': { description: 'PatchBatchResult list or single batch' },
-            '404': { description: 'Batch not found (RFC 9457)' },
-          },
+          responses: { '200': { description: 'PatchBatchResult list or single batch' } },
         },
         post: {
           summary: 'Propose unified diff patches for actionable findings (non-destructive propose-patch)',
           security: [{ SessionCookie: [] }],
-          requestBody: {
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    findingId: { type: 'string' },
-                    ruleId: {
-                      type: 'string',
-                      enum: [
-                        'R-TECH-01',
-                        'R-TECH-02',
-                        'R-TECH-03',
-                        'R-TECH-05',
-                        'R-TECH-14',
-                        'R-ONPAGE-01',
-                        'R-ONPAGE-04',
-                      ],
-                    },
-                  },
-                },
-              },
-            },
-          },
-          responses: {
-            '200': { description: 'Proposed patch batch created' },
-            '401': { description: 'Authentication required' },
-            '422': { description: 'Validation error or apply rejected via API' },
-          },
+          responses: { '200': { description: 'Proposed patch batch created' } },
+        },
+      },
+      '/api/v1/watch': {
+        get: {
+          summary: 'Retrieve search engine official updates feed (Google/Bing) and alert if > 90 days',
+          responses: { '200': { description: 'Watch entries and freshness metrics' } },
+        },
+        post: {
+          summary: 'Sync official search engine RSS/Atom feeds',
+          security: [{ SessionCookie: [] }],
+          responses: { '200': { description: 'Watch feed synchronization result' } },
+        },
+      },
+      '/api/v1/gsc/performance': {
+        get: {
+          summary: 'Retrieve Google Search Console search analytics and queries',
+          responses: { '200': { description: 'GSC performance rows' } },
+        },
+        post: {
+          summary: 'Synchronize GSC performance data',
+          security: [{ SessionCookie: [] }],
+          responses: { '200': { description: 'GSC sync result' } },
+        },
+      },
+      '/api/v1/gsc/inspect': {
+        post: {
+          summary: 'Inspect single URL indexation status in Google Search Console',
+          security: [{ SessionCookie: [] }],
+          responses: { '200': { description: 'GSC URL inspection result' } },
+        },
+      },
+      '/api/v1/cwv': {
+        get: {
+          summary: 'Retrieve Core Web Vitals (CrUX and PageSpeed) field metrics',
+          responses: { '200': { description: 'CWV metrics' } },
+        },
+        post: {
+          summary: 'Fetch fresh Core Web Vitals from PageSpeed API',
+          security: [{ SessionCookie: [] }],
+          responses: { '200': { description: 'CWV fetch result' } },
+        },
+      },
+      '/api/v1/agent/run': {
+        post: {
+          summary: 'Start an autonomous SEO agent investigation and patch suggestion session',
+          security: [{ SessionCookie: [] }],
+          responses: { '200': { description: 'Agent session created' } },
+        },
+      },
+      '/api/v1/bing/performance': {
+        get: {
+          summary: 'Retrieve Bing Webmaster Tools performance and query data',
+          responses: { '200': { description: 'Bing performance rows' } },
+        },
+        post: {
+          summary: 'Sync Bing Webmaster Tools performance data',
+          security: [{ SessionCookie: [] }],
+          responses: { '200': { description: 'Bing sync result' } },
+        },
+      },
+      '/api/v1/bing/inspect': {
+        post: {
+          summary: 'Inspect single URL indexation status in Bing Webmaster Tools',
+          security: [{ SessionCookie: [] }],
+          responses: { '200': { description: 'Bing URL inspection result' } },
         },
       },
     },
   };
 }
-

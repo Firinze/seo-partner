@@ -1,0 +1,7 @@
+{
+  "name": "laravel/real-world-portal",
+  "require": {
+    "php": "^8.2",
+    "laravel/framework": "^11.0"
+  }
+}

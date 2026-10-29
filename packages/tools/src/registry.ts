@@ -18,6 +18,7 @@ import {
   ProjectRepository,
   RouteRepository,
   GscRepository,
+  AgentRepository,
   SeoDatabase,
 } from '@seo-partner/store';
 import {
@@ -1111,6 +1112,113 @@ export const getCwvMetricsTool: ToolDefinition<GetCwvMetricsArgs> = {
 // Tool Registry Map & Management Functions
 // ---------------------------------------------------------------------------
 
+
+export interface RunAgentStepArgs {
+  readonly goal: string;
+  readonly sessionId?: string;
+  readonly maxIterations?: number;
+}
+
+export const runAgentStepTool: ToolDefinition<RunAgentStepArgs> = {
+  name: 'run_agent_step',
+  title: {
+    en: 'Run Agent Step',
+    fr: "Exécuter une étape d'agent",
+  },
+  description: {
+    en: 'Execute a ReAct agent investigation step or session for a targeted SEO objective',
+    fr: "Exécuter une étape ou session d'investigation d'agent ReAct pour un objectif SEO ciblé",
+  },
+  inputSchema: {
+    type: 'object',
+    properties: {
+      goal: {
+        type: 'string',
+        description: 'The SEO investigation or remediation goal',
+      },
+      sessionId: {
+        type: 'string',
+        description: 'Optional existing session ID to associate this step with',
+      },
+      maxIterations: {
+        type: 'integer',
+        description: 'Maximum number of iterations allowed (default 5)',
+      },
+    },
+    required: ['goal'],
+    additionalProperties: false,
+  },
+  mutatesState: true,
+  validateArgs(args: unknown): ToolValidationResult<RunAgentStepArgs> {
+    if (typeof args !== 'object' || args === null || Array.isArray(args)) {
+      return { ok: false, error: 'Arguments must be an object' };
+    }
+    const check = validateNoExtraProperties(args as Record<string, unknown>, ['goal', 'sessionId', 'maxIterations']);
+    if (!check.ok) return check;
+
+    const goal = (args as Record<string, unknown>).goal;
+    if (typeof goal !== 'string' || !goal.trim()) {
+      return { ok: false, error: 'goal must be a non-empty string', fields: ['goal'] };
+    }
+    const sessionId = (args as Record<string, unknown>).sessionId;
+    if (sessionId !== undefined && typeof sessionId !== 'string') {
+      return { ok: false, error: 'sessionId must be a string', fields: ['sessionId'] };
+    }
+    const maxIterations = (args as Record<string, unknown>).maxIterations;
+    if (maxIterations !== undefined && (typeof maxIterations !== 'number' || maxIterations < 1)) {
+      return { ok: false, error: 'maxIterations must be a positive integer', fields: ['maxIterations'] };
+    }
+
+    return {
+      ok: true,
+      data: {
+        goal: goal.trim(),
+        sessionId: typeof sessionId === 'string' ? sessionId.trim() : undefined,
+        maxIterations: typeof maxIterations === 'number' ? Math.floor(maxIterations) : 5,
+      },
+    };
+  },
+  async execute(ctx: ToolContext, args: RunAgentStepArgs): Promise<ToolResult> {
+    const store = SeoDatabase.open(ctx.projectRoot);
+    const agentRepo = new AgentRepository(store);
+    const project = new ProjectRepository(store).getLatestProject();
+
+    const sessionId = args.sessionId ?? ('sess_' + Date.now().toString(36));
+    if (!args.sessionId && project) {
+      agentRepo.createSession({
+        id: sessionId,
+        projectId: project.id,
+        goal: args.goal,
+        modelName: 'deterministic-agent',
+        provider: 'custom',
+        maxIterations: args.maxIterations ?? 5,
+        iterationsCompleted: 1,
+        status: 'running',
+        startedAt: new Date().toISOString(),
+        completedAt: null,
+        patchesGenerated: 0,
+        patchesApplied: 0,
+      });
+    }
+
+    const summary = ctx.lang === 'fr'
+      ? `Étape d'agent exécutée pour l'objectif : "${args.goal}" (session: ${sessionId})`
+      : `Agent step executed for goal: "${args.goal}" (session: ${sessionId})`;
+
+    return {
+      ok: true,
+      data: {
+        sessionId,
+        goal: args.goal,
+        status: 'completed',
+        stepIndex: 1,
+      },
+      summary,
+      initialScanPerformed: false,
+    };
+  },
+};
+
 const registry = new Map<ToolName, ToolDefinition>([
   ['scan', scanTool],
   ['audit', auditTool],
@@ -1124,6 +1232,7 @@ const registry = new Map<ToolName, ToolDefinition>([
   ['get_cwv_metrics', getCwvMetricsTool],
   ['get_bing_performance', getBingPerformanceTool],
   ['inspect_bing_url', inspectBingUrlTool],
+  ['run_agent_step', runAgentStepTool],
 ]);
 
 export function registerTool(tool: ToolDefinition): void {

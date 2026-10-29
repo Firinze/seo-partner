@@ -7,4 +7,4 @@ export * from './gitignore-guard.js';
 export * from './outbound-log.js';
 export * from './memory.js';
 export * from './fs-walker.js';
-
+export * from './security/secret-patterns.js';

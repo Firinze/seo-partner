@@ -1,0 +1,7 @@
+{
+  "name": "real-world-astro",
+  "version": "1.0.0",
+  "dependencies": {
+    "astro": "^4.10.0"
+  }
+}

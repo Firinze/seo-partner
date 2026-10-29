@@ -1,6 +1,6 @@
 {
   "name": "seo-partner",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "bin": {
     "seo-partner": "./dist/bin.js"
@@ -28,6 +28,10 @@
     "@seo-partner/tools": "workspace:*",
     "@seo-partner/mcp": "workspace:*",
     "@seo-partner/agent": "workspace:*"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "Firinze Gbènito Dossou"
 }
-

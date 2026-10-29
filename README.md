@@ -4,7 +4,7 @@
 
 <br />
 
-[![Version](https://img.shields.io/badge/version-0.8.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
+[![Version](https://img.shields.io/badge/version-1.0.0_GA-10b981?style=for-the-badge&logoColor=white)](./package.json)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-059669?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7_Strict-047857?style=for-the-badge&logo=typescript&logoColor=white)](./tsconfig.base.json)
 [![Packages](https://img.shields.io/badge/Workspaces-12_Packages-34d399?style=for-the-badge)](./package.json)

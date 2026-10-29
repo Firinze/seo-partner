@@ -1,6 +1,6 @@
 {
   "name": "@seo-partner/dashboard",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,6 +16,10 @@
   },
   "dependencies": {
     "@seo-partner/core": "workspace:*"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "Firinze Gbènito Dossou"
 }
-

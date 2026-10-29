@@ -1,5 +1,3 @@
- 
-
 # Cahier des charges : seo-partner (nom de travail)
 
 Version 1.0 (brouillon à valider) | 28 octobre 2026 | Auteur : Firinze Gbènito Dossou (Leadbooster)
@@ -35,59 +33,56 @@ Décision structurante : TypeScript/Node de bout en bout, un écart assumé avec
 - **P2 Consultant / agence** : audite des sites clients (WordPress, Shopify, Wix) en mode crawl et produit des rapports.
 - **P3 Contributeur open source** : ajoute un adapter ou une règle.
 
-
-| ID   | User story                                                               | Critère d'acceptation                                                                                                                                                                                                                                                                                                                                                                         |
-| ------ | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| US1  | P1 installe et initialise l'outil sans piège                            | Installation globale (`pnpm add -g seo-partner` / `npm i -g seo-partner`, ou `npx` ponctuel), puis `seo-partner init --here --ide <cible>` : détecte l'IDE sans exiger de binaire dans le `PATH` (`--ignore-agent-tools` implicite ou explicite), fusionne sans écraser le projet existant, sécurise `.gitignore` (`.agents/`, `.seo/index.db`) et passe `doctor` au vert en moins de 2 min |
-| US2  | P1 scanne un projet de 10 000 fichiers                                   | Terminé en moins de 60 s à froid, `.gitignore` respecté, aucun secret lu                                                                                                                                                                                                                                                                                                                    |
-| US3  | P1 relance après modification de 5 fichiers                             | Scan incrémental sous 5 s                                                                                                                                                                                                                                                                                                                                                                     |
-| US4  | P1 demande « quelles pages n'ont pas de meta description ? »           | L'agent répond via MCP avec fichier et ligne, sans relire les fichiers                                                                                                                                                                                                                                                                                                                        |
-| US5  | P2 crawle un site en ligne                                               | robots.txt respecté, débit configurable, rapport avec statuts, canonical, redirections, hreflang                                                                                                                                                                                                                                                                                             |
-| US6  | P1 reçoit un backlog priorisé                                          | Chaque action a score ICE, preuve (fichier+ligne ou URL), responsable, KPI                                                                                                                                                                                                                                                                                                                     |
-| US7  | P1 ouvre le dashboard                                                    | `seo-partner dashboard` ouvre une page locale, table de 10 000 lignes fluide                                                                                                                                                                                                                                                                                                                   |
-| US8  | P3 ajoute un adapter                                                     | Guide + gabarit + tests de conformité, aucun changement du core                                                                                                                                                                                                                                                                                                                               |
-| US9  | P1 suit les changements de Google                                        | `watch` compare les sources officielles, tout non confirmé est marqué « Rapporté, à vérifier »                                                                                                                                                                                                                                                                                          |
-| US10 | P1 vérifie que son code ne sort pas                                     | Mode `--offline` et journal des requêtes sortantes consultable                                                                                                                                                                                                                                                                                                                                |
-| US11 | P2 n'a pas d'agent d'IDE mais une clé API (Anthropic, OpenAI ou Gemini) | seo-partner agent fonctionne avec la clé, coût estimé affiché, plafond de jetons respecté ; sans clé, toutes les commandes déterministes restent utilisables                                                                                                                                                                                                                            |
-| US12 | P1 utilise Claude Code, Codex, Gemini CLI, Cursor ou OpenCode            | Le même skill et les mêmes outils MCP donnent des résultats équivalents sur chaque cible (scénarios de test communs)                                                                                                                                                                                                                                                                      |
+| ID | User story | Critère d'acceptation |
+| --- | --- | --- |
+| US1 | P1 installe et initialise l'outil sans piège | Installation globale (`pnpm add -g seo-partner` / `npm i -g seo-partner`, ou `npx` ponctuel), puis `seo-partner init --here --ide <cible>` : détecte l'IDE sans exiger de binaire dans le `PATH` (`--ignore-agent-tools` implicite ou explicite), fusionne sans écraser le projet existant, sécurise `.gitignore` (`.agents/`, `.seo/index.db`) et passe `doctor` au vert en moins de 2 min |
+| US2 | P1 scanne un projet de 10 000 fichiers | Terminé en moins de 60 s à froid, `.gitignore` respecté, aucun secret lu |
+| US3 | P1 relance après modification de 5 fichiers | Scan incrémental sous 5 s |
+| US4 | P1 demande « quelles pages n'ont pas de meta description ? » | L'agent répond via MCP avec fichier et ligne, sans relire les fichiers |
+| US5 | P2 crawle un site en ligne | robots.txt respecté, débit configurable, rapport avec statuts, canonical, redirections, hreflang |
+| US6 | P1 reçoit un backlog priorisé | Chaque action a score ICE, preuve (fichier+ligne ou URL), responsable, KPI |
+| US7 | P1 ouvre le dashboard | `seo-partner dashboard` ouvre une page locale, table de 10 000 lignes fluide |
+| US8 | P3 ajoute un adapter | Guide + gabarit + tests de conformité, aucun changement du core |
+| US9 | P1 suit les changements de Google | `watch` compare les sources officielles, tout non confirmé est marqué « Rapporté, à vérifier » |
+| US10 | P1 vérifie que son code ne sort pas | Mode `--offline` et journal des requêtes sortantes consultable |
+| US11 | P2 n'a pas d'agent d'IDE mais une clé API (Anthropic, OpenAI ou Gemini) | seo-partner agent fonctionne avec la clé, coût estimé affiché, plafond de jetons respecté ; sans clé, toutes les commandes déterministes restent utilisables |
+| US12 | P1 utilise Claude Code, Codex, Gemini CLI, Cursor ou OpenCode | Le même skill et les mêmes outils MCP donnent des résultats équivalents sur chaque cible (scénarios de test communs) |
 
 ## 4. Objectifs et critères de succès
 
-
-| Indicateur                                                       | Cible v1.0                     | Mesure                                  |
-| ------------------------------------------------------------------ | -------------------------------- | ----------------------------------------- |
-| Installation jusqu'au premier rapport                            | < 10 min                       | Test chronométré sur 5 projets réels |
-| Scan à froid, 10 000 fichiers                                   | < 60 s                         | Benchmark CI sur jeu généré          |
-| Scan incrémental (5 fichiers)                                   | < 5 s                          | Idem                                    |
-| Mémoire maximale pendant un scan                                | < 1 Go                         | Idem                                    |
-| Installations réussies (`doctor` vert)                          | >= 90 % sur les IDE supportés | Matrice de tests + retours              |
-| Faux positifs des règles Must                                   | < 10 %                         | Revue manuelle de 20 projets            |
-| Fichiers source envoyés à un tiers sans autorisation explicite | 0                              | Test automatisé + journal              |
-| Couverture de tests du core                                      | >= 80 %                        | CI                                      |
-| Utilisateurs externes ayant lancé un audit complet              | >= 10 à 6 mois                | Retours, issues, discussions            |
+| Indicateur | Cible v1.0 | Mesure |
+| --- | --- | --- |
+| Installation jusqu'au premier rapport | < 10 min | Test chronométré sur 5 projets réels |
+| Scan à froid, 10 000 fichiers | < 60 s | Benchmark CI sur jeu généré |
+| Scan incrémental (5 fichiers) | < 5 s | Idem |
+| Mémoire maximale pendant un scan | < 1 Go | Idem |
+| Installations réussies (`doctor` vert) | >= 90 % sur les IDE supportés | Matrice de tests + retours |
+| Faux positifs des règles Must | < 10 % | Revue manuelle de 20 projets |
+| Fichiers source envoyés à un tiers sans autorisation explicite | 0 | Test automatisé + journal |
+| Couverture de tests du core | >= 80 % | CI |
+| Utilisateurs externes ayant lancé un audit complet | >= 10 à 6 mois | Retours, issues, discussions |
 
 Toutes les cibles chiffrées sont des hypothèses à confirmer par benchmark après v0.1.
 
 ## 5. Périmètre fonctionnel (MoSCoW)
 
-
-| Module                                 | Contenu                                                                                              | Priorité | Version      |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------ | ----------- | -------------- |
-| M1 Skill pack                          | Skill généralisé + références                                                                   | Must      | v0.1         |
-| M2 CLI et installeur                   | `init`, `doctor`, `scan`, `uninstall`                                                                | Must      | v0.1         |
-| M3 Scanner et index                    | Rapport JSON puis SQLite incrémental                                                                | Must      | v0.1 à v0.2 |
-| M4 Moteur de règles + ICE             | Catalogue de règles, backlog                                                                        | Must      | v0.1         |
-| M5 Crawler                             | HTTP, robots, rendu optionnel                                                                        | Must      | v0.2         |
-| M6 Rapports                            | Markdown, JSON, HTML autonome                                                                        | Should    | v0.2         |
-| M7 Dashboard local                     | Lecture seule d'abord                                                                                | Should    | v0.3         |
-| M8 Serveur MCP                         | Interrogation de l'index par l'agent                                                                 | Should    | v0.4         |
-| M9 Connecteurs                         | Search Console, PageSpeed Insights, Bing WMT                                                         | Should    | v0.4         |
-| M10 Veille                             | Commande `watch`                                                                                     | Should    | v0.4         |
-| M11 Adapters supplémentaires          | Voir ci-dessous                                                                                      | Should    | v0.5 à v1.0 |
-| M12 GitHub Action                      | Audit en CI                                                                                          | Could     | v0.5         |
-| M13 Rapport à la marque du consultant | White label                                                                                          | Could     | après v1.0  |
-| M14 Mode autonome                      | Boucle d'agent interne avec clé API (Anthropic, OpenAI, Gemini), panneau de discussion du dashboard | Should    | v0.6         |
-| M15 Parcours non techniques            | Installation guidée et actions depuis le dashboard, sans passer par un IDE                          | Could     | après v1.0  |
+| Module | Contenu | Priorité | Version |
+| --- | --- | --- | --- |
+| M1 Skill pack | Skill généralisé + références | Must | v0.1 |
+| M2 CLI et installeur | `init`, `doctor`, `scan`, `uninstall` | Must | v0.1 |
+| M3 Scanner et index | Rapport JSON puis SQLite incrémental | Must | v0.1 à v0.2 |
+| M4 Moteur de règles + ICE | Catalogue de règles, backlog | Must | v0.1 |
+| M5 Crawler | HTTP, robots, rendu optionnel | Must | v0.2 |
+| M6 Rapports | Markdown, JSON, HTML autonome | Should | v0.2 |
+| M7 Dashboard local | Lecture seule d'abord | Should | v0.3 |
+| M8 Serveur MCP | Interrogation de l'index par l'agent | Should | v0.4 |
+| M9 Connecteurs | Search Console, PageSpeed Insights, Bing WMT | Should | v0.4 |
+| M10 Veille | Commande `watch` | Should | v0.4 |
+| M11 Adapters supplémentaires | Voir ci-dessous | Should | v0.5 à v1.0 |
+| M12 GitHub Action | Audit en CI | Could | v0.5 |
+| M13 Rapport à la marque du consultant | White label | Could | après v1.0 |
+| M14 Mode autonome | Boucle d'agent interne avec clé API (Anthropic, OpenAI, Gemini), panneau de discussion du dashboard | Should | v0.6 |
+| M15 Parcours non techniques | Installation guidée et actions depuis le dashboard, sans passer par un IDE | Could | après v1.0 |
 
 **Technologies à supporter (ordre d'implémentation)**
 
@@ -204,22 +199,21 @@ skills/        skill pack indépendant des IDE
 
 ## 9. Modèle de données (SQLite)
 
-
-| Table                        | Colonnes clés                                                                            |
-| ------------------------------ | ------------------------------------------------------------------------------------------- |
-| project                      | id, root, frameworks, created\_at                                                         |
-| file                         | id, path, hash, mtime, size, kind, scanned\_at                                            |
-| route                        | id, file\_id, pattern, rendering\_mode                                                    |
-| page\_meta                   | route\_id, title, description, canonical, robots, h1, og\_json, hreflang\_json            |
-| link                         | from\_route, to\_url, anchor, kind, rel                                                   |
-| schema\_item                 | route\_id, type, json, valid                                                              |
-| crawl\_run / crawl\_page     | config, statut, url, code HTTP, chaîne de redirection, indexable, délai                 |
-| rule                         | id, category, severity, source\_url                                                       |
-| finding                      | id, rule\_id, subject\_ref, evidence\_json, status, first\_seen, last\_seen, resolved\_at |
-| action                       | finding\_id, ice\_i, ice\_c, ice\_e, score, owner, due, kpi, status                       |
-| metric\_snapshot             | date, source, url, impressions, clicks, ctr, position                                     |
-| watch\_source / watch\_entry | url, type, last\_checked, hash, summary, confirmed                                        |
-| decision                     | date, text, rationale, finding\_id                                                        |
+| Table | Colonnes clés |
+| --- | --- |
+| project | id, root, frameworks, created\_at |
+| file | id, path, hash, mtime, size, kind, scanned\_at |
+| route | id, file\_id, pattern, rendering\_mode |
+| page\_meta | route\_id, title, description, canonical, robots, h1, og\_json, hreflang\_json |
+| link | from\_route, to\_url, anchor, kind, rel |
+| schema\_item | route\_id, type, json, valid |
+| crawl\_run / crawl\_page | config, statut, url, code HTTP, chaîne de redirection, indexable, délai |
+| rule | id, category, severity, source\_url |
+| finding | id, rule\_id, subject\_ref, evidence\_json, status, first\_seen, last\_seen, resolved\_at |
+| action | finding\_id, ice\_i, ice\_c, ice\_e, score, owner, due, kpi, status |
+| metric\_snapshot | date, source, url, impressions, clicks, ctr, position |
+| watch\_source / watch\_entry | url, type, last\_checked, hash, summary, confirmed |
+| decision | date, text, rationale, finding\_id |
 
 Migrations versionnées ; le schéma ERD est un livrable de v0.2.
 
@@ -233,15 +227,14 @@ Migrations versionnées ; le schéma ERD est un livrable de v0.2.
 - `POST /scans` et `POST /crawls` acceptent `Idempotency-Key`.
 - Changement cassant = `/v2` ; dépréciation annoncée dans le changelog.
 
-
-| Endpoint                            | Rôle                            |
-| ------------------------------------- | ---------------------------------- |
-| GET /projects, /pages, /pages/{id}  | Lecture de l'index               |
+| Endpoint | Rôle |
+| --- | --- |
+| GET /projects, /pages, /pages/{id} | Lecture de l'index |
 | GET /findings, PATCH /findings/{id} | Constats et changement de statut |
-| GET /backlog                        | Actions triées par ICE          |
-| POST /scans, POST /crawls           | Lancer un job                    |
-| GET /jobs/{id}, /jobs/{id}/events   | État et progression             |
-| GET /metrics, /watch, /health       | Mesures, veille, santé          |
+| GET /backlog | Actions triées par ICE |
+| POST /scans, POST /crawls | Lancer un job |
+| GET /jobs/{id}, /jobs/{id}/events | État et progression |
+| GET /metrics, /watch, /health | Mesures, veille, santé |
 
 **10.2 Outils MCP.** Lecture seule par défaut : `list_pages`, `get_page`, `list_findings`, `get_backlog`, `search_index`, `get_history`. Actions avec confirmation : `run_scan`, `run_crawl`, `record_decision`. Le contenu issu du crawl est signalé comme non fiable dans les réponses.
 
@@ -278,17 +271,16 @@ Migrations versionnées ; le schéma ERD est un livrable de v0.2.
 
 Principe : local-first. L'outil n'envoie jamais de contenu du projet à un tiers de sa propre initiative. En mode agent hôte, le fournisseur du modèle est celui de l'IDE de l'utilisateur, hors du contrôle de l'outil. En mode autonome, seuls des extraits de l'index (chemins, métadonnées, constats) partent vers le fournisseur choisi, et l'envoi d'extraits de fichiers source exige une autorisation explicite. Les recherches web ne contiennent jamais d'extraits du code.
 
-
-| Menace                                                     | Mesure                                                                                                             |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| Fuite de code ou de secrets                                | Exclusion des `.env` et clés, masquage, requêtes web sans contenu de code, mode `--offline`, journal des sorties |
-| SSRF via le crawler                                        | Liste de domaines autorisés, adresses privées bloquées par défaut                                              |
-| Accès au dashboard depuis le réseau, CSRF, DNS rebinding | Écoute sur 127.0.0.1, contrôle Host et Origin, token de session, CORS fermé                                     |
-| Injection de prompt via pages crawlées ou fichiers        | Contenu externe traité comme donnée, jamais comme instruction, marqué non fiable côté MCP                     |
-| Attaque sur la chaîne d'approvisionnement npm             | Peu de dépendances, lockfile, analyse des dépendances, publication avec provenance, 2FA                          |
-| Vol des jetons Google et des clés API des modèles        | Trousseau du système ou fichier en 0600, jamais dans `.seo/` commité, PKCE                                       |
-| Écriture non voulue par l'agent                           | Mode propose-patch par défaut, confirmation et `--dry-run`                                                        |
-| Télémétrie                                              | Aucune par défaut, opt-in explicite                                                                               |
+| Menace | Mesure |
+| --- | --- |
+| Fuite de code ou de secrets | Exclusion des `.env` et clés, masquage, requêtes web sans contenu de code, mode `--offline`, journal des sorties |
+| SSRF via le crawler | Liste de domaines autorisés, adresses privées bloquées par défaut |
+| Accès au dashboard depuis le réseau, CSRF, DNS rebinding | Écoute sur 127.0.0.1, contrôle Host et Origin, token de session, CORS fermé |
+| Injection de prompt via pages crawlées ou fichiers | Contenu externe traité comme donnée, jamais comme instruction, marqué non fiable côté MCP |
+| Attaque sur la chaîne d'approvisionnement npm | Peu de dépendances, lockfile, analyse des dépendances, publication avec provenance, 2FA |
+| Vol des jetons Google et des clés API des modèles | Trousseau du système ou fichier en 0600, jamais dans `.seo/` commité, PKCE |
+| Écriture non voulue par l'agent | Mode propose-patch par défaut, confirmation et `--dry-run` |
+| Télémétrie | Aucune par défaut, opt-in explicite |
 
 **Mode autonome (clé API)**
 
@@ -313,16 +305,15 @@ Principe : local-first. L'outil n'envoie jamais de contenu du projet à un tiers
 
 ## 16. Feuille de route et déploiement progressif
 
-
-| Version                | Contenu                                                                                                                             | Critère de sortie                                      |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| v0.1 (2 à 3 semaines) | Skill généralisé, `init` sur 5 cibles, `doctor`, scan Next.js, rapport JSON/MD, 15 règles                                       | US1 et US2, premier rapport sous 10 min sur 3 projets   |
-| v0.2 (2 à 3 semaines) | SQLite, incrémental, crawl, rapports HTML, PHP (Laravel, Symfony, Laragon), 40 règles                                             | US3 et US5, cibles de performance tenues                |
-| v0.3 (2 semaines)      | Dashboard lecture seule, OpenAPI                                                                                                    | US7, accessibilité AA vérifiée                       |
-| v0.4 (2 à 3 semaines) | MCP, Search Console, PageSpeed Insights, `watch`                                                                                    | US4, US9, US10                                          |
-| v0.5 (2 semaines)      | Astro, Nuxt, SvelteKit, SPA Vite, GitHub Action                                                                                     | Adapters validés sur projets réels                    |
+| Version | Contenu | Critère de sortie |
+| --- | --- | --- |
+| v0.1 (2 à 3 semaines) | Skill généralisé, `init` sur 5 cibles, `doctor`, scan Next.js, rapport JSON/MD, 15 règles | US1 et US2, premier rapport sous 10 min sur 3 projets |
+| v0.2 (2 à 3 semaines) | SQLite, incrémental, crawl, rapports HTML, PHP (Laravel, Symfony, Laragon), 40 règles | US3 et US5, cibles de performance tenues |
+| v0.3 (2 semaines) | Dashboard lecture seule, OpenAPI | US7, accessibilité AA vérifiée |
+| v0.4 (2 à 3 semaines) | MCP, Search Console, PageSpeed Insights, `watch` | US4, US9, US10 |
+| v0.5 (2 semaines) | Astro, Nuxt, SvelteKit, SPA Vite, GitHub Action | Adapters validés sur projets réels |
 | v0.6 (2 à 3 semaines) | Mode autonome : adapters Anthropic, OpenAI, Gemini, recherche web intégrée, plafonds de coût, panneau de discussion du dashboard | US11, journal des envois vérifié par test automatisé |
-| v1.0 (3 à 4 semaines) | Durcissement, documentation complète, revue de sécurité, gel de l'API v1, binaire autonome                                       | Tous les critères de la section 4                      |
+| v1.0 (3 à 4 semaines) | Durcissement, documentation complète, revue de sécurité, gel de l'API v1, binaire autonome | Tous les critères de la section 4 |
 
 Estimations indicatives pour un mainteneur à plein temps (environ 4 à 5 mois au total), à recalibrer après v0.1.
 
@@ -330,17 +321,16 @@ Estimations indicatives pour un mainteneur à plein temps (environ 4 à 5 mois a
 
 ## 17. Risques
 
-
-| Risque                                                   | Proba.  | Impact                          | Réponse                                                                      |
-| ---------------------------------------------------------- | --------- | --------------------------------- | ------------------------------------------------------------------------------- |
-| Dispersion du périmètre                                | Haute   | Livraison retardée             | Phasage strict, Next.js d'abord                                               |
-| Concurrence de packs SEO existants                       | Moyenne | Faible adoption                 | Différenciateur : index local + crawl + dashboard, pas seulement des prompts |
-| Formats des IDE qui évoluent                            | Haute   | Installeur cassé               | Tests d'installation par cible, adapters d'IDE isolés                        |
-| Faux positifs                                            | Moyenne | Perte de confiance              | Preuve obligatoire par constat, corpus de test                                |
-| Crawl abusif ou contraire aux conditions d'un site       | Moyenne | Risque juridique et réputation | robots.txt, débit limité, User-Agent identifiable                           |
-| Dépendance aux API Google (quotas, changements)         | Moyenne | Fonction dégradée             | Cache, mode sans connecteur                                                   |
-| Charge de maintenance sur une seule personne             | Haute   | Projet abandonné               | Périmètre réduit, contributions via guides d'adapter                       |
-| Incident de sécurité sur un outil qui lit tout le code | Faible  | Réputation                     | Section 13, revue avant v1.0                                                  |
+| Risque | Proba. | Impact | Réponse |
+| --- | --- | --- | --- |
+| Dispersion du périmètre | Haute | Livraison retardée | Phasage strict, Next.js d'abord |
+| Concurrence de packs SEO existants | Moyenne | Faible adoption | Différenciateur : index local + crawl + dashboard, pas seulement des prompts |
+| Formats des IDE qui évoluent | Haute | Installeur cassé | Tests d'installation par cible, adapters d'IDE isolés |
+| Faux positifs | Moyenne | Perte de confiance | Preuve obligatoire par constat, corpus de test |
+| Crawl abusif ou contraire aux conditions d'un site | Moyenne | Risque juridique et réputation | robots.txt, débit limité, User-Agent identifiable |
+| Dépendance aux API Google (quotas, changements) | Moyenne | Fonction dégradée | Cache, mode sans connecteur |
+| Charge de maintenance sur une seule personne | Haute | Projet abandonné | Périmètre réduit, contributions via guides d'adapter |
+| Incident de sécurité sur un outil qui lit tout le code | Faible | Réputation | Section 13, revue avant v1.0 |
 
 ## 18. Gouvernance et valeur
 
@@ -350,18 +340,17 @@ Estimations indicatives pour un mainteneur à plein temps (environ 4 à 5 mois a
 
 ## 19. Décisions d'architecture et questions ouvertes
 
-
-| ADR | Décision                                                                          | Alternative écartée                                                    | Raison                                                                                                                                                                                                                                                                    |
-| ----- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 001 | TypeScript/Node de bout en bout                                                    | FastAPI + Next.js (défaut des prompts)                                  | Installation globale simple (`pnpm add -g` / `npm i -g`) ou `npx`, un seul langage à maintenir (Node requis chez l'utilisateur, binaire autonome prévu pour les profils PHP, Python et Ruby), SDK MCP en TypeScript ; Python reste possible pour des scripts optionnels |
-| 002 | SPA Vite servie localement                                                         | Next.js                                                                  | Pas de SSR nécessaire, installation plus légère                                                                                                                                                                                                                        |
-| 003 | SQLite                                                                             | PostgreSQL, MongoDB                                                      | Local-first, zéro service, fichier unique                                                                                                                                                                                                                                |
-| 004 | Monolithe modulaire                                                                | Microservices                                                            | Outil local mono-processus                                                                                                                                                                                                                                                |
-| 005 | Index déterministe interrogé par l'agent                                         | Agent qui lit les fichiers                                               | Coût, vitesse et fiabilité sur 10 000+ fichiers                                                                                                                                                                                                                         |
-| 006 | MCP comme canal principal, skill comme couche de méthode                          | Prompts seuls                                                            | Portabilité entre IDE                                                                                                                                                                                                                                                    |
-| 007 | Propose-patch par défaut                                                          | Écriture automatique                                                    | Sécurité et confiance                                                                                                                                                                                                                                                   |
-| 008 | Définition unique des outils (MCP et agent interne), modèle de langage optionnel | Logique d'outils dupliquée par mode, ou outils dépendants d'un modèle | Même comportement dans les deux modes, cœur testable sans modèle                                                                                                                                                                                                       |
-| 009 | Mode autonome par adapters de fournisseurs fins, clé fournie par l'utilisateur    | Framework d'orchestration lourd, service hébergé par le projet         | Peu de dépendances, aucune clé ni donnée côté projet, coût à la charge de l'utilisateur                                                                                                                                                                            |
+| ADR | Décision | Alternative écartée | Raison |
+| --- | --- | --- | --- |
+| 001 | TypeScript/Node de bout en bout | FastAPI + Next.js (défaut des prompts) | Installation globale simple (`pnpm add -g` / `npm i -g`) ou `npx`, un seul langage à maintenir (Node requis chez l'utilisateur, binaire autonome prévu pour les profils PHP, Python et Ruby), SDK MCP en TypeScript ; Python reste possible pour des scripts optionnels |
+| 002 | SPA Vite servie localement | Next.js | Pas de SSR nécessaire, installation plus légère |
+| 003 | SQLite | PostgreSQL, MongoDB | Local-first, zéro service, fichier unique |
+| 004 | Monolithe modulaire | Microservices | Outil local mono-processus |
+| 005 | Index déterministe interrogé par l'agent | Agent qui lit les fichiers | Coût, vitesse et fiabilité sur 10 000+ fichiers |
+| 006 | MCP comme canal principal, skill comme couche de méthode | Prompts seuls | Portabilité entre IDE |
+| 007 | Propose-patch par défaut | Écriture automatique | Sécurité et confiance |
+| 008 | Définition unique des outils (MCP et agent interne), modèle de langage optionnel | Logique d'outils dupliquée par mode, ou outils dépendants d'un modèle | Même comportement dans les deux modes, cœur testable sans modèle |
+| 009 | Mode autonome par adapters de fournisseurs fins, clé fournie par l'utilisateur | Framework d'orchestration lourd, service hébergé par le projet | Peu de dépendances, aucune clé ni donnée côté projet, coût à la charge de l'utilisateur |
 
 **Décisions validées (28 octobre 2026) :** cible v1 = développeurs et freelances, non-techniques ensuite via le dashboard ; licence MIT, projet open source complet ; développement à plein temps.
 
@@ -375,19 +364,18 @@ Le texte intégral du skill vit dans le dépôt (`skills/seo-partner/SKILL.md` e
 
 **Références à livrer et à généraliser :** `veille-mises-a-jour`, `audit-technique`, `implementation-nextjs`, `strategie-mots-cles`, `on-page-et-contenu`, `schema-donnees-structurees`, `seo-local`, `geo-geographique-et-generatif`, `netlinking-autorite`, `mesure-dashboard-roi`, `roadmap-12-mois`, plus `scripts/audit-metadata.mjs` (remplacé par `scan`).
 
-
-| Élément actuel                                                | Devient                                                                                                                   |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `$ARGUMENTS`                                                    | Argument transmis par chaque cible ; absent, l'agent le demande                                                           |
-| `search_web`, `ask_question`                                    | Capacités abstraites « recherche web » et « poser une question », fournies par l'agent hôte ou par le mode autonome |
-| Lecture et mise à jour manuelles du fichier de veille          | `seo-partner watch`, date vérifiée par `doctor`                                                                         |
-| Cadrage : chercher d'abord dans le dépôt                      | Lecture de `.seo/config` et de l'index, questions seulement pour l'introuvable                                            |
-| Script `audit-metadata.mjs` (Next.js seulement)                 | `seo-partner scan` (tous les frameworks supportés)                                                                       |
-| Règles propres à un projet (langue, sans emoji, `pnpm build`) | `.seo/config` du projet utilisateur, jamais dans le skill                                                                 |
-| `PROJECT_MEMORY.md`                                             | `.seo/decisions.md` ; l'`AGENTS.md` du projet utilisateur reste prioritaire                                               |
-| Dépendance au skill `copywriting`                              | Dépendance optionnelle déclarée ; absente, règles de rédaction minimales intégrées                                 |
-| Check-list de validation cochée à la main                     | Règles exécutées par `audit`, cases cochées automatiquement quand le critère est mesurable                           |
-| Livrables écrits à la main dans `docs/seo/`                   | Générés par `report`                                                                                                   |
+| Élément actuel | Devient |
+| --- | --- |
+| `$ARGUMENTS` | Argument transmis par chaque cible ; absent, l'agent le demande |
+| `search_web`, `ask_question` | Capacités abstraites « recherche web » et « poser une question », fournies par l'agent hôte ou par le mode autonome |
+| Lecture et mise à jour manuelles du fichier de veille | `seo-partner watch`, date vérifiée par `doctor` |
+| Cadrage : chercher d'abord dans le dépôt | Lecture de `.seo/config` et de l'index, questions seulement pour l'introuvable |
+| Script `audit-metadata.mjs` (Next.js seulement) | `seo-partner scan` (tous les frameworks supportés) |
+| Règles propres à un projet (langue, sans emoji, `pnpm build`) | `.seo/config` du projet utilisateur, jamais dans le skill |
+| `PROJECT_MEMORY.md` | `.seo/decisions.md` ; l'`AGENTS.md` du projet utilisateur reste prioritaire |
+| Dépendance au skill `copywriting` | Dépendance optionnelle déclarée ; absente, règles de rédaction minimales intégrées |
+| Check-list de validation cochée à la main | Règles exécutées par `audit`, cases cochées automatiquement quand le critère est mesurable |
+| Livrables écrits à la main dans `docs/seo/` | Générés par `report` |
 
 **Forme :** version anglaise de référence et version française, mêmes sections. `SKILL.md` court (méthode et règles), détail dans les références chargées à la demande pour limiter le contexte consommé.
 
