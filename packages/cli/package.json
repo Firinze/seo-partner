@@ -1,6 +1,7 @@
 {
   "name": "seo-partner",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "description": "Copilote SEO local-first pour développeurs — 44 règles déterministes, serveur MCP 13 outils, dashboard interactif, correctifs AST et connecteurs GSC/Bing/CWV.",
   "type": "module",
   "bin": {
     "seo-partner": "./dist/bin.js"
@@ -17,6 +18,30 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/firinze/seo-partner.git"
+  },
+  "homepage": "https://github.com/firinze/seo-partner#readme",
+  "bugs": "https://github.com/firinze/seo-partner/issues",
+  "keywords": [
+    "seo",
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "nextjs",
+    "astro",
+    "django",
+    "nuxt",
+    "sveltekit",
+    "remix",
+    "crawler",
+    "audit",
+    "search-console",
+    "cwv",
+    "indexnow",
+    "local-first"
+  ],
   "dependencies": {
     "@seo-partner/core": "workspace:*",
     "@seo-partner/store": "workspace:*",
