@@ -154,7 +154,7 @@ export async function executeCli(
   try {
     if (command === 'help' || parsed.values['help']) {
       const helpText = [
-        'seo-partner v0.8.0 — Deterministic Local SEO Partner',
+        'seo-partner v1.0.0 — Copilote SEO Local-First',
         '',
         'Commands:',
         '  seo-partner init [--here] [--ide agy|claude|cursor|gemini|codex] [--with-mcp] [--lang en|fr] [--ignore-agent-tools] [--dry-run]',

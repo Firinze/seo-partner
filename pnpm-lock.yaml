@@ -163,6 +163,9 @@ importers:
       '@seo-partner/adapters':
         specifier: workspace:*
         version: link:../adapters
+      '@seo-partner/agent':
+        specifier: workspace:*
+        version: link:../agent
       '@seo-partner/core':
         specifier: workspace:*
         version: link:../core
