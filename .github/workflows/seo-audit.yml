@@ -1,10 +1,7 @@
 name: "SEO Quality Gate"
 
 on:
-  push:
-    branches: ["main", "master"]
-  pull_request:
-    branches: ["main", "master"]
+  workflow_dispatch:
 
 jobs:
   seo-partner-audit:
@@ -26,4 +23,3 @@ jobs:
           fail-on-blockers: 'true'
           max-critical: '0'
           upload-sarif: 'true'
-
