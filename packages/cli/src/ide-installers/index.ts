@@ -225,18 +225,18 @@ export function detectActiveIdeFromEnv(): IdeTarget | null {
 }
 
 export function detectWorkspaceIdeTargets(projectRoot: string): ReadonlyArray<IdeTarget> {
-  // 1. Workspace directory markers explicitly present in the repository
+  // 1. Environment-first detection: if running inside a specific IDE terminal, configure THAT active IDE exclusively
+  const activeFromEnv = detectActiveIdeFromEnv();
+  if (activeFromEnv) {
+    return [activeFromEnv];
+  }
+
+  // 2. Workspace directory markers explicitly present in the repository (fallback when running outside an IDE)
   const detected: IdeTarget[] = [];
   for (const [target, installer] of IDE_INSTALLERS.entries()) {
     if (installer.detectInWorkspace(projectRoot)) {
       detected.push(target);
     }
-  }
-
-  // 2. Active environment detection: if running inside an IDE terminal, prioritize that active IDE
-  const activeFromEnv = detectActiveIdeFromEnv();
-  if (activeFromEnv && !detected.includes(activeFromEnv)) {
-    detected.unshift(activeFromEnv);
   }
 
   if (detected.length > 0) {

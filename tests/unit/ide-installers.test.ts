@@ -83,10 +83,31 @@ describe('US1: Multi-IDE Installers, init, doctor, and uninstall', () => {
     const root = createTempProject();
     fs.mkdirSync(path.join(root, '.cursor'), { recursive: true });
 
-    const res = runInitCommand({ projectRoot: root, lang: 'en' });
-    expect(res.ideTargets).toContain('cursor');
+    // Temporarily clear active IDE env to test directory-based detection fallback
+    const savedEnv = { ...process.env };
+    for (const k of Object.keys(process.env)) {
+      if (k.toLowerCase().startsWith('antigravity_') || k.toLowerCase().startsWith('agy_')) {
+        delete process.env[k];
+      }
+    }
+
+    try {
+      const res = runInitCommand({ projectRoot: root, lang: 'en' });
+      expect(res.ideTargets).toContain('cursor');
+      expect(
+        fs.existsSync(path.join(root, '.cursor', 'skills', 'seo-partner', 'SKILL.md')),
+      ).toBe(true);
+    } finally {
+      process.env = savedEnv;
+    }
+  });
+
+  it('defaults to French (lang: fr) when lang is omitted', () => {
+    const root = createTempProject();
+    const res = runInitCommand({ projectRoot: root, ide: 'agy' });
+    expect(res.lang).toBe('fr');
     expect(
-      fs.existsSync(path.join(root, '.cursor', 'skills', 'seo-partner', 'SKILL.md')),
+      fs.existsSync(path.join(root, '.agents', 'skills', 'seo-partner', 'SKILL.md')),
     ).toBe(true);
   });
 

@@ -41,35 +41,10 @@ export function getSeoDbPath(projectRoot: string): string {
 }
 
 export function detectDefaultLanguage(): SupportedLanguage {
-  const envLang = (
-    process.env.LC_ALL ||
-    process.env.LANG ||
-    process.env.LANGUAGE ||
-    ''
-  ).toLowerCase();
-  if (envLang.startsWith('en')) return 'en';
-  if (envLang.startsWith('fr')) return 'fr';
-
-  if (process.env.VSCODE_NLS_CONFIG) {
-    try {
-      const parsed = JSON.parse(process.env.VSCODE_NLS_CONFIG);
-      const locale = (parsed.osLocale || parsed.userLocale || '').toLowerCase();
-      if (locale.startsWith('en')) return 'en';
-      if (locale.startsWith('fr')) return 'fr';
-    } catch {
-      // ignore
-    }
+  if (process.env.SEO_PARTNER_LANG === 'en') {
+    return 'en';
   }
-
-  try {
-    const intlLocale = Intl.DateTimeFormat().resolvedOptions().locale.toLowerCase();
-    if (intlLocale.startsWith('en')) return 'en';
-    if (intlLocale.startsWith('fr')) return 'fr';
-  } catch {
-    // ignore
-  }
-
-  // Default to French as primary language
+  // Default to French as the primary language
   return 'fr';
 }
 
