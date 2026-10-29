@@ -48,6 +48,14 @@ build/
 .env.*
 !.env.example
 !.env.sample
+
+# ============================================================================
+# 5. Cahiers des charges et documents de cadrage internes (Non versionnes)
+# ============================================================================
+*[Cc]ahier*[Dd]es*[Cc]harge*
+*CAHIER_DES_CHARGES*
+docs/CAHIER_DES_CHARGES*
+
 !.env.template
 *.pem
 *.key
@@ -76,3 +84,5 @@ desktop.ini
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+seo-partner-skill
