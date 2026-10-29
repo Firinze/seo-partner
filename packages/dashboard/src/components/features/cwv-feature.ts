@@ -18,12 +18,12 @@ export function renderCwvFeature(props: CwvFeatureProps): string {
   const formatRatingBadge = (rating: string | null) => {
     if (!rating) return `<span class="ui-badge ui-badge-neutral">N/A</span>`;
     if (rating === 'good') {
-      return `<span class="ui-badge ui-badge-low">${isFr ? 'BON' : 'GOOD'}</span>`;
+      return `<span class="ui-badge ui-badge-low">${isFr ? 'Bon' : 'GOOD'}</span>`;
     }
     if (rating === 'needs-improvement') {
-      return `<span class="ui-badge ui-badge-medium">${isFr ? 'A AMELIORER' : 'NEEDS IMPR'}</span>`;
+      return `<span class="ui-badge ui-badge-medium">${isFr ? 'À améliorer' : 'NEEDS IMPR'}</span>`;
     }
-    return `<span class="ui-badge ui-badge-critical">${isFr ? 'PAUVRE' : 'POOR'}</span>`;
+    return `<span class="ui-badge ui-badge-critical">${isFr ? 'Critique / Mauvais' : 'POOR'}</span>`;
   };
 
   const rows =

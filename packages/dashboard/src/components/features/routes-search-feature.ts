@@ -34,7 +34,7 @@ export function renderRoutesSearchFeature(
   const ftsBlockHtml =
     ftsResults !== undefined
       ? `<div id="fts-results-container" class="fts-results-panel">
-          <div class="ui-label">FTS5 Results (${ftsResults.length})</div>
+          <div class="ui-label">${lang === 'fr' ? 'Résultats de recherche' : 'Search Results'} (${ftsResults.length})</div>
           ${
             ftsResults.length === 0
               ? `<p class="muted-note">${escapeHtml(dict.emptyStateMessage)}</p>`
@@ -57,8 +57,8 @@ export function renderRoutesSearchFeature(
     const firstH1 = item.headings.find((h) => h.level === 1)?.text ?? '—';
     const langVal = item.htmlLang?.value ?? '—';
     const sitemapBadge = item.route.inSitemap
-      ? renderBadge({ label: 'YES', variant: 'low' })
-      : renderBadge({ label: 'NO', variant: 'neutral' });
+      ? renderBadge({ label: lang === 'fr' ? 'Oui' : 'YES', variant: 'low' })
+      : renderBadge({ label: lang === 'fr' ? 'Non' : 'NO', variant: 'neutral' });
     return `<tr>
       <td><code>${escapeHtml(item.route.pattern)}</code><div class="cell-subtext">${escapeHtml(item.route.filePath)}</div></td>
       <td>${renderBadge({ label: getRouterKindLabel(item.route.routerKind), variant: 'neutral' })}</td>

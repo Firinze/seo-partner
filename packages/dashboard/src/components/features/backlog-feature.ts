@@ -26,9 +26,9 @@ export function renderBacklogFeature(
       selectedValue: activeFilters?.ownerRole ?? '',
       options: [
         { value: '', label: dict.filterAllRoles },
-        { value: 'dev', label: 'dev' },
-        { value: 'content', label: 'content' },
-        { value: 'outreach', label: 'outreach' },
+        { value: 'dev', label: isFr ? 'Développeur' : 'Developer' },
+        { value: 'content', label: isFr ? 'Rédacteur / Contenu' : 'Content Writer' },
+        { value: 'outreach', label: isFr ? 'Marketing / Partenariats' : 'Outreach / Marketing' },
       ],
     })}
     ${renderSelectFilter({
@@ -37,9 +37,9 @@ export function renderBacklogFeature(
       selectedValue: activeFilters?.targetTimeframe ?? '',
       options: [
         { value: '', label: dict.filterAllTimeframes },
-        { value: 'immediate', label: 'immediate' },
-        { value: '30-days', label: '30-days' },
-        { value: '90-days', label: '90-days' },
+        { value: 'immediate', label: isFr ? 'Immédiat (< 48h)' : 'Immediate (< 48h)' },
+        { value: '30-days', label: isFr ? 'Court terme (< 30 jours)' : 'Short-term (< 30d)' },
+        { value: '90-days', label: isFr ? 'Moyen terme (< 90 jours)' : 'Mid-term (< 90d)' },
       ],
     })}
   </div>`;

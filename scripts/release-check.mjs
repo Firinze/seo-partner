@@ -10,8 +10,8 @@ export function checkReleaseReadiness(projectRoot = process.cwd()) {
   const issues = [];
   const packageSummaries = [];
 
-  if (rootPkg.version !== '1.0.0') {
-    issues.push(`Root package.json version is '${rootPkg.version}' (expected '1.0.0')`);
+  if (!rootPkg.version.startsWith('1.0.')) {
+    issues.push(`Root package.json version is '${rootPkg.version}' (expected '1.0.x')`);
   }
 
   for (const dir of packageDirs) {
@@ -27,8 +27,8 @@ export function checkReleaseReadiness(projectRoot = process.cwd()) {
     };
     packageSummaries.push(summary);
 
-    if (pkg.version !== '1.0.0') {
-      issues.push(`Package ${pkg.name} (${dir}) has version '${pkg.version}' (expected '1.0.0')`);
+    if (!pkg.version.startsWith('1.0.')) {
+      issues.push(`Package ${pkg.name} (${dir}) has version '${pkg.version}' (expected '1.0.x')`);
     }
 
     if (pkg.publishConfig?.access !== 'public') {

@@ -27,11 +27,11 @@ export function renderFindingsFeature(
       selectedValue: activeFilters?.category ?? '',
       options: [
         { value: '', label: dict.filterAllCategories },
-        { value: 'technical', label: 'Technical (14)' },
-        { value: 'on-page', label: 'On-Page (14)' },
-        { value: 'schema', label: 'Schema.org (5)' },
-        { value: 'local', label: 'Local SEO (4)' },
-        { value: 'geo', label: 'GEO / Intl (3)' },
+        { value: 'technical', label: isFr ? 'Technique (14)' : 'Technical (14)' },
+        { value: 'on-page', label: isFr ? 'Contenu & Balises (14)' : 'On-Page (14)' },
+        { value: 'schema', label: isFr ? 'Données structurées (5)' : 'Schema.org (5)' },
+        { value: 'local', label: isFr ? 'SEO Local (4)' : 'Local SEO (4)' },
+        { value: 'geo', label: isFr ? 'SEO International & IA (3)' : 'GEO / Intl (3)' },
       ],
     })}
     ${renderSelectFilter({
@@ -40,10 +40,10 @@ export function renderFindingsFeature(
       selectedValue: activeFilters?.severity ?? '',
       options: [
         { value: '', label: dict.filterAllSeverities },
-        { value: 'critical', label: 'Critical' },
-        { value: 'high', label: 'High' },
-        { value: 'medium', label: 'Medium' },
-        { value: 'low', label: 'Low' },
+        { value: 'critical', label: isFr ? 'Critique (Bloquant)' : 'Critical' },
+        { value: 'high', label: isFr ? 'Haute priorité' : 'High' },
+        { value: 'medium', label: isFr ? 'Moyenne priorité' : 'Medium' },
+        { value: 'low', label: isFr ? 'Faible' : 'Low' },
       ],
     })}
     <div class="checkbox-field">

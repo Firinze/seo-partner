@@ -47,19 +47,19 @@ export function renderOverviewFeature(
     title: dict.severityBreakdownTitle,
     childrenHtml: `<div class="stat-grid-4">
       <div class="stat-box">
-        ${renderBadge({ label: 'CRITICAL', variant: 'critical' })}
+        ${renderBadge({ label: lang === 'fr' ? 'CRITIQUE' : 'CRITICAL', variant: 'critical' })}
         <strong class="stat-count">${stats.bySeverity.critical}</strong>
       </div>
       <div class="stat-box">
-        ${renderBadge({ label: 'HIGH', variant: 'high' })}
+        ${renderBadge({ label: lang === 'fr' ? 'HAUTE' : 'HIGH', variant: 'high' })}
         <strong class="stat-count">${stats.bySeverity.high}</strong>
       </div>
       <div class="stat-box">
-        ${renderBadge({ label: 'MEDIUM', variant: 'medium' })}
+        ${renderBadge({ label: lang === 'fr' ? 'MOYENNE' : 'MEDIUM', variant: 'medium' })}
         <strong class="stat-count">${stats.bySeverity.medium}</strong>
       </div>
       <div class="stat-box">
-        ${renderBadge({ label: 'LOW', variant: 'low' })}
+        ${renderBadge({ label: lang === 'fr' ? 'FAIBLE' : 'LOW', variant: 'low' })}
         <strong class="stat-count">${stats.bySeverity.low}</strong>
       </div>
     </div>`,
@@ -69,11 +69,11 @@ export function renderOverviewFeature(
     id: 'card-category-breakdown',
     title: dict.categoryBreakdownTitle,
     childrenHtml: `<div class="stat-grid-5">
-      <div class="stat-box"><span>Technical</span><strong class="stat-count-emerald">${stats.byCategory.technical}</strong></div>
-      <div class="stat-box"><span>On-Page</span><strong class="stat-count-emerald">${stats.byCategory['on-page']}</strong></div>
-      <div class="stat-box"><span>Schema.org</span><strong class="stat-count-emerald">${stats.byCategory.schema}</strong></div>
-      <div class="stat-box"><span>Local SEO</span><strong class="stat-count-emerald">${stats.byCategory.local}</strong></div>
-      <div class="stat-box"><span>GEO / Intl</span><strong class="stat-count-emerald">${stats.byCategory.geo}</strong></div>
+      <div class="stat-box"><span>${lang === 'fr' ? 'Technique' : 'Technical'}</span><strong class="stat-count-emerald">${stats.byCategory.technical}</strong></div>
+      <div class="stat-box"><span>${lang === 'fr' ? 'Contenu & Balises' : 'On-Page'}</span><strong class="stat-count-emerald">${stats.byCategory['on-page']}</strong></div>
+      <div class="stat-box"><span>${lang === 'fr' ? 'Données structurées' : 'Schema.org'}</span><strong class="stat-count-emerald">${stats.byCategory.schema}</strong></div>
+      <div class="stat-box"><span>${lang === 'fr' ? 'SEO Local' : 'Local SEO'}</span><strong class="stat-count-emerald">${stats.byCategory.local}</strong></div>
+      <div class="stat-box"><span>${lang === 'fr' ? 'International & IA' : 'GEO / Intl'}</span><strong class="stat-count-emerald">${stats.byCategory.geo}</strong></div>
     </div>`,
   });
 

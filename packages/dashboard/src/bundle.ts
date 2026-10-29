@@ -599,6 +599,12 @@ a {
   font-weight: 700;
   margin-bottom: 6px;
 }
+.is-hidden,
+.modal-backdrop.is-hidden,
+.modal-backdrop[hidden],
+[hidden] {
+  display: none !important;
+}
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -914,24 +920,54 @@ export function renderDashboardClientScript(): string {
     });
   }
 
+  function closeModal() {
+    if (patchModal) {
+      patchModal.classList.add('is-hidden');
+      patchModal.setAttribute('hidden', 'hidden');
+    }
+  }
+
+  function openModal(diff) {
+    if (patchModal && modalDiffPreview) {
+      modalDiffPreview.textContent = diff || '';
+      patchModal.classList.remove('is-hidden');
+      patchModal.removeAttribute('hidden');
+    }
+  }
+
   document.addEventListener('click', function(e) {
     if (e.target && e.target.classList && e.target.classList.contains('btn-open-patch-confirm')) {
-      if (patchModal && modalDiffPreview && currentPendingPatch) {
-        modalDiffPreview.textContent = currentPendingPatch.diff || '';
-        patchModal.classList.remove('is-hidden');
+      if (currentPendingPatch) {
+        openModal(currentPendingPatch.diff || '');
       }
     }
   });
 
-  if (modalCloseBtn && patchModal) {
-    modalCloseBtn.addEventListener('click', function() { patchModal.classList.add('is-hidden'); });
+  if (modalCloseBtn) {
+    modalCloseBtn.addEventListener('click', closeModal);
   }
-  if (modalCancelBtn && patchModal) {
-    modalCancelBtn.addEventListener('click', function() { patchModal.classList.add('is-hidden'); });
+  if (modalCancelBtn) {
+    modalCancelBtn.addEventListener('click', closeModal);
   }
+  if (patchModal) {
+    patchModal.addEventListener('click', function(e) {
+      if (e.target === patchModal) {
+        closeModal();
+      }
+    });
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && patchModal && !patchModal.hasAttribute('hidden')) {
+      closeModal();
+    }
+  });
+
   if (modalConfirmBtn && patchModal) {
     modalConfirmBtn.addEventListener('click', async function() {
-      if (!currentPendingPatch) return;
+      if (!currentPendingPatch) {
+        closeModal();
+        return;
+      }
       modalConfirmBtn.setAttribute('disabled', 'disabled');
       modalConfirmBtn.textContent = 'Application en cours...';
       try {
@@ -943,14 +979,16 @@ export function renderDashboardClientScript(): string {
           })
         });
         if (res && res.success) {
-          patchModal.classList.add('is-hidden');
+          closeModal();
           appendChatBlock('ui-alert ui-alert-success', 'Correctif applique avec succes sur ' + (res.data.appliedFiles || []).join(', '));
         } else {
           alert('Erreur : ' + ((res && res.error) || 'Echec'));
         }
+      } catch (err) {
+        alert('Erreur de connexion : ' + err.message);
       } finally {
         modalConfirmBtn.removeAttribute('disabled');
-        modalConfirmBtn.textContent = 'Appliquer le correctif';
+        modalConfirmBtn.textContent = 'Appliquer la modification maintenant';
       }
     });
   }
@@ -969,10 +1007,10 @@ export function renderDashboardSpaHtml(state: DashboardInitialState): string {
     { id: 'tab-btn-crawl', label: dict.tabCrawl, panelId: 'panel-crawl' },
     { id: 'tab-btn-decisions', label: dict.tabDecisions, panelId: 'panel-decisions' },
     { id: 'tab-btn-patches', label: dict.tabPatches, panelId: 'panel-patches' },
-    { id: 'tab-btn-gsc', label: 'GSC', panelId: 'panel-gsc' },
-    { id: 'tab-btn-cwv', label: 'CWV', panelId: 'panel-cwv' },
-    { id: 'tab-btn-chat', label: 'Agent Chat', panelId: 'panel-chat' },
-    { id: 'tab-btn-bing', label: 'Bing', panelId: 'panel-bing' },
+    { id: 'tab-btn-gsc', label: state.lang === 'fr' ? 'Google Search Console' : 'Search Console', panelId: 'panel-gsc' },
+    { id: 'tab-btn-cwv', label: state.lang === 'fr' ? 'Vitesse & Web Vitals' : 'Core Web Vitals', panelId: 'panel-cwv' },
+    { id: 'tab-btn-chat', label: state.lang === 'fr' ? 'Assistant SEO IA' : 'AI Assistant', panelId: 'panel-chat' },
+    { id: 'tab-btn-bing', label: state.lang === 'fr' ? 'Bing & IndexNow' : 'Bing IndexNow', panelId: 'panel-bing' },
   ]);
 
   const langSwitcherHtml = renderSelectFilter({
@@ -1019,7 +1057,7 @@ export function renderDashboardSpaHtml(state: DashboardInitialState): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SEO PARTNER v0.6 — Local Dashboard (${escapeHtml(state.overview.project?.name ?? 'seo-project')})</title>
+  <title>SEO Partner v1.0.0 — Tableau de bord (${escapeHtml(state.overview.project?.name ?? 'seo-project')})</title>
   <style>${renderDashboardCss()}</style>
 </head>
 <body>
