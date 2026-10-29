@@ -89,5 +89,40 @@ describe('US1: Multi-IDE Installers, init, doctor, and uninstall', () => {
       fs.existsSync(path.join(root, '.cursor', 'skills', 'seo-partner', 'SKILL.md')),
     ).toBe(true);
   });
+
+  it('prioritizes Antigravity active environment over loose CLAUDE.md documentation file', () => {
+    const root = createTempProject();
+    fs.writeFileSync(path.join(root, 'CLAUDE.md'), '# Claude Instructions', 'utf-8');
+
+    // Simulate Antigravity terminal environment
+    const prevAgy = process.env.ANTIGRAVITY_AGENT;
+    process.env.ANTIGRAVITY_AGENT = '1';
+
+    try {
+      const res = runInitCommand({ projectRoot: root, lang: 'en' });
+      expect(res.ideTargets).toContain('agy');
+      expect(res.ideTargets).not.toContain('claude');
+      expect(
+        fs.existsSync(path.join(root, '.agents', 'skills', 'seo-partner', 'SKILL.md')),
+      ).toBe(true);
+    } finally {
+      if (prevAgy === undefined) {
+        delete process.env.ANTIGRAVITY_AGENT;
+      } else {
+        process.env.ANTIGRAVITY_AGENT = prevAgy;
+      }
+    }
+  });
+
+  it('generates MCP config using npx -y without requiring global installation', () => {
+    const root = createTempProject();
+    const res = runInitCommand({ projectRoot: root, ide: 'agy', withMcp: true, lang: 'en' });
+    expect(res.mcpSnippets).toBeDefined();
+    const agySnippet = res.mcpSnippets?.find((s) => s.ide === 'agy');
+    expect(agySnippet).toBeDefined();
+    expect(agySnippet?.content).toContain('"command": "npx"');
+    expect(agySnippet?.content).toContain('"args": [');
+    expect(agySnippet?.content).toContain('"-y"');
+  });
 });
 

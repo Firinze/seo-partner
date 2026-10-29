@@ -17,10 +17,7 @@ export class CodexInstaller implements IdeInstallerAdapter {
   public readonly skillRelativeDir = '.codex/skills/seo-partner';
 
   public detectInWorkspace(projectRoot: string): boolean {
-    return (
-      fs.existsSync(path.join(projectRoot, '.codex')) ||
-      fs.existsSync(path.join(projectRoot, 'AGENTS.md'))
-    );
+    return fs.existsSync(path.join(projectRoot, '.codex'));
   }
 
   public install(options: {

@@ -30,8 +30,8 @@ export function getMcpSnippetContent(format: 'json' | 'toml'): string {
   if (format === 'toml') {
     return [
       '[mcp_servers.seo-partner]',
-      'command = "seo-partner"',
-      'args = ["mcp"]',
+      'command = "npx"',
+      'args = ["-y", "seo-partner", "mcp"]',
     ].join('\n');
   }
 
@@ -39,8 +39,8 @@ export function getMcpSnippetContent(format: 'json' | 'toml'): string {
     {
       mcpServers: {
         'seo-partner': {
-          command: 'seo-partner',
-          args: ['mcp'],
+          command: 'npx',
+          args: ['-y', 'seo-partner', 'mcp'],
         },
       },
     },
@@ -102,8 +102,8 @@ export function writeMcpConfig(
             : {};
 
         mcpServers['seo-partner'] = {
-          command: 'seo-partner',
-          args: ['mcp'],
+          command: 'npx',
+          args: ['-y', 'seo-partner', 'mcp'],
         };
         existingObj.mcpServers = mcpServers;
 

@@ -1,6 +1,6 @@
 {
   "name": "seo-partner",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Copilote SEO local-first pour développeurs — 44 règles déterministes, serveur MCP 13 outils, dashboard interactif, correctifs AST et connecteurs GSC/Bing/CWV.",
   "type": "module",
   "bin": {
@@ -15,7 +15,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node ../../scripts/sync-cli-skills.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "repository": {

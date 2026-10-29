@@ -1,6 +1,7 @@
 import path from 'node:path';
 import {
   createDefaultConfig,
+  detectDefaultLanguage,
   ensureGitignoreSecurity,
   initDecisionsFile,
   saveSeoConfig,
@@ -37,7 +38,7 @@ export function runInitCommand(options: InitCommandOptions): InitCommandResult {
   const lang: SupportedLanguage =
     options.lang && (VALID_LANGUAGES as ReadonlyArray<string>).includes(options.lang)
       ? (options.lang as SupportedLanguage)
-      : 'en';
+      : detectDefaultLanguage();
 
   let ideTargets: ReadonlyArray<IdeTarget> = [];
   if (!options.terminalOnly) {

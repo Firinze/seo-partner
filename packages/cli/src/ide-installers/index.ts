@@ -49,9 +49,21 @@ export function resolveBundledSkillSourceDir(lang: SupportedLanguage): string {
           ? fileURLToPath(import.meta.url)
           : process.cwd());
   const currentDir = path.dirname(currentFile);
-  // Works both from packages/cli/src/ide-installers and packages/cli/dist/ide-installers
-  const repoRoot = path.resolve(currentDir, '..', '..', '..', '..');
-  return path.join(repoRoot, 'skills', 'seo-partner', lang);
+
+  // 1. Packaged location inside @seo-partner/cli (e.g. node_modules/seo-partner/skills/seo-partner/<lang>)
+  // When executing from dist/ide-installers/, ../../skills reaches the package root skills directory
+  const candidatePkgSkills = path.resolve(currentDir, '..', '..', 'skills', 'seo-partner', lang);
+  if (fs.existsSync(candidatePkgSkills)) {
+    return candidatePkgSkills;
+  }
+
+  // 2. Monorepo root location during local development (packages/cli/dist/ide-installers/../../../../skills)
+  const candidateRepoSkills = path.resolve(currentDir, '..', '..', '..', '..', 'skills', 'seo-partner', lang);
+  if (fs.existsSync(candidateRepoSkills)) {
+    return candidateRepoSkills;
+  }
+
+  return candidatePkgSkills;
 }
 
 export function copySkillPackToTargetDir(options: {
@@ -63,6 +75,12 @@ export function copySkillPackToTargetDir(options: {
   const sourceDir = resolveBundledSkillSourceDir(options.lang);
   const destDir = path.join(options.projectRoot, options.targetSkillRelDir);
   const createdFiles: string[] = [];
+
+  const srcSkillMd = path.join(sourceDir, 'SKILL.md');
+  if (!fs.existsSync(srcSkillMd)) {
+    // If bundled skill source is missing, skip copying gracefully without crashing
+    return createdFiles;
+  }
 
   const skillFileRel = path.posix.join(
     options.targetSkillRelDir.split(path.sep).join('/'),
@@ -82,14 +100,19 @@ export function copySkillPackToTargetDir(options: {
 
   if (!options.dryRun) {
     fs.mkdirSync(path.join(destDir, 'references'), { recursive: true });
-    fs.copyFileSync(
-      path.join(sourceDir, 'SKILL.md'),
-      path.join(destDir, 'SKILL.md'),
-    );
+    try {
+      fs.copyFileSync(srcSkillMd, path.join(destDir, 'SKILL.md'));
+    } catch {
+      // Non-fatal safety guard
+    }
     for (const refName of EXPECTED_REFERENCE_FILES) {
       const srcRef = path.join(sourceDir, 'references', refName);
       if (fs.existsSync(srcRef)) {
-        fs.copyFileSync(srcRef, path.join(destDir, 'references', refName));
+        try {
+          fs.copyFileSync(srcRef, path.join(destDir, 'references', refName));
+        } catch {
+          // Non-fatal safety guard
+        }
       }
     }
   }
@@ -151,13 +174,84 @@ export const IDE_INSTALLERS: ReadonlyMap<IdeTarget, IdeInstallerAdapter> = new M
   ['codex', new CodexInstaller()],
 ]);
 
+export function detectActiveIdeFromEnv(): IdeTarget | null {
+  const envKeys = Object.keys(process.env);
+
+  // 1. Google Antigravity (must check before generic VS Code since it uses a VS Code host)
+  if (
+    process.env.ANTIGRAVITY_AGENT === '1' ||
+    Boolean(process.env.ANTIGRAVITY_APP_DATA_DIR) ||
+    Boolean(process.env.ANTIGRAVITY_PROJECT_ID) ||
+    process.env.ANTIGRAVITY_VSCODE_HOST === '1' ||
+    Boolean(process.env.AGY_LLM_GATEWAY_URL) ||
+    envKeys.some((k) => k.toLowerCase().startsWith('antigravity_') || k.toLowerCase().startsWith('agy_'))
+  ) {
+    return 'agy';
+  }
+
+  // 2. Cursor (must check before generic VS Code since it is a VS Code fork)
+  if (
+    Boolean(process.env.CURSOR_CLI) ||
+    Boolean(process.env.CURSOR_AGENT) ||
+    Boolean(process.env.CURSOR_TRACE_ID) ||
+    Boolean(process.env.CURSOR_CONFIG_DIR) ||
+    envKeys.some((k) => k.toLowerCase().includes('cursor'))
+  ) {
+    return 'cursor';
+  }
+
+  // 3. Claude Code CLI / hooks
+  if (
+    process.env.CLAUDECODE === '1' ||
+    process.env.CLAUDE_CODE_CHILD_SESSION === '1' ||
+    Boolean(process.env.CLAUDE_CODE) ||
+    Boolean(process.env.CLAUDE_PROJECT_DIR) ||
+    envKeys.some((k) => k.toLowerCase().includes('claudecode'))
+  ) {
+    return 'claude';
+  }
+
+  // 4. Gemini CLI
+  if (Boolean(process.env.GEMINI_CLI) || Boolean(process.env.GEMINI_CLI_HOME)) {
+    return 'gemini';
+  }
+
+  // 5. OpenAI Codex
+  if (Boolean(process.env.CODEX_CLI) || Boolean(process.env.OPENAI_CODEX)) {
+    return 'codex';
+  }
+
+  return null;
+}
+
 export function detectWorkspaceIdeTargets(projectRoot: string): ReadonlyArray<IdeTarget> {
+  // 1. Workspace directory markers explicitly present in the repository
   const detected: IdeTarget[] = [];
   for (const [target, installer] of IDE_INSTALLERS.entries()) {
     if (installer.detectInWorkspace(projectRoot)) {
       detected.push(target);
     }
   }
-  return detected.length > 0 ? detected : ['agy'];
+
+  // 2. Active environment detection: if running inside an IDE terminal, prioritize that active IDE
+  const activeFromEnv = detectActiveIdeFromEnv();
+  if (activeFromEnv && !detected.includes(activeFromEnv)) {
+    detected.unshift(activeFromEnv);
+  }
+
+  if (detected.length > 0) {
+    return detected;
+  }
+
+  // 3. Document fallback markers (only if no dedicated IDE directory or active terminal was detected)
+  if (fs.existsSync(path.join(projectRoot, 'CLAUDE.md'))) {
+    return ['claude'];
+  }
+  if (fs.existsSync(path.join(projectRoot, 'AGENTS.md'))) {
+    return ['codex'];
+  }
+
+  // 4. Default fallback
+  return ['agy'];
 }
 

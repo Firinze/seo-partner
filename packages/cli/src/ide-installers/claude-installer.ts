@@ -14,10 +14,7 @@ export class ClaudeInstaller implements IdeInstallerAdapter {
   public readonly skillRelativeDir = '.claude/skills/seo-partner';
 
   public detectInWorkspace(projectRoot: string): boolean {
-    return (
-      fs.existsSync(path.join(projectRoot, '.claude')) ||
-      fs.existsSync(path.join(projectRoot, 'CLAUDE.md'))
-    );
+    return fs.existsSync(path.join(projectRoot, '.claude'));
   }
 
   public install(options: {

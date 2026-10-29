@@ -40,6 +40,39 @@ export function getSeoDbPath(projectRoot: string): string {
   return path.join(getSeoDirPath(projectRoot), 'index.db');
 }
 
+export function detectDefaultLanguage(): SupportedLanguage {
+  const envLang = (
+    process.env.LC_ALL ||
+    process.env.LANG ||
+    process.env.LANGUAGE ||
+    ''
+  ).toLowerCase();
+  if (envLang.startsWith('en')) return 'en';
+  if (envLang.startsWith('fr')) return 'fr';
+
+  if (process.env.VSCODE_NLS_CONFIG) {
+    try {
+      const parsed = JSON.parse(process.env.VSCODE_NLS_CONFIG);
+      const locale = (parsed.osLocale || parsed.userLocale || '').toLowerCase();
+      if (locale.startsWith('en')) return 'en';
+      if (locale.startsWith('fr')) return 'fr';
+    } catch {
+      // ignore
+    }
+  }
+
+  try {
+    const intlLocale = Intl.DateTimeFormat().resolvedOptions().locale.toLowerCase();
+    if (intlLocale.startsWith('en')) return 'en';
+    if (intlLocale.startsWith('fr')) return 'fr';
+  } catch {
+    // ignore
+  }
+
+  // Default to French as primary language
+  return 'fr';
+}
+
 export function createDefaultConfig(options: {
   projectRoot: string;
   lang?: SupportedLanguage;
@@ -51,7 +84,7 @@ export function createDefaultConfig(options: {
   return {
     version: '1.0',
     projectName,
-    lang: options.lang ?? 'en',
+    lang: options.lang ?? detectDefaultLanguage(),
     ideTargets: options.ideTargets ?? ['agy'],
     maxFileSizeKb: options.maxFileSizeKb ?? 1024,
     excludePatterns: DEFAULT_EXCLUDE_PATTERNS,
