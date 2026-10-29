@@ -29,3 +29,4 @@ describe('US2: CycloneDX v1.5 SBOM Generation & Supply-Chain Compliance', () => 
     expect(names).toContain('seo-partner');
   });
 });
+

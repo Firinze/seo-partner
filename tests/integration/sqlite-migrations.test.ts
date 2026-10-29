@@ -65,3 +65,4 @@ describe('US3: SQLite Schema v5 Backward-Compatible Migrations', () => {
     }
   });
 });
+

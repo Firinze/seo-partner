@@ -60,3 +60,4 @@ export async function runBenchmark<T>(
     clearInterval(timer);
   }
 }
+

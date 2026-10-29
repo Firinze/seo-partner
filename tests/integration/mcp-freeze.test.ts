@@ -83,3 +83,4 @@ describe('US3: MCP Stdio Tools Contract Freeze & Schema Strictness', () => {
     expect(scanTool.title).toMatch(/scan|analyser|indexer/i);
   });
 });
+

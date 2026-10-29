@@ -56,7 +56,7 @@ describe('US4: Single-Executable Applications (SEA) Packaging Pipeline', () => {
 
     expect(fs.existsSync(manifestPath)).toBe(true);
     const manifest: BinaryManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
-    expect(manifest.version).toBe('0.7.0');
+    expect(manifest.version).toBe('1.0.0');
     expect(manifest.binaries.length).toBeGreaterThan(0);
     const primary = manifest.binaries[0]!;
     expect(primary.sha256).toMatch(/^[a-f0-9]{64}$/);

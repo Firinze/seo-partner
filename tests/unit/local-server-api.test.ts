@@ -67,7 +67,7 @@ export default function HomePage() {
       paths: Record<string, unknown>;
     }>;
     expect(openApiJson.data.openapi).toBe('3.1.0');
-    expect(openApiJson.data.info.version).toBe('0.4.0');
+    expect(openApiJson.data.info.version).toBe('1.0.0');
     expect(Object.keys(openApiJson.data.paths).length).toBeGreaterThanOrEqual(14);
     expect(openApiJson.data.paths['/api/v1/patches']).toBeDefined();
 

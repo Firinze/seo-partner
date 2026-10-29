@@ -88,3 +88,4 @@ export function detectSecrets(content: string, filePath?: string): SecretFinding
 
   return findings;
 }
+

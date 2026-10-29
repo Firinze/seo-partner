@@ -105,3 +105,4 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(im
   const result = generateSbom();
   console.log(`[SBOM] CycloneDX v${result.specVersion} generated successfully at ${result.filePath} (${result.componentsCount} components)`);
 }
+

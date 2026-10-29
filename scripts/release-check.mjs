@@ -65,3 +65,4 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(im
     console.log('[RELEASE CHECK PASS] All 12 packages are valid, versioned 1.0.0, and configured for public npm release.');
   }
 }
+
