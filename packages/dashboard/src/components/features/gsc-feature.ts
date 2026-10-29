@@ -43,6 +43,30 @@ export function renderGscFeature(props: GscFeatureProps): string {
       <p class="panel-subtitle">${escapeHtml(subtitle)}</p>
     </div>
 
+    <div class="ui-card" style="margin-top: 16px; padding: 16px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 8px;">
+      <h3 style="margin-top: 0; font-size: 15px; font-weight: 600;">
+        ${isFr ? 'Demarche officielle : Comment faire indexer vos pages sur Google et Bing ?' : 'Official Workflow: How to Get Your Pages Indexed on Google & Bing?'}
+      </h3>
+      <div style="font-size: 13px; line-height: 1.6; color: var(--text-muted, #475569); margin-top: 8px;">
+        <p style="margin: 6px 0;">
+          <strong>1. ${isFr ? 'Controle prealable' : 'Pre-check'} :</strong>
+          ${isFr ? 'Assurez-vous avec `seo-partner audit` que vos pages ne comportent aucun blocage d indexation (balise noindex accidentelle, robots.txt bloquant, lien canonique invalide).' : 'Ensure `seo-partner audit` reports zero blockers (no accidental noindex, blocking robots.txt, or broken canonicals).'}
+        </p>
+        <p style="margin: 6px 0;">
+          <strong>2. ${isFr ? 'Indexation globale automatique (Google)' : 'Automated site-wide indexing (Google)'} :</strong>
+          ${isFr ? 'Dans Google Search Console, rendez-vous dans le menu <em>Sitemaps</em> et declarez l URL de votre fichier sitemap (ex. <code>https://votresite.com/sitemap.xml</code>). C est la methode officielle recommandee par Google pour decouvrir et indexer l ensemble de vos pages.' : 'In Google Search Console, navigate to <em>Sitemaps</em> and submit your sitemap URL (e.g. <code>https://yourdomain.com/sitemap.xml</code>). This is Google official recommended method to discover and crawl all pages.'}
+        </p>
+        <p style="margin: 6px 0;">
+          <strong>3. ${isFr ? 'Indexation prioritaire d une page specifique (Google)' : 'Priority indexing for an individual page (Google)'} :</strong>
+          ${isFr ? 'Google ne propose pas d API publique pour automatiser le bouton d indexation manuelle. Pour une page urgente (lancement, refonte), collez son URL dans la barre d inspection tout en haut de Google Search Console, puis cliquez sur <em>Demander une indexation</em>.' : 'Google does not expose a public API for manual indexing requests. For an urgent page, paste its URL into Search Console top inspection bar and click <em>Request Indexing</em>.'}
+        </p>
+        <p style="margin: 6px 0;">
+          <strong>4. ${isFr ? 'Indexation instantanee par API (Bing & IndexNow)' : 'Instant API Indexing (Bing & IndexNow)'} :</strong>
+          ${isFr ? 'Sur Bing, vous pouvez soumettre vos URLs directement par API avec `seo-partner bing indexnow`. Bing et ses moteurs partenaires (Yahoo, Yandex) sont notifies en quelques secondes.' : 'On Bing, you can submit fresh URLs directly via API with `seo-partner bing indexnow`. Bing and partner engines are notified in seconds.'}
+        </p>
+      </div>
+    </div>
+
     <div class="ui-table-wrap" style="margin-top: 16px;">
       <table class="ui-table">
         <thead>
