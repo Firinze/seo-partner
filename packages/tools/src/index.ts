@@ -27,3 +27,8 @@ export * from './patch/fixers.js';
 export * from './patch/patch-engine.js';
 export * from './watcher/fs-watcher.js';
 export * from './watcher/debouncer.js';
+export * from './watch/feed-parser.js';
+export * from './watch/sync-engine.js';
+export * from './bing/orchestrator.js';
+export * from './bing/tools.js';
+export * from './doctor/engine.js';

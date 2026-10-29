@@ -5,6 +5,7 @@ import {
   verifyGitignoreSecurity,
 } from '@seo-partner/core';
 import { SeoDatabase } from '@seo-partner/store';
+import { checkWatchFreshness } from '@seo-partner/tools';
 import {
   EXPECTED_REFERENCE_FILES,
   IDE_INSTALLERS,
@@ -122,32 +123,12 @@ export function runDoctorCommand(options: { projectRoot: string }): DoctorComman
   }
 
   // 5. Watch freshness check (<= 90 days)
-  if (watchFilePath && fs.existsSync(watchFilePath)) {
-    const watchContent = fs.readFileSync(watchFilePath, 'utf-8');
-    const lastDateStr = extractWatchLastVerifiedDate(watchContent);
-    if (lastDateStr) {
-      const diffMs = Date.now() - new Date(lastDateStr).getTime();
-      const diffDays = Math.max(0, Math.floor(diffMs / (1000 * 3600 * 24)));
-      const fresh = diffDays <= 90;
-      checks.push({
-        id: 'watch-freshness',
-        status: fresh ? 'ok' : 'warn',
-        message: `Last watch verification: ${lastDateStr} (${diffDays} days ago, threshold <= 90 days)`,
-      });
-    } else {
-      checks.push({
-        id: 'watch-freshness',
-        status: 'warn',
-        message: 'Could not parse Last Verified date in veille-mises-a-jour.md',
-      });
-    }
-  } else {
-    checks.push({
-      id: 'watch-freshness',
-      status: 'error',
-      message: 'Missing watch reference file (veille-mises-a-jour.md)',
-    });
-  }
+  const watchCheck = checkWatchFreshness(projectRoot, 90);
+  checks.push({
+    id: 'watch-freshness',
+    status: watchCheck.status,
+    message: watchCheck.message,
+  });
 
   // 6. SQLite WAL store check
   try {

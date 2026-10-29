@@ -5,6 +5,7 @@ import type {
   AgentRunSession,
   AgentStepLog,
   ToolContext,
+  AgentStreamEvent,
 } from '@seo-partner/core';
 import {
   AgentRepository,
@@ -37,6 +38,7 @@ export interface AgentRunOptions {
   readonly signal?: AbortSignal;
   readonly adapter?: LlmProviderAdapter; // Optional injected adapter for tests
   readonly lang?: 'fr' | 'en';
+  readonly onEvent?: (event: AgentStreamEvent) => void;
 }
 
 export interface AgentRunResult {
@@ -108,6 +110,12 @@ export class AutonomousAgent {
     };
 
     logEntry({ type: 'session_start', session: sessionRecord });
+    options.onEvent?.({
+      type: 'agent:started',
+      sessionId,
+      timestamp: startedAt,
+      payload: { summary: options.goal },
+    });
 
     const guard = new LoopGuard({
       maxIterations,
@@ -177,6 +185,15 @@ export class AutonomousAgent {
         const thought = completion.content;
         const toolCalls = completion.toolCalls;
 
+        if (thought) {
+          options.onEvent?.({
+            type: 'agent:thought',
+            sessionId,
+            timestamp: new Date().toISOString(),
+            payload: { thought },
+          });
+        }
+
         // If no tool calls requested, we reached a final answer
         if (!toolCalls || toolCalls.length === 0) {
           finalSummary = thought ?? 'Goal accomplished.';
@@ -205,6 +222,15 @@ export class AutonomousAgent {
           }
 
           const sanitizedArgs = guard.sanitizeToolArguments(tc.name, tc.arguments);
+          options.onEvent?.({
+            type: 'agent:tool_call',
+            sessionId,
+            timestamp: new Date().toISOString(),
+            payload: {
+              toolName: tc.name,
+              toolArguments: sanitizedArgs as Record<string, unknown>,
+            },
+          });
           const toolDef = getTool(tc.name);
 
           let toolResult: Record<string, unknown> = {};
@@ -230,6 +256,29 @@ export class AutonomousAgent {
               const msg = err instanceof Error ? err.message : String(err);
               toolResult = { ok: false, error: msg };
             }
+          }
+
+          options.onEvent?.({
+            type: 'agent:tool_result',
+            sessionId,
+            timestamp: new Date().toISOString(),
+            payload: {
+              toolName: tc.name,
+              toolResult,
+            },
+          });
+
+          if (tc.name === 'propose_patch' && toolResult.ok) {
+            const patchData = (toolResult.data ?? {}) as Record<string, unknown>;
+            options.onEvent?.({
+              type: 'agent:patch_proposed',
+              sessionId,
+              timestamp: new Date().toISOString(),
+              payload: {
+                patchBatchId: String(patchData.batchId ?? ''),
+                patchUnifiedDiff: String(patchData.unifiedDiff ?? ''),
+              },
+            });
           }
 
           const stepLog: AgentStepLog = {
@@ -261,8 +310,20 @@ export class AutonomousAgent {
     } catch (err: unknown) {
       finalStatus = 'failed';
       finalSummary = err instanceof Error ? err.message : String(err);
+      options.onEvent?.({
+        type: 'agent:error',
+        sessionId,
+        timestamp: new Date().toISOString(),
+        payload: { errorMessage: finalSummary },
+      });
     } finally {
       const completedAt = new Date().toISOString();
+      options.onEvent?.({
+        type: 'agent:completed',
+        sessionId,
+        timestamp: completedAt,
+        payload: { summary: finalSummary },
+      });
       const finalSession: AgentRunSession = {
         ...sessionRecord,
         iterationsCompleted: guard.getIteration(),

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Google Search Status Dashboard Incident History</title>
+    <link>https://status.search.google.com</link>
+    <description>Status incident history for Google Search serving and crawling</description>
+    <lastBuildDate>2026-10-24T18:00:00Z</lastBuildDate>
+    <item>
+      <title>Search Serving and Indexing Latency resolved</title>
+      <link>https://status.search.google.com/incidents/search-latency-2026-10</link>
+      <guid>incident-2026-10-serving</guid>
+      <pubDate>Thu, 22 Oct 2026 14:00:00 GMT</pubDate>
+      <description>We experienced an issue with search indexing latency between 10:00 and 13:30 UTC. The issue is now completely mitigated.</description>
+    </item>
+  </channel>
+</rss>
+

@@ -389,6 +389,8 @@ export type ToolName =
   | 'get_gsc_performance'
   | 'inspect_gsc_url'
   | 'get_cwv_metrics'
+  | 'get_bing_performance'
+  | 'inspect_bing_url'
   | 'run_agent_step';
 
 export interface ToolContext {
@@ -584,7 +586,14 @@ export type SseEventType =
   | 'audit:completed'
   | 'route:updated'
   | 'finding:blocking'
-  | 'ping';
+  | 'ping'
+  | 'agent:started'
+  | 'agent:thought'
+  | 'agent:tool_call'
+  | 'agent:tool_result'
+  | 'agent:patch_proposed'
+  | 'agent:completed'
+  | 'agent:error';
 
 export interface SsePayload<T = unknown> {
   readonly type: SseEventType;

@@ -1,0 +1,85 @@
+name: 'seo-partner Audit'
+description: 'Audit SEO deterministe, controle qualite CI/CD et export SARIF pour GitHub Code Scanning'
+author: 'Firinze Gbenito Dossou'
+
+branding:
+  icon: 'search'
+  color: 'green'
+
+inputs:
+  project-root:
+    description: 'Chemin relatif du projet a analyser'
+    required: false
+    default: '.'
+  fail-on-blockers:
+    description: 'Echouer le job si des blocages d indexation sont detectes'
+    required: false
+    default: 'true'
+  max-critical:
+    description: 'Nombre maximal d anomalies critiques autorisees avant echec'
+    required: false
+    default: '0'
+  max-high:
+    description: 'Nombre maximal d anomalies elevees autorisees (-1 pour desactiver)'
+    required: false
+    default: '-1'
+  min-score:
+    description: 'Score SEO global minimum requis sur 100'
+    required: false
+    default: '0'
+  format:
+    description: 'Format du rapport (sarif | markdown | json)'
+    required: false
+    default: 'sarif'
+  output:
+    description: 'Chemin du fichier de rapport SARIF exporte'
+    required: false
+    default: '.seo/sarif-report.sarif'
+  upload-sarif:
+    description: 'Televerser automatiquement le fichier SARIF vers GitHub Code Scanning'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Verifier l environnement Node.js
+      shell: bash
+      run: |
+        if ! command -v node &> /dev/null; then
+          echo "Node.js non detecte. Veuillez utiliser actions/setup-node@v4 en amont."
+          exit 1
+        fi
+
+    - name: Executer l audit CI seo-partner
+      shell: bash
+      run: |
+        ROOT_ARG="${{ inputs.project-root }}"
+        FAIL_ARG=""
+        if [ "${{ inputs.fail-on-blockers }}" = "true" ]; then
+          FAIL_ARG="--fail-on-blockers"
+        fi
+        
+        MAX_CRIT="${{ inputs.max-critical }}"
+        MAX_HIGH="${{ inputs.max-high }}"
+        MIN_SCORE="${{ inputs.min-score }}"
+        FORMAT_ARG="${{ inputs.format }}"
+        OUTPUT_ARG="${{ inputs.output }}"
+
+        # Execution de la CLI seo-partner ci
+        npx --yes seo-partner ci \
+          --cwd "$ROOT_ARG" \
+          $FAIL_ARG \
+          --max-critical "$MAX_CRIT" \
+          --max-high "$MAX_HIGH" \
+          --min-score "$MIN_SCORE" \
+          --format "$FORMAT_ARG" \
+          --output "$OUTPUT_ARG"
+
+    - name: Televerser le rapport SARIF vers GitHub Code Scanning
+      if: inputs.upload-sarif == 'true' && hashFiles(inputs.output) != ''
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.output }}
+        category: seo-partner
+

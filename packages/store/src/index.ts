@@ -8,3 +8,5 @@ export * from './repositories/decision-repo.js';
 export * from './repositories/gsc-repo.js';
 export * from './repositories/cwv-repo.js';
 export * from './repositories/agent-repo.js';
+export * from './repositories/watch-repo.js';
+export * from './repositories/bing-repo.js';

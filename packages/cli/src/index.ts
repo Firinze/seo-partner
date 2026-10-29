@@ -25,6 +25,8 @@ import { runCwvCommand } from './commands/cwv.js';
 import { runAgentCommand } from './commands/agent.js';
 import { runCiCommand } from './commands/ci.js';
 import { runPrCommand } from './commands/pr.js';
+import { runWatchSync } from '@seo-partner/tools';
+import { runBingCliCommand } from './commands/bing.js';
 
 export * from './ide-installers/index.js';
 export * from './commands/init.js';
@@ -45,6 +47,7 @@ export * from './commands/agent.js';
 export * from './commands/watch.js';
 export * from './commands/ci.js';
 export * from './commands/pr.js';
+export * from './commands/bing.js';
 
 export function wrapCliEnvelope<T>(data: T): CliEnvelope<T> {
   return {
@@ -127,6 +130,7 @@ export async function executeCli(
       'auto-apply': { type: 'boolean' },
       notify: { type: 'boolean' },
       'debounce-ms': { type: 'string' },
+      google: { type: 'boolean' },
       'fail-on-blockers': { type: 'boolean' },
       'max-critical': { type: 'string' },
       'max-high': { type: 'string' },
@@ -150,7 +154,7 @@ export async function executeCli(
   try {
     if (command === 'help' || parsed.values['help']) {
       const helpText = [
-        'seo-partner v0.7.0 — Deterministic Local SEO Partner',
+        'seo-partner v0.8.0 — Deterministic Local SEO Partner',
         '',
         'Commands:',
         '  seo-partner init [--here] [--ide agy|claude|cursor|gemini|codex] [--with-mcp] [--lang en|fr] [--ignore-agent-tools] [--dry-run]',
@@ -162,6 +166,8 @@ export async function executeCli(
         '  seo-partner patch [--finding <id>] [--rule <ruleId>] [--apply] [--force] [--lang fr|en] [--json]',
         '  seo-partner gsc sync --site <url> [--days <n>] [--credentials <path>] [--json]',
         '  seo-partner gsc inspect --url <url> [--site <url>] [--credentials <path>] [--json]',
+        '  seo-partner bing sync --site <url> [--api-key <key>] [--force] [--json]',
+        '  seo-partner bing inspect --url <url> [--site <url>] [--api-key <key>] [--force] [--json]',
         '  seo-partner cwv fetch --url <url> [--form-factor PHONE|DESKTOP|ALL] [--refresh] [--offline] [--json]',
         '  seo-partner agent run --goal "..." [--provider anthropic|openai|gemini|custom] [--model <name>] [--base-url <url>] [--max-iterations <n>] [--auto-apply] [--json]',
         '  seo-partner watch [--scope <dir>] [--notify] [--debounce-ms <ms>]',
@@ -544,6 +550,35 @@ export async function executeCli(
       };
     }
 
+    if (command === 'bing') {
+      if (subcommand !== 'sync' && subcommand !== 'inspect') {
+        throw new Error("Missing or invalid subcommand for 'bing'. Usage: seo-partner bing <sync|inspect> [options]");
+      }
+
+      const res = await runBingCliCommand({
+        projectRoot,
+        subcommand,
+        siteUrl: typeof parsed.values['site'] === 'string' ? parsed.values['site'] : undefined,
+        url: typeof parsed.values['url'] === 'string' ? parsed.values['url'] : undefined,
+        apiKey: typeof parsed.values['api-key'] === 'string' ? parsed.values['api-key'] : undefined,
+        force: Boolean(parsed.values['force']),
+      });
+
+      let text = '';
+      if (res.kind === 'sync') {
+        text = `Bing sync completed: ${res.result.rowsSynced} row(s) synced for ${res.result.siteUrl} (cached: ${res.result.fromCache}).`;
+      } else {
+        const r = res.result;
+        text = `Bing inspection completed for ${r.url}: verdict=${r.verdict}, state=${r.indexingState}, http=${r.httpCode}.`;
+      }
+
+      return {
+        exitCode: 0,
+        stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(res.result), null, 2) : text,
+        stderr: '',
+      };
+    }
+
     if (command === 'agent') {
       const maxIterVal =
         typeof parsed.values['max-iterations'] === 'string'
@@ -590,6 +625,24 @@ export async function executeCli(
     }
 
     if (command === 'watch') {
+      const isGoogle = Boolean(parsed.values['google']) || parsed.positionals[1] === 'sync';
+      if (isGoogle) {
+        const syncRes = await runWatchSync({
+          projectRoot,
+          offline: Boolean(parsed.values['offline']),
+          force: Boolean(parsed.values['force']),
+        });
+        return {
+          exitCode: 0,
+          stdout: jsonMode
+            ? JSON.stringify(wrapCliEnvelope(syncRes), null, 2)
+            : `[watch] Synchronisation officielle Google terminee (${syncRes.sourcesChecked} sources controlees)\n` +
+              `Date de mise a jour : ${syncRes.lastSyncTimestamp}\n` +
+              `Nouvelles entrees : ${syncRes.newEntriesCount}\n` +
+              `Fichier de reference actualise : skills/seo-partner/references/veille-mises-a-jour.md`,
+          stderr: '',
+        };
+      }
       const debounceVal =
         typeof parsed.values['debounce-ms'] === 'string'
           ? Number(parsed.values['debounce-ms'])

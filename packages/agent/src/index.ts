@@ -7,3 +7,4 @@ export * from './llm/gemini.js';
 export * from './llm/factory.js';
 export * from './loop-guard.js';
 export * from './loop.js';
+export * from './patch-applicator.js';

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Google Search Central Blog</title>
+  <link rel="alternate" type="text/html" href="https://developers.google.com/search/blog"/>
+  <updated>2026-10-25T12:00:00Z</updated>
+  <id>tag:developers.google.com,2026:search-blog</id>
+  <entry>
+    <title>Official guidance on structured data for search carousels</title>
+    <link rel="alternate" type="text/html" href="https://developers.google.com/search/blog/2026/10/carousel-structured-data"/>
+    <id>tag:developers.google.com,2026:search-blog-post-1</id>
+    <published>2026-10-20T09:00:00Z</published>
+    <updated>2026-10-20T09:00:00Z</updated>
+    <summary>Google Search Central announces updated technical guidelines for implementing structured data markup on carousel items.</summary>
+  </entry>
+  <entry>
+    <title>Core Update October 2026 algorithmic deployment completed</title>
+    <link rel="alternate" type="text/html" href="https://developers.google.com/search/blog/2026/10/core-update-october-2026"/>
+    <id>tag:developers.google.com,2026:search-blog-post-2</id>
+    <published>2026-10-15T15:30:00Z</published>
+    <updated>2026-10-15T15:30:00Z</updated>
+    <summary>The rollout of the October 2026 Core Update is now complete. Review documentation on core ranking systems.</summary>
+  </entry>
+</feed>
+

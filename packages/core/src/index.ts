@@ -1,4 +1,7 @@
 export * from './types.js';
+export * from './types/watch.js';
+export * from './types/bing.js';
+export * from './types/agent-chat.js';
 export * from './config.js';
 export * from './gitignore-guard.js';
 export * from './outbound-log.js';

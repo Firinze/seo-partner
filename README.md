@@ -4,18 +4,18 @@
 
 <br />
 
-[![Version](https://img.shields.io/badge/version-0.7.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
+[![Version](https://img.shields.io/badge/version-0.8.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-059669?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7_Strict-047857?style=for-the-badge&logo=typescript&logoColor=white)](./tsconfig.base.json)
 [![Packages](https://img.shields.io/badge/Workspaces-12_Packages-34d399?style=for-the-badge)](./package.json)
-[![MCP Tools](https://img.shields.io/badge/MCP_Tools-11_Deterministic-10b981?style=for-the-badge)](./packages/mcp/src/server.ts)
+[![MCP Tools](https://img.shields.io/badge/MCP_Tools-13_Deterministic-10b981?style=for-the-badge)](./packages/mcp/src/server.ts)
 [![SQLite WAL + FTS5](https://img.shields.io/badge/SQLite-WAL_%2B_FTS5-059669?style=for-the-badge&logo=sqlite&logoColor=white)](./packages/store/src/db.ts)
 [![OpenAPI 3.1 + RFC 9457](https://img.shields.io/badge/OpenAPI_3.1-RFC_9457-047857?style=for-the-badge&logoColor=white)](./packages/server/src/openapi.ts)
 [![Rules](https://img.shields.io/badge/SEO_Rules-44_Verified-10b981?style=for-the-badge&logoColor=white)](./packages/rules/src/engine.ts)
 [![License](https://img.shields.io/badge/License-MIT-065f46?style=for-the-badge)](./LICENSE)
 
 <p align="center">
-  <strong>Local-First Deterministic SEO Tools Registry, Standard stdio MCP Server (11 Tools), Git Unified Diff Remediation Engine (<code>seo-partner patch</code>), Google Search Console & Core Web Vitals Connectors, Autonomous ReAct Agent Loop (<code>seo-partner agent run</code>), Real-Time Watcher Daemon (<code>seo-partner watch</code>), CI/CD Compliance Engine with OASIS SARIF v2.1.0 (<code>seo-partner ci</code>), Automated PR Bot (<code>seo-partner pr</code>), Standalone OS Binaries (SEA), Multi-Framework Adapters (Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP, Static), Anti-SSRF Crawler, 44 Rules Engine with ICE Scoring, Local REST API, and WCAG 2.2 AA Dashboard.</strong><br />
+  <strong>Local-First Deterministic SEO Tools Registry, Standard stdio MCP Server (13 Tools), Git Unified Diff Remediation Engine (<code>seo-partner patch</code>), Google Search Console & Core Web Vitals Connectors, Autonomous ReAct Agent Loop (<code>seo-partner agent run</code>), Real-Time Watcher Daemon (<code>seo-partner watch</code>), CI/CD Compliance Engine with OASIS SARIF v2.1.0 (<code>seo-partner ci</code>), Automated PR Bot (<code>seo-partner pr</code>), Standalone OS Binaries (SEA), Multi-Framework Adapters (Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP, Static), Anti-SSRF Crawler, 44 Rules Engine with ICE Scoring, Local REST API, and WCAG 2.2 AA Dashboard.</strong><br />
   <em>Engineered for Antigravity (<code>agy</code>), Claude Code, Cursor, Windsurf, Codex, Gemini Code Assist, and Cline — zero LLM repairs, zero code execution (<code>F-S5</code>), and verifiable backups.</em>
 </p>
 
@@ -32,7 +32,7 @@
 1. [Vision and Value Proposition (`v0.7`)](#1-vision-and-value-proposition-v07)
 2. [System Architecture and Data Flow (`12 Packages`)](#2-system-architecture-and-data-flow-12-packages)
 3. [Quick Start Guide](#3-quick-start-guide)
-4. [Complete CLI Reference (18 Commands)](#4-complete-cli-reference-18-commands)
+4. [Complete CLI Reference (20 Commands)](#4-complete-cli-reference-18-commands)
 5. [Model Context Protocol (MCP) Server (`@seo-partner/mcp`)](#5-model-context-protocol-mcp-server-seo-partnermcp)
 6. [Deterministic Remediation Engine (`seo-partner patch`)](#6-deterministic-remediation-engine-seo-partner-patch)
 7. [External Connectors: Google Search Console & Core Web Vitals](#7-external-connectors-google-search-console--core-web-vitals)
@@ -57,7 +57,7 @@
 
 | Capability | Generic AI Coding Agent | Cloud SaaS Crawler | **`seo-partner` (`v0.7`)** |
 | :--- | :--- | :--- | :--- |
-| **Model Context Protocol (MCP)** | Manual copy-paste prompts | Proprietary APIs | **Yes — Standard JSON-RPC 2.0 stdio Server (11 Shared Tools)** |
+| **Model Context Protocol (MCP)** | Manual copy-paste prompts | Proprietary APIs | **Yes — Standard JSON-RPC 2.0 stdio Server (13 Shared Tools)** |
 | **Code Remediation & Safe Patches** | Hallucinated code edits | Read-only audit | **Yes — Verifiable Unified Diffs + Safe Atomic `--apply` + Backups** |
 | **Google Search Console & CWV** | Disconnected | Heavy SaaS connectors | **Yes — Native RS256 JWT + CrUX & PageSpeed with 7-Day SQLite TTL** |
 | **Autonomous ReAct Agent Loop** | Uncontrolled loops | Black-box cloud agent | **Yes — Local ReAct Engine with Cycle Guards & Step JSONL Auditing** |
@@ -192,7 +192,7 @@ seo-partner serve --port 4321 --lang fr
 
 ---
 
-## 4. Complete CLI Reference (18 Commands)
+## 4. Complete CLI Reference (20 Commands)
 
 1. **`seo-partner init`**: Creates `.seo/config.json`, `.seo/decisions.md`, secures `.gitignore`, installs skill packs, and with `--with-mcp` automatically merges stdio MCP configurations for Claude Code, Cursor, Windsurf, Codex, Gemini Code Assist, and Cline.
 2. **`seo-partner mcp`**: Runs the Model Context Protocol stdio server using JSON-RPC 2.0, exposing all 11 deterministic tools. Accepts `--allow-apply` to permit automated patch application.
@@ -212,6 +212,8 @@ seo-partner serve --port 4321 --lang fr
 16. **`seo-partner serve`**: Starts the local API server and interactive Web Dashboard on `127.0.0.1` with automatic port fallback (`+1..20`).
 17. **`seo-partner memory`**: Synchronizes architectural SEO decisions between `.seo/decisions.md` and SQLite.
 18. **`seo-partner uninstall`**: Safely removes IDE skill files while preserving `.seo/` data.
+19. **`seo-partner watch sync --google`**: Synchronizes official Google Search Central Blog and Status Dashboard feeds with SHA-256 revision hashing and 90-day freshness alerts (`F-V1`).
+20. **`seo-partner bing <sync|inspect>`**: Read-only Bing Webmaster Tools connector querying 30-day performance stats and inspecting URL indexation with 7-day TTL SQLite caching (`M9`).
 
 ---
 
@@ -219,7 +221,7 @@ seo-partner serve --port 4321 --lang fr
 
 The MCP server implements the standard Model Context Protocol over `stdio` using JSON-RPC 2.0 without third-party heavyweight SDKs:
 
-### Exposed Tools (11 Deterministic Tools)
+### Exposed Tools (13 Deterministic Tools)
 
 | Tool Name | Parameters | Description |
 | :--- | :--- | :--- |
@@ -273,6 +275,50 @@ The remediation engine repairs corrigible SEO defects using pure AST and string 
 - **Chrome User Experience Report (CrUX)**: Retrieves field data for LCP, INP, CLS, FCP, and TTFB. Gracefully falls back to origin-level metrics if page-level data is sparse.
 - **PageSpeed Insights**: Conducts lab performance audits when field data is unavailable.
 - **SQLite 7-Day TTL Cache**: Prevents duplicate API quota consumption by caching evaluated CWV payloads for 7 days (`--refresh` bypass available).
+
+---
+
+---
+
+## 7b. Bing Webmaster Tools Connector (M9)
+
+The Bing Webmaster Tools connector provides read-only search intelligence and URL inspection without third-party dependencies:
+- **API v2 Integration**: Queries `GetQueryStats` for 30-day impressions, clicks, CTR, and average position, and `GetUrlTrafficStats` for real-time indexing status.
+- **7-Day SQLite TTL Cache**: Results are persisted in `bing_performance` and `bing_inspection` tables. Cached data is served instantly unless `--force` is supplied.
+- **Universal Surface**: Exposed via CLI (`seo-partner bing sync/inspect`), MCP tools (`get_bing_performance`, `inspect_bing_url`), local REST API (`/api/v1/bing/*`), and the web dashboard.
+
+---
+
+## 9b. Official Google SEO Watch & 90-Day Freshness (F-V1)
+
+- **Official Feeds**: Ingests Google Search Central Blog (Atom) and Google Search Status Dashboard (RSS).
+- **Revision Tracking**: Compares content SHA-256 digests in `watch_source` and persists entries into `watch_entry`.
+- **Reference Generation**: Generates `skills/seo-partner/references/veille-mises-a-jour.md`. Unconfirmed community rules are marked "Reported, to verify" (`confirmed: false`).
+- **Doctor Freshness Check**: `seo-partner doctor` triggers a warning whenever the latest official sync is older than 90 days.
+
+---
+
+## 10b. Packaged GitHub Action (action.yml, M12)
+
+The official composite GitHub Action encapsulates CI threshold enforcement and automated SARIF uploading:
+```yaml
+- name: Audit SEO Compliance
+  uses: Firinze/seo-partner@v0.8
+  with:
+    fail-on-blockers: 'true'
+    min-score: '80'
+    upload-sarif: 'true'
+```
+Generates `$GITHUB_STEP_SUMMARY` and uploads findings directly to GitHub Code Scanning.
+
+---
+
+## 13b. Agent Chat Tab & Interactive Patch Modal (M14)
+
+The local web dashboard (`seo-partner serve`) includes a dedicated "Agent Chat" tab:
+- **Real-Time Streaming**: Listens to SSE events (`agent:thought`, `agent:tool_call`, `agent:tool_result`, `agent:patch_proposed`, `agent:completed`).
+- **Explicit Patch Approval**: Inline unified diff viewer and confirmation modal dialog enforcing Constitution Principle II before calling `POST /api/v1/agent/apply-patch`.
+- **Accessibility**: Zero emojis, zero glassmorphism, WCAG 2.2 AA compliant focus traps and keyboard navigation.
 
 ---
 

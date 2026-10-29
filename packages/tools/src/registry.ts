@@ -33,6 +33,7 @@ import { recordDecision } from './engine/decisions.js';
 import { ensureIndex } from './engine/ensure-index.js';
 import { runGscSyncCommand, runGscInspectCommand } from './engine/gsc-sync.js';
 import { runCwvFetchCommand } from './engine/cwv-fetch.js';
+import { getBingPerformanceTool, inspectBingUrlTool } from './bing/tools.js';
 import {
   applyPatchBatch,
   proposePatches,
@@ -1121,6 +1122,8 @@ const registry = new Map<ToolName, ToolDefinition>([
   ['get_gsc_performance', getGscPerformanceTool],
   ['inspect_gsc_url', inspectGscUrlTool],
   ['get_cwv_metrics', getCwvMetricsTool],
+  ['get_bing_performance', getBingPerformanceTool],
+  ['inspect_bing_url', inspectBingUrlTool],
 ]);
 
 export function registerTool(tool: ToolDefinition): void {

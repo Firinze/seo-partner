@@ -7,6 +7,7 @@ import type {
   Finding,
   GscInspectionRecord,
   GscPerformanceRecord,
+  BingPerformanceRecord,
   PatchBatchResult,
   PrioritizedAction,
   SupportedLanguage,
@@ -22,6 +23,8 @@ import { renderDecisionsReportsFeature } from './components/features/decisions-r
 import { renderPatchesFeature } from './components/features/patches-feature.js';
 import { renderGscFeature } from './components/features/gsc-feature.js';
 import { renderCwvFeature } from './components/features/cwv-feature.js';
+import { renderAgentChatFeature } from './components/features/chat-feature.js';
+import { renderBingFeature } from './components/features/bing-feature.js';
 
 export interface DashboardInitialState {
   readonly lang: SupportedLanguage;
@@ -35,6 +38,7 @@ export interface DashboardInitialState {
   readonly gscPerformance?: ReadonlyArray<GscPerformanceRecord>;
   readonly gscInspection?: ReadonlyArray<GscInspectionRecord>;
   readonly cwvMetrics?: ReadonlyArray<CwvMetricRecord>;
+  readonly bingPerformance?: ReadonlyArray<BingPerformanceRecord>;
 }
 
 export function renderDashboardCss(): string {
@@ -531,6 +535,121 @@ a {
   border: 1px solid #7c2d12;
   font-size: 13px;
 }
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.chat-input-bar {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-emerald);
+  padding: 16px;
+}
+.ui-textarea {
+  width: 100%;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-strong);
+  color: var(--text-main);
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+  min-height: 50px;
+}
+.ui-textarea:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 2px;
+}
+.chat-meta-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+.chat-stream-box {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-emerald);
+  padding: 16px;
+  min-height: 250px;
+  max-height: 600px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chat-thought-block {
+  background-color: #0d1e16;
+  border: 1px solid var(--accent-emerald);
+  padding: 10px 14px;
+  font-size: 13px;
+}
+.chat-tool-block {
+  background-color: #071510;
+  border: 1px solid var(--border-strong);
+  padding: 10px 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+.chat-tool-header {
+  color: var(--accent-bright);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(5, 11, 8, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.modal-card {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-emerald);
+}
+.modal-title {
+  margin: 0;
+  font-size: 16px;
+  color: var(--accent-bright);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+}
+.modal-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-emerald);
+}
 `.trim();
 }
 
@@ -724,6 +843,117 @@ export function renderDashboardClientScript(): string {
       }
     });
   }
+
+  // --- Agent Chat & Real-Time SSE (v0.8) ---
+  const chatGoal = document.getElementById('agent-chat-goal');
+  const chatRunBtn = document.getElementById('btn-agent-run');
+  const chatStream = document.getElementById('chat-stream-log');
+  const patchModal = document.getElementById('apply-patch-modal');
+  const modalCloseBtn = document.getElementById('btn-modal-close');
+  const modalCancelBtn = document.getElementById('btn-modal-cancel');
+  const modalConfirmBtn = document.getElementById('btn-modal-confirm-apply');
+  const modalDiffPreview = document.querySelector('#modal-patch-diff-preview code');
+  let currentPendingPatch = null;
+
+  function appendChatBlock(className, html) {
+    if (!chatStream) return;
+    const emptyState = chatStream.querySelector('.chat-empty-state');
+    if (emptyState) emptyState.remove();
+    const div = document.createElement('div');
+    div.className = className;
+    div.innerHTML = html;
+    chatStream.appendChild(div);
+    chatStream.scrollTop = chatStream.scrollHeight;
+  }
+
+  if (chatRunBtn && chatGoal) {
+    chatRunBtn.addEventListener('click', async function() {
+      const goal = chatGoal.value.trim();
+      if (!goal) return;
+      chatRunBtn.setAttribute('disabled', 'disabled');
+      chatRunBtn.textContent = 'Execution en cours...';
+
+      appendChatBlock('chat-thought-block', '<strong>Instruction utilisateur :</strong> ' + goal);
+
+      try {
+        const res = await apiCall('/api/v1/agent/run', {
+          method: 'POST',
+          body: JSON.stringify({ goal: goal })
+        });
+        if (res && res.success && res.data) {
+          appendChatBlock('chat-thought-block', '<strong>Agent termine :</strong> ' + (res.data.message || 'Succes'));
+        } else {
+          appendChatBlock('ui-alert ui-alert-error', '<strong>Erreur :</strong> ' + ((res && res.error) || 'Echec d execution'));
+        }
+      } catch (err) {
+        appendChatBlock('ui-alert ui-alert-error', 'Erreur de connexion : ' + err.message);
+      } finally {
+        chatRunBtn.removeAttribute('disabled');
+        chatRunBtn.textContent = 'Lancer l Agent';
+      }
+    });
+  }
+
+  if (typeof EventSource !== 'undefined') {
+    const sse = new EventSource('/api/v1/events', { withCredentials: true });
+    sse.addEventListener('message', function(evt) {
+      try {
+        const payload = JSON.parse(evt.data);
+        if (payload.type === 'agent:thought' && payload.data && payload.data.payload) {
+          appendChatBlock('chat-thought-block', '<strong>Raisonnement :</strong> ' + (payload.data.payload.thought || ''));
+        } else if (payload.type === 'agent:tool_call' && payload.data && payload.data.payload) {
+          appendChatBlock('chat-tool-block', '<div class="chat-tool-header">Appel d outil : ' + payload.data.payload.toolName + '</div><pre><code>' + JSON.stringify(payload.data.payload.toolArguments || {}, null, 2) + '</code></pre>');
+        } else if (payload.type === 'agent:patch_proposed' && payload.data && payload.data.payload) {
+          const p = payload.data.payload;
+          currentPendingPatch = { batchId: p.patchBatchId, diff: p.patchUnifiedDiff, sessionId: payload.data.sessionId };
+          appendChatBlock('chat-tool-block', '<div class="chat-tool-header">Proposition de correctif (' + p.patchBatchId + ')</div><pre class="patch-diff-pre"><code>' + (p.patchUnifiedDiff || '') + '</code></pre><button type="button" class="ui-btn ui-btn-primary btn-open-patch-confirm" style="margin-top:8px;">Examiner & Appliquer</button>');
+        }
+      } catch (e) {
+        // Ignore parse error
+      }
+    });
+  }
+
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.classList && e.target.classList.contains('btn-open-patch-confirm')) {
+      if (patchModal && modalDiffPreview && currentPendingPatch) {
+        modalDiffPreview.textContent = currentPendingPatch.diff || '';
+        patchModal.classList.remove('is-hidden');
+      }
+    }
+  });
+
+  if (modalCloseBtn && patchModal) {
+    modalCloseBtn.addEventListener('click', function() { patchModal.classList.add('is-hidden'); });
+  }
+  if (modalCancelBtn && patchModal) {
+    modalCancelBtn.addEventListener('click', function() { patchModal.classList.add('is-hidden'); });
+  }
+  if (modalConfirmBtn && patchModal) {
+    modalConfirmBtn.addEventListener('click', async function() {
+      if (!currentPendingPatch) return;
+      modalConfirmBtn.setAttribute('disabled', 'disabled');
+      modalConfirmBtn.textContent = 'Application en cours...';
+      try {
+        const res = await apiCall('/api/v1/agent/apply-patch', {
+          method: 'POST',
+          body: JSON.stringify({
+            sessionId: currentPendingPatch.sessionId,
+            patchBatchId: currentPendingPatch.batchId
+          })
+        });
+        if (res && res.success) {
+          patchModal.classList.add('is-hidden');
+          appendChatBlock('ui-alert ui-alert-success', 'Correctif applique avec succes sur ' + (res.data.appliedFiles || []).join(', '));
+        } else {
+          alert('Erreur : ' + ((res && res.error) || 'Echec'));
+        }
+      } finally {
+        modalConfirmBtn.removeAttribute('disabled');
+        modalConfirmBtn.textContent = 'Appliquer le correctif';
+      }
+    });
+  }
 })();
 `.trim();
 }
@@ -741,6 +971,8 @@ export function renderDashboardSpaHtml(state: DashboardInitialState): string {
     { id: 'tab-btn-patches', label: dict.tabPatches, panelId: 'panel-patches' },
     { id: 'tab-btn-gsc', label: 'GSC', panelId: 'panel-gsc' },
     { id: 'tab-btn-cwv', label: 'CWV', panelId: 'panel-cwv' },
+    { id: 'tab-btn-chat', label: 'Agent Chat', panelId: 'panel-chat' },
+    { id: 'tab-btn-bing', label: 'Bing', panelId: 'panel-bing' },
   ]);
 
   const langSwitcherHtml = renderSelectFilter({
@@ -775,6 +1007,11 @@ export function renderDashboardSpaHtml(state: DashboardInitialState): string {
   const cwvPanel = renderCwvFeature({
     lang: state.lang,
     metrics: state.cwvMetrics,
+  });
+  const chatPanel = renderAgentChatFeature(state.lang);
+  const bingPanel = renderBingFeature({
+    lang: state.lang,
+    performanceRecords: state.bingPerformance,
   });
 
   return `<!DOCTYPE html>
@@ -824,6 +1061,12 @@ export function renderDashboardSpaHtml(state: DashboardInitialState): string {
       </div>
       <div id="panel-cwv" role="tabpanel" aria-labelledby="tab-btn-cwv" class="tab-panel" hidden>
         ${cwvPanel}
+      </div>
+      <div id="panel-chat" role="tabpanel" aria-labelledby="tab-btn-chat" class="tab-panel" hidden>
+        ${chatPanel}
+      </div>
+      <div id="panel-bing" role="tabpanel" aria-labelledby="tab-btn-bing" class="tab-panel" hidden>
+        ${bingPanel}
       </div>
     </main>
   </div>

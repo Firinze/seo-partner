@@ -34,10 +34,22 @@ async function main(): Promise<void> {
     let notify = false;
     let debounceMs: number | undefined;
     let json = false;
+    let google = false;
+    let subcommand: string | undefined;
+    let offline = false;
+    let force = false;
 
     for (let i = 1; i < rawArgs.length; i++) {
       const arg = rawArgs[i];
-      if (arg === '--cwd' && i + 1 < rawArgs.length) {
+      if (arg === 'sync') {
+        subcommand = 'sync';
+      } else if (arg === '--google') {
+        google = true;
+      } else if (arg === '--offline') {
+        offline = true;
+      } else if (arg === '--force') {
+        force = true;
+      } else if (arg === '--cwd' && i + 1 < rawArgs.length) {
         cwd = rawArgs[++i];
       } else if (arg === '--scope' && i + 1 < rawArgs.length) {
         scope = rawArgs[++i];
@@ -50,7 +62,7 @@ async function main(): Promise<void> {
       }
     }
 
-    await runWatchCliCommand({ cwd, scope, notify, debounceMs, json });
+    await runWatchCliCommand({ cwd, scope, notify, debounceMs, json, google, subcommand, offline, force });
   } else {
     const result = await executeCli(rawArgs);
     if (result.stdout) {

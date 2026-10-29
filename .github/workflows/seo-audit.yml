@@ -1,0 +1,29 @@
+name: "SEO Quality Gate"
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  seo-partner-audit:
+    name: Deterministic SEO Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Run seo-partner CI Audit
+        uses: ./
+        with:
+          project-root: '.'
+          fail-on-blockers: 'true'
+          max-critical: '0'
+          upload-sarif: 'true'
+

@@ -27,6 +27,8 @@ import {
   RouteRepository,
   GscRepository,
   CwvRepository,
+  WatchRepository,
+  BingRepository,
   SeoDatabase,
 } from '@seo-partner/store';
 import {
@@ -42,6 +44,7 @@ import {
   writeMarkdownReport,
 } from '@seo-partner/rules';
 import { renderDashboardSpaHtml } from '@seo-partner/dashboard';
+import { AutonomousAgent, applyAgentPatch } from '@seo-partner/agent';
 import {
   runScanCommand,
   runAuditCommand,
@@ -52,6 +55,10 @@ import {
   runGscSyncCommand,
   runGscInspectCommand,
   runCwvFetchCommand,
+  runWatchSync,
+  runBingSyncCommand,
+  runBingInspectCommand,
+  getBingPerformanceSummary,
 } from '@seo-partner/tools';
 import {
   buildCorsHeaders,
@@ -63,6 +70,7 @@ import {
   isLoopbackHost,
   verifySessionRequest,
 } from './security.js';
+
 import {
   AuditRequestSchema,
   BacklogQuerySchema,
@@ -1024,6 +1032,227 @@ export function createLocalApiApp(options: LocalApiAppOptions): LocalApiApp {
         });
 
         return jsonResponse(200, buildSuccessEnvelope(result), originHeader);
+      }
+
+      if (method === 'GET' && pathname === '/api/v1/watch') {
+        const store = SeoDatabase.open(projectRoot);
+        try {
+          const watchRepo = new WatchRepository(store);
+          const sources = watchRepo.listSources();
+          const latestEntries = watchRepo.listEntries({ limit: 50 });
+          const lastSyncDate = watchRepo.getLatestSyncDate();
+          const isFresh = watchRepo.isFresh(90);
+
+          return jsonResponse(
+            200,
+            buildSuccessEnvelope({
+              sources,
+              latestEntries,
+              lastSyncDate,
+              isFresh,
+            }),
+            originHeader,
+          );
+        } finally {
+          store.close();
+        }
+      }
+
+      if (method === 'POST' && pathname === '/api/v1/watch/sync') {
+        const rawBody = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+        const syncRes = await runWatchSync({
+          projectRoot,
+          offline: Boolean(rawBody?.offline),
+          force: Boolean(rawBody?.force),
+        });
+
+        return jsonResponse(200, buildSuccessEnvelope(syncRes), originHeader);
+      }
+
+      if (method === 'POST' && pathname === '/api/v1/agent/run') {
+        const rawBody = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+        const goal = typeof rawBody?.goal === 'string' ? rawBody.goal : '';
+        if (!goal) {
+          return jsonResponse(
+            400,
+            buildErrorEnvelope({
+              typeSlug: 'missing-goal',
+              title: 'Missing Goal',
+              status: 400,
+              detail: 'Field "goal" is required for /api/v1/agent/run',
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+
+        const agent = new AutonomousAgent();
+        const runResult = await agent.run({
+          projectRoot,
+          goal,
+          provider: typeof rawBody?.provider === 'string' ? (rawBody.provider as any) : undefined,
+          model: typeof rawBody?.model === 'string' ? rawBody.model : undefined,
+          apiKey: typeof rawBody?.apiKey === 'string' ? rawBody.apiKey : undefined,
+          baseUrl: typeof rawBody?.baseUrl === 'string' ? rawBody.baseUrl : undefined,
+          maxIterations: typeof rawBody?.maxIterations === 'number' ? rawBody.maxIterations : undefined,
+          autoApply: Boolean(rawBody?.autoApply),
+          onEvent: (evt) => {
+            globalSseBroadcaster.broadcastAgentEvent(evt);
+          },
+        });
+
+        return jsonResponse(
+          200,
+          buildSuccessEnvelope({
+            sessionId: runResult.session.id,
+            status: runResult.session.status,
+            goal: runResult.session.goal,
+            message: runResult.summary,
+            stepsCount: runResult.steps.length,
+          }),
+          originHeader,
+        );
+      }
+
+      if (method === 'POST' && pathname === '/api/v1/agent/apply-patch') {
+        const rawBody = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+        const sessionId = typeof rawBody?.sessionId === 'string' ? rawBody.sessionId : '';
+        const patchBatchId = typeof rawBody?.patchBatchId === 'string' ? rawBody.patchBatchId : '';
+
+        if (!sessionId || !patchBatchId) {
+          return jsonResponse(
+            400,
+            buildErrorEnvelope({
+              typeSlug: 'missing-parameters',
+              title: 'Missing Parameters',
+              status: 400,
+              detail: 'Fields "sessionId" and "patchBatchId" are required for /api/v1/agent/apply-patch',
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+
+        try {
+          const res = await applyAgentPatch({
+            projectRoot,
+            sessionId,
+            patchBatchId,
+            force: Boolean(rawBody?.force),
+          });
+
+          return jsonResponse(200, buildSuccessEnvelope(res), originHeader);
+        } catch (err: unknown) {
+          return jsonResponse(
+            500,
+            buildErrorEnvelope({
+              typeSlug: 'patch-application-failed',
+              title: 'Patch Application Failed',
+              status: 500,
+              detail: err instanceof Error ? err.message : String(err),
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+      }
+
+      if (method === 'GET' && pathname === '/api/v1/bing/performance') {
+        const siteUrlParam = url.searchParams.get('siteUrl') ?? undefined;
+        const limitParam = url.searchParams.get('limit');
+        const limit = limitParam ? Number.parseInt(limitParam, 10) : 100;
+
+        const summary = await getBingPerformanceSummary({
+          projectRoot,
+          siteUrl: siteUrlParam,
+          limit: Number.isFinite(limit) && limit > 0 ? limit : 100,
+        });
+
+        return jsonResponse(200, buildSuccessEnvelope(summary), originHeader);
+      }
+
+      if (method === 'POST' && pathname === '/api/v1/bing/sync') {
+        const rawBody = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+        const siteUrl = typeof rawBody?.siteUrl === 'string' ? rawBody.siteUrl.trim() : '';
+
+        if (!siteUrl) {
+          return jsonResponse(
+            400,
+            buildErrorEnvelope({
+              typeSlug: 'missing-site-url',
+              title: 'Missing siteUrl',
+              status: 400,
+              detail: 'Field "siteUrl" is required for /api/v1/bing/sync',
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+
+        try {
+          const syncRes = await runBingSyncCommand({
+            projectRoot,
+            siteUrl,
+            apiKey: typeof rawBody?.apiKey === 'string' ? rawBody.apiKey : undefined,
+            force: Boolean(rawBody?.force),
+          });
+
+          return jsonResponse(200, buildSuccessEnvelope(syncRes), originHeader);
+        } catch (err: unknown) {
+          return jsonResponse(
+            500,
+            buildErrorEnvelope({
+              typeSlug: 'bing-sync-failed',
+              title: 'Bing Sync Failed',
+              status: 500,
+              detail: err instanceof Error ? err.message : String(err),
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+      }
+
+      if (method === 'POST' && pathname === '/api/v1/bing/inspect') {
+        const rawBody = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+        const targetUrl = typeof rawBody?.url === 'string' ? rawBody.url.trim() : '';
+
+        if (!targetUrl) {
+          return jsonResponse(
+            400,
+            buildErrorEnvelope({
+              typeSlug: 'missing-url',
+              title: 'Missing url',
+              status: 400,
+              detail: 'Field "url" is required for /api/v1/bing/inspect',
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
+
+        try {
+          const inspectRes = await runBingInspectCommand({
+            projectRoot,
+            url: targetUrl,
+            siteUrl: typeof rawBody?.siteUrl === 'string' ? rawBody.siteUrl : undefined,
+            apiKey: typeof rawBody?.apiKey === 'string' ? rawBody.apiKey : undefined,
+          });
+
+          return jsonResponse(200, buildSuccessEnvelope(inspectRes), originHeader);
+        } catch (err: unknown) {
+          return jsonResponse(
+            500,
+            buildErrorEnvelope({
+              typeSlug: 'bing-inspect-failed',
+              title: 'Bing Inspect Failed',
+              status: 500,
+              detail: err instanceof Error ? err.message : String(err),
+              instance: pathname,
+            }),
+            originHeader,
+          );
+        }
       }
 
       if (method === 'GET' && (pathname === '/api/v1/gsc' || pathname === '/api/v1/gsc/performance')) {

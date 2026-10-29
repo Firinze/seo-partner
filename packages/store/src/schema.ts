@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 export const INITIAL_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS schema_migration (
@@ -264,6 +264,53 @@ CREATE TABLE IF NOT EXISTS agent_step_log (
   created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS watch_source (
+  id TEXT PRIMARY KEY,
+  url TEXT NOT NULL UNIQUE,
+  kind TEXT NOT NULL,
+  last_checked_at TEXT,
+  content_hash TEXT
+);
+
+CREATE TABLE IF NOT EXISTS watch_entry (
+  id TEXT PRIMARY KEY,
+  source_id TEXT NOT NULL REFERENCES watch_source(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  pub_date TEXT NOT NULL,
+  official_url TEXT NOT NULL,
+  confirmed INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS bing_performance (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  url TEXT NOT NULL,
+  query TEXT NOT NULL DEFAULT '',
+  clicks INTEGER NOT NULL DEFAULT 0,
+  impressions INTEGER NOT NULL DEFAULT 0,
+  ctr REAL NOT NULL DEFAULT 0.0,
+  position REAL NOT NULL DEFAULT 0.0,
+  date_start TEXT NOT NULL,
+  date_end TEXT NOT NULL,
+  fetched_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS bing_inspection (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  url TEXT NOT NULL,
+  verdict TEXT NOT NULL,
+  indexing_state TEXT NOT NULL,
+  crawl_state TEXT NOT NULL,
+  last_crawl_time TEXT,
+  http_code INTEGER NOT NULL DEFAULT 0,
+  fetched_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_file_project ON file(project_id);
 CREATE INDEX IF NOT EXISTS idx_route_project ON route(project_id);
 CREATE INDEX IF NOT EXISTS idx_crawl_run_project ON crawl_run(project_id, started_at DESC);
@@ -276,4 +323,9 @@ CREATE INDEX IF NOT EXISTS idx_gsc_insp_proj_url ON gsc_inspection (project_id, 
 CREATE INDEX IF NOT EXISTS idx_cwv_proj_url ON cwv_metrics (project_id, url, form_factor);
 CREATE INDEX IF NOT EXISTS idx_agent_session_proj ON agent_run_session (project_id, started_at DESC);
 CREATE INDEX IF NOT EXISTS idx_agent_step_session ON agent_step_log (session_id, step_index ASC);
+CREATE INDEX IF NOT EXISTS idx_watch_entry_source ON watch_entry(source_id, pub_date DESC);
+CREATE INDEX IF NOT EXISTS idx_watch_entry_confirmed ON watch_entry(confirmed);
+CREATE INDEX IF NOT EXISTS idx_bing_perf_project_url ON bing_performance(project_id, url);
+CREATE INDEX IF NOT EXISTS idx_bing_perf_query ON bing_performance(project_id, query);
+CREATE INDEX IF NOT EXISTS idx_bing_insp_project_url ON bing_inspection(project_id, url);
 `;

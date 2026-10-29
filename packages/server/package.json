@@ -21,6 +21,7 @@
     "@seo-partner/crawler": "workspace:*",
     "@seo-partner/rules": "workspace:*",
     "@seo-partner/dashboard": "workspace:*",
+    "@seo-partner/agent": "workspace:*",
     "@seo-partner/tools": "workspace:*"
   }
 }

@@ -4,18 +4,18 @@
 
 <br />
 
-[![Version](https://img.shields.io/badge/version-0.7.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
+[![Version](https://img.shields.io/badge/version-0.8.0-10b981?style=for-the-badge&logoColor=white)](./package.json)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-059669?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7_Strict-047857?style=for-the-badge&logo=typescript&logoColor=white)](./tsconfig.base.json)
 [![Packages](https://img.shields.io/badge/Workspaces-12_Packages-34d399?style=for-the-badge)](./package.json)
-[![Outils MCP](https://img.shields.io/badge/Outils_MCP-11_Deterministes-10b981?style=for-the-badge)](./packages/mcp/src/server.ts)
+[![Outils MCP](https://img.shields.io/badge/Outils_MCP-13_Deterministes-10b981?style=for-the-badge)](./packages/mcp/src/server.ts)
 [![SQLite WAL + FTS5](https://img.shields.io/badge/SQLite-WAL_%2B_FTS5-059669?style=for-the-badge&logo=sqlite&logoColor=white)](./packages/store/src/db.ts)
 [![OpenAPI 3.1 + RFC 9457](https://img.shields.io/badge/OpenAPI_3.1-RFC_9457-047857?style=for-the-badge&logoColor=white)](./packages/server/src/openapi.ts)
 [![Regles](https://img.shields.io/badge/Regles_SEO-44_Verifiees-10b981?style=for-the-badge&logoColor=white)](./packages/rules/src/engine.ts)
 [![Licence](https://img.shields.io/badge/Licence-MIT-065f46?style=for-the-badge)](./LICENSE)
 
 <p align="center">
-  <strong>Registre d'outils SEO deterministes local-first, Serveur MCP standard sur flux stdio (11 outils), Moteur de remediation par diffs Git unifies (<code>seo-partner patch</code>), Connecteurs Google Search Console & Core Web Vitals, Boucle d'agent autonome ReAct (<code>seo-partner agent run</code>), Demon d'observation temps reel (<code>seo-partner watch</code>), Moteur de conformite CI/CD avec export OASIS SARIF v2.1.0 (<code>seo-partner ci</code>), Bot de Pull Request automatise (<code>seo-partner pr</code>), Binaires systeme autonomes (SEA), Adapteurs multi-frameworks (Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP, Statique), Crawler anti-SSRF, Moteur de 44 regles avec scoring ICE, API REST locale et Dashboard WCAG 2.2 AA.</strong><br />
+  <strong>Registre d'outils SEO deterministes local-first, Serveur MCP standard sur flux stdio (13 outils), Moteur de remediation par diffs Git unifies (<code>seo-partner patch</code>), Connecteurs Google Search Console & Core Web Vitals, Boucle d'agent autonome ReAct (<code>seo-partner agent run</code>), Demon d'observation temps reel (<code>seo-partner watch</code>), Moteur de conformite CI/CD avec export OASIS SARIF v2.1.0 (<code>seo-partner ci</code>), Bot de Pull Request automatise (<code>seo-partner pr</code>), Binaires systeme autonomes (SEA), Adapteurs multi-frameworks (Next.js, Astro, Nuxt 3, SvelteKit, Remix, Django, Laravel, Symfony, PHP, Statique), Crawler anti-SSRF, Moteur de 44 regles avec scoring ICE, API REST locale et Dashboard WCAG 2.2 AA.</strong><br />
   <em>Concu pour Antigravity (<code>agy</code>), Claude Code, Cursor, Windsurf, Codex, Gemini Code Assist et Cline — zero generation LLM non verifiee, zero execution de code cible (<code>F-S5</code>) et sauvegardes automatiques.</em>
 </p>
 
@@ -32,7 +32,7 @@
 1. [Vision et Proposition de Valeur (`v0.7`)](#1-vision-et-proposition-de-valeur-v07)
 2. [Architecture Systeme et Flux de Donnees (`12 Packages`)](#2-architecture-systeme-et-flux-de-donnees-12-packages)
 3. [Demarrage Rapide](#3-demarrage-rapide)
-4. [Reference Complete de la CLI (18 Commandes)](#4-reference-complete-de-la-cli-18-commandes)
+4. [Reference Complete de la CLI (20 Commandes)](#4-reference-complete-de-la-cli-18-commandes)
 5. [Serveur Model Context Protocol (MCP) (`@seo-partner/mcp`)](#5-serveur-model-context-protocol-mcp-seo-partnermcp)
 6. [Moteur de Remediation Deterministe (`seo-partner patch`)](#6-moteur-de-remediation-deterministe-seo-partner-patch)
 7. [Connecteurs Externes : Google Search Console & Core Web Vitals](#7-connecteurs-externes--google-search-console--core-web-vitals)
@@ -57,7 +57,7 @@
 
 | Capacite | Agent IA Generique | Crawler Cloud SaaS | **`seo-partner` (`v0.7`)** |
 | :--- | :--- | :--- | :--- |
-| **Model Context Protocol (MCP)** | Prompts manuels copies-colles | API proprietaires | **Oui — Serveur stdio JSON-RPC 2.0 Standard (11 outils partages)** |
+| **Model Context Protocol (MCP)** | Prompts manuels copies-colles | API proprietaires | **Oui — Serveur stdio JSON-RPC 2.0 Standard (13 outils partages)** |
 | **Remediation & Patchs securises** | Hallucinations de code | Audit en lecture seule | **Oui — Diffs unifies verifiables + `--apply` atomique + Sauvegardes** |
 | **Google Search Console & CWV** | Deconnectes | Connecteurs SaaS lourds | **Oui — JWT RS256 natif + CrUX & PageSpeed avec cache SQLite 7 jours** |
 | **Boucle d'Agent Autonome ReAct** | Boucles infinies | Boite noire cloud | **Oui — Moteur ReAct local avec garde-fous de cycle & traces JSONL** |
@@ -192,7 +192,7 @@ seo-partner serve --port 4321 --lang fr
 
 ---
 
-## 4. Reference Complete de la CLI (18 Commandes)
+## 4. Reference Complete de la CLI (20 Commandes)
 
 1. **`seo-partner init`**: Cree `.seo/config.json`, `.seo/decisions.md`, securise `.gitignore`, installe les skills et, avec `--with-mcp`, fusionne automatiquement la configuration stdio MCP pour Claude Code, Cursor, Windsurf, Codex, Gemini Code Assist et Cline.
 2. **`seo-partner mcp`**: Demarre le serveur Model Context Protocol sur flux stdio (JSON-RPC 2.0), exposant les 11 outils deterministes. Accepte le drapeau `--allow-apply` pour autoriser l'application directe des correctifs.
@@ -219,7 +219,7 @@ seo-partner serve --port 4321 --lang fr
 
 Le serveur MCP met en oeuvre le protocole Model Context Protocol officiel sur flux `stdio` avec JSON-RPC 2.0 sans dependance SDK externe lourde :
 
-### Outils Exposes (11 Outils Deterministes)
+### Outils Exposes (13 Outils Deterministes)
 
 | Nom de l'Outil | Parametres | Description |
 | :--- | :--- | :--- |
@@ -273,6 +273,50 @@ Le moteur de remediation repare les defauts SEO corrigibles par transformation d
 - **Chrome User Experience Report (CrUX)**: Collecte des metriques de terrain (LCP, INP, CLS, FCP, TTFB). Repli automatique et gracieux sur l'origine si la page dispose d'un volume de trafic insuffisant.
 - **PageSpeed Insights**: Realisation d'audits de performance en environnement de laboratoire lorsque les donnees de terrain sont absentes.
 - **Cache SQLite TTL 7 Jours**: Evite la surconsommation des quotas d'API en conservant les mesures evaluees pendant 7 jours (contournable avec `--refresh`).
+
+---
+
+---
+
+## 7b. Connecteur Bing Webmaster Tools (M9)
+
+Le connecteur Bing Webmaster Tools apporte une visibilite complete sur le moteur Bing en lecture seule :
+- **API v2 REST** : Interroge `GetQueryStats` (impressions, clics, CTR, position moyenne sur 30 jours) et `GetUrlTrafficStats` pour l'etat d'indexation.
+- **Cache Local SQLite & TTL 7 jours** : Donnees stockees dans les tables `bing_performance` et `bing_inspection`. Aucun appel reseau tant que le cache est valide, sauf avec `--force`.
+- **Exposition Universelle** : CLI (`seo-partner bing sync/inspect`), outils MCP (`get_bing_performance`, `inspect_bing_url`), API REST locale (`/api/v1/bing/*`) et dashboard web.
+
+---
+
+## 9b. Veille Google Officielle & Alerte 90 Jours (F-V1)
+
+- **Flux Officiels** : Synchronisation du blog Google Search Central (Atom) et du Status Dashboard (RSS).
+- **Suivi des Revisions** : Hachage SHA-256 compare dans `watch_source` et enregistrement des entrees dans `watch_entry`.
+- **Document de Reference** : Generation de `skills/seo-partner/references/veille-mises-a-jour.md`. Les regles communautaires non confirmees portent la mention « Rapporté, à vérifier » (`confirmed: false`).
+- **Alerte Doctor** : `seo-partner doctor` emet un avertissement des que la derniere synchronisation depasse 90 jours.
+
+---
+
+## 10b. GitHub Action Packagée (action.yml, M12)
+
+Action composite officielle executant `seo-partner ci` et le televersement SARIF :
+```yaml
+- name: Audit de Conformite SEO
+  uses: Firinze/seo-partner@v0.8
+  with:
+    fail-on-blockers: 'true'
+    min-score: '80'
+    upload-sarif: 'true'
+```
+Publie le resume dans `$GITHUB_STEP_SUMMARY` et alimente GitHub Code Scanning.
+
+---
+
+## 13b. Onglet Agent Chat & Modal d'Approbation de Patch (M14)
+
+Le dashboard local (`seo-partner serve`) integre un onglet « Agent Chat » interactif :
+- **Streaming Temps Reel** : Reception des etapes ReAct via SSE (`agent:thought`, `agent:tool_call`, `agent:tool_result`, `agent:patch_proposed`, `agent:completed`).
+- **Approbation Explicite** : Visualisation du diff unifie et dialogue modal de confirmation strict conformement au Principe II de la Constitution avant appel a `POST /api/v1/agent/apply-patch`.
+- **Accessibilite** : 0 emoji, 0 glassmorphism, conforme WCAG 2.2 AA.
 
 ---
 
