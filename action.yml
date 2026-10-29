@@ -1,5 +1,5 @@
-name: 'SEO Partner — Contrôle Qualité SEO'
-description: 'Auditez le SEO de vos applications web en CI/CD, bloquez les régressions d indexation et intégrez les alertes SARIF dans GitHub Security.'
+name: 'SEO Partner Quality Gate'
+description: 'Automated SEO code audit, CI/CD quality gate, and SARIF export for GitHub Code Scanning to prevent search indexation blockers.'
 author: 'Firinze Gbènito Dossou'
 
 branding:
