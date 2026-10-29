@@ -8,3 +8,4 @@ export const MCP_PACKAGE_VERSION = '0.4.0';
 export * from './jsonrpc.js';
 export * from './server.js';
 export * from './tools/bing.js';
+export * from './tools/semantic.js';

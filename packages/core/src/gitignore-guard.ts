@@ -8,6 +8,7 @@ export const REQUIRED_GITIGNORE_ENTRIES: ReadonlyArray<string> = [
   '.mcp.json',
   'seo-report.md',
   '*-audit-*.md',
+  '*audit*.md',
   '.agents/',
   '.claude/',
   '.cursor/',
@@ -15,6 +16,8 @@ export const REQUIRED_GITIGNORE_ENTRIES: ReadonlyArray<string> = [
   '.codex/',
   '.windsurf/',
   'specs/',
+  '*CAHIER_DES_CHARGES*',
+  'docs/CAHIER_DES_CHARGES*',
 ];
 
 const SECRET_FILE_PATTERNS: ReadonlyArray<RegExp> = [
@@ -82,6 +85,13 @@ export function shouldExcludePath(
   for (const rawPattern of extraIgnorePatterns) {
     const clean = rawPattern.replace(/^\/+/, '').replace(/\/+$/, '');
     if (!clean) continue;
+    if (clean.includes('*')) {
+      const regexPattern = new RegExp('^' + clean.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$');
+      const filename = path.posix.basename(relativePathPosix);
+      if (regexPattern.test(relativePathPosix) || regexPattern.test(filename)) {
+        return { excluded: true, reason: 'ignored' };
+      }
+    }
     if (
       relativePathPosix === clean ||
       relativePathPosix.startsWith(`${clean}/`) ||
@@ -93,6 +103,8 @@ export function shouldExcludePath(
 
   return { excluded: false, reason: null };
 }
+
+export const isPathExcluded = shouldExcludePath;
 
 export function ensureGitignoreSecurity(
   projectRoot: string,
@@ -128,6 +140,8 @@ export function ensureGitignoreSecurity(
 
   return { updated: true, addedEntries, gitignorePath };
 }
+
+export const ensureGitignoreEntries = ensureGitignoreSecurity;
 
 export function verifyGitignoreSecurity(projectRoot: string): {
   secure: boolean;

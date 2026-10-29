@@ -10,4 +10,5 @@ export * from './repositories/cwv-repo.js';
 export * from './repositories/agent-repo.js';
 export * from './repositories/watch-repo.js';
 export * from './repositories/bing-repo.js';
+export * from './proposal-store.js';
 export * from './migrations.js';

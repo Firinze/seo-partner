@@ -116,3 +116,33 @@ export class NuxtAdapter implements FrameworkAdapter {
   }
 }
 
+
+export interface NuxtMetaFields {
+  title?: string;
+  description?: string;
+  canonical?: string;
+}
+
+export function patchNuxtTemplate(
+  sourceCode: string,
+  meta: NuxtMetaFields,
+): string {
+  let result = sourceCode;
+
+  const entries: string[] = [];
+  if (meta.title) entries.push(`  title: '${meta.title.replace(/'/g, "\\'")}',`);
+  if (meta.description) entries.push(`  description: '${meta.description.replace(/'/g, "\\'")}',`);
+  if (meta.canonical) entries.push(`  canonical: '${meta.canonical}',`);
+
+  const seoMetaCall = `useSeoMeta({\n${entries.join('\n')}\n});\n`;
+
+  if (/<script\s+setup[^>]*>/i.test(result)) {
+    if (!/useSeoMeta\s*\(/i.test(result)) {
+      result = result.replace(/(<script\s+setup[^>]*>\s*\n)/i, `$1${seoMetaCall}`);
+    }
+  } else {
+    result = `<script setup lang="ts">\n${seoMetaCall}</script>\n\n` + result;
+  }
+
+  return result;
+}

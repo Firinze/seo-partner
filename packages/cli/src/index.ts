@@ -1,6 +1,7 @@
 import { parseArgs } from 'node:util';
-import type {
-  CliEnvelope,
+import {
+  ensureGitignoreSecurity,
+  type CliEnvelope,
   ReportFormat,
   ReportType,
   RuleCategory,
@@ -150,6 +151,11 @@ export async function executeCli(
     typeof parsed.values['cwd'] === 'string'
       ? parsed.values['cwd']
       : process.cwd();
+  try {
+    if (command !== 'help' && !parsed.values['help'] && command !== 'uninstall') {
+      ensureGitignoreSecurity(projectRoot);
+    }
+  } catch {}
 
   try {
     if (command === 'help' || parsed.values['help']) {
@@ -506,16 +512,22 @@ export async function executeCli(
       });
 
       let text = '';
+      let dataToWrap = null;
       if (res.kind === 'sync') {
         text = `GSC sync completed: ${res.result.recordsCount} record(s) synced for ${res.result.siteUrl}.`;
-      } else {
+        dataToWrap = res.result;
+      } else if (res.kind === 'inspect') {
         const r = res.result.record;
         text = `GSC inspection completed for ${r?.url}: verdict=${r?.verdict}, coverage=${r?.coverageState}.`;
+        dataToWrap = r;
+      } else {
+        text = res.message;
+        dataToWrap = res;
       }
 
       return {
         exitCode: 0,
-        stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(res.kind === 'sync' ? res.result : res.result.record), null, 2) : text,
+        stdout: jsonMode ? JSON.stringify(wrapCliEnvelope(dataToWrap), null, 2) : text,
         stderr: '',
       };
     }

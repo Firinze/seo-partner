@@ -3,6 +3,7 @@ import type { Readable, Writable } from 'node:stream';
 import type { SupportedLanguage, ToolContext, ToolResult } from '@seo-partner/core';
 import { getTool, listTools, registerTool, type ToolDefinition, type ToolValidationResult } from '@seo-partner/tools';
 import { AutonomousAgent } from '@seo-partner/agent';
+import { generateSemanticCopyTool } from './tools/semantic.js';
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -45,6 +46,7 @@ export class McpServer {
     this.projectRoot = options.projectRoot;
     this.allowApply = Boolean(options.allowApply);
     this.lang = options.lang ?? 'en';
+    registerTool(generateSemanticCopyTool);
   }
 
   public getContext(): ToolContext {

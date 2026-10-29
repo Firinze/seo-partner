@@ -124,3 +124,32 @@ export class AstroAdapter implements FrameworkAdapter {
   }
 }
 
+
+export interface AstroMetaFields {
+  title?: string;
+  description?: string;
+  canonical?: string;
+}
+
+export function patchAstroTemplate(
+  sourceCode: string,
+  meta: AstroMetaFields,
+): string {
+  let result = sourceCode;
+
+  const entries: string[] = [];
+  if (meta.title) entries.push(`title: "${meta.title.replace(/"/g, '\\"')}"`);
+  if (meta.description) entries.push(`description: "${meta.description.replace(/"/g, '\\"')}"`);
+  if (meta.canonical) entries.push(`canonical: "${meta.canonical}"`);
+
+  const seoVarBlock = `const seoMeta = {\n  ${entries.join(',\n  ')}\n};\n`;
+
+  const frontmatterMatch = /^---\s*\n([\s\S]*?)\n---/m.exec(result);
+  if (frontmatterMatch) {
+    result = result.replace(/^---\s*\n/m, `---\n${seoVarBlock}`);
+  } else {
+    result = `---\n${seoVarBlock}---\n\n` + result;
+  }
+
+  return result;
+}

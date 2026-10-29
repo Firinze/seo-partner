@@ -328,4 +328,31 @@ CREATE INDEX IF NOT EXISTS idx_watch_entry_confirmed ON watch_entry(confirmed);
 CREATE INDEX IF NOT EXISTS idx_bing_perf_project_url ON bing_performance(project_id, url);
 CREATE INDEX IF NOT EXISTS idx_bing_perf_query ON bing_performance(project_id, query);
 CREATE INDEX IF NOT EXISTS idx_bing_insp_project_url ON bing_inspection(project_id, url);
+
+CREATE TABLE IF NOT EXISTS connector_credential (
+  service TEXT PRIMARY KEY,
+  auth_type TEXT NOT NULL,
+  access_token TEXT,
+  refresh_token TEXT,
+  expires_at INTEGER,
+  service_account_email TEXT,
+  site_url TEXT NOT NULL,
+  last_synced_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS page_inventory (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  source_file_path TEXT NOT NULL,
+  route_path TEXT NOT NULL,
+  scope TEXT NOT NULL DEFAULT 'public',
+  auth_signals_json TEXT NOT NULL DEFAULT '[]',
+  existing_metadata_json TEXT,
+  existing_skeleton TEXT NOT NULL DEFAULT 'none',
+  recommended_robots TEXT NOT NULL DEFAULT 'index, follow',
+  in_sitemap INTEGER NOT NULL DEFAULT 1,
+  scanned_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_page_inv_project ON page_inventory(project_id, scope);
 `;

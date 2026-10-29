@@ -8,3 +8,4 @@ export * from './catalog/perf-rules.js';
 export * from './engine.js';
 export * from './reporter.js';
 export * from './html-reporter.js';
+export * from './jsonld-generator.js';

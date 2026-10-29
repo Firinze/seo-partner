@@ -167,7 +167,7 @@ export function writeMarkdownReport(options: GenerateReportOptions): {
   readonly markdown: string;
 } {
   const today = new Date().toISOString().slice(0, 10);
-  const defaultRelPath = path.join('docs', 'seo', `${today}-${options.reportType}.md`);
+  const defaultRelPath = path.join('.seo', 'reports', `${today}-${options.reportType}.md`);
   const targetPath = options.customOutputPath
     ? path.resolve(options.projectRoot, options.customOutputPath)
     : path.resolve(options.projectRoot, defaultRelPath);

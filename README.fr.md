@@ -4,7 +4,7 @@
 
 <br />
 
-[![Version](https://img.shields.io/badge/version-1.0.0_GA-10b981?style=for-the-badge&logoColor=white)](./package.json)
+[![Version](https://img.shields.io/badge/version-1.0.2-10b981?style=for-the-badge&logoColor=white)](./package.json)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-059669?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7_Strict-047857?style=for-the-badge&logo=typescript&logoColor=white)](./tsconfig.base.json)
 [![Workspaces](https://img.shields.io/badge/Architecture-12_Packages-34d399?style=for-the-badge)](./package.json)
@@ -32,7 +32,7 @@
 ---
 
 > [!NOTE]
-> **Version 1.0.0 GA Disponible** : SEO Partner est desormais stabilise en version finale pour la production. Il s'installe en quelques secondes via `npx seo-partner init`, fonctionne a 100 % en local sur votre poste (sans envoyer vos fichiers a des serveurs tiers), et ne necessite aucune dependance cloud obligatoire.
+> **Version 1.0.2 Disponible** : SEO Partner est desormais stabilise en version finale pour la production. Il s'installe en quelques secondes via `npx seo-partner init`, fonctionne a 100 % en local sur votre poste (sans envoyer vos fichiers a des serveurs tiers), et ne necessite aucune dependance cloud obligatoire.
 
 ---
 
@@ -95,6 +95,14 @@ Que vous soyez debutant absolu ou developpeur chevronne, SEO Partner s'adapte a 
 
 ## 3. Les 3 Facons Simples d'Utiliser SEO Partner
 
+> [!TIP]
+> **Recommandation Prioritaire : A Lancer dans le Terminal Integre de Votre IDE**  
+> Pour une experience optimale, lancez SEO Partner directement depuis le terminal integre de votre editeur (Cursor, VS Code, Windsurf, Claude Code, Antigravity) :
+> - **Avec l'Agent IDE (Serveur MCP)** : Aucun jeton payant n'est requis. L'Agent de votre IDE exploite directement le protocole MCP et redige vos balises SEO sans consommer vos quotas de tokens.
+> - **En Mode Externe (Sans MCP)** : Si vous lancez l'outil sans agent IDE, SEO Partner vous invite de maniere interactive a **choisir votre fournisseur IA d'abord** (OpenAI, Anthropic Claude, Google Gemini, ou OpenCode / Ollama local), puis a renseigner votre cle d'API correspondante.
+> - **Sans IA disponible** : SEO Partner applique un refus pedagogique propre avec des conseils de configuration, sans jamais inserer de faux tags ou de marqueurs temporaires `TODO-SEO`.
+> - **Souverainete Absolue du Code** : Jamais de modification directe sauvage de votre code source. SEO Partner formule des propositions de patch (`.seo/proposals/`) sous forme de diffs clairs. L'application reelle sur disque n'intervient qu'apres votre validation explicite (`seo-partner patch --apply` ou via le bouton du dashboard).
+
 Choisissez le mode qui vous convient le mieux :
 
 ### Mode 1 : Le Tableau de Bord Visuel dans Votre Navigateur (Recommande pour Debutants)
@@ -102,14 +110,14 @@ Lancez une seule commande :
 ```bash
 npx seo-partner serve
 ```
-Votre navigateur s'ouvre sur un tableau de bord complet avec des jauges de score, la liste des pages analysees, et un assistant de discussion IA pour vous guider pas a pas.
+Votre navigateur s'ouvre sur un tableau de bord complet avec des jauges de score, la liste des pages analysees, un visualiseur interactif de diff Avant/Apres et un assistant de discussion IA pour vous guider pas a pas.
 
-### Mode 2 : Dans Votre Editeur de Code avec un Agent IA (Cursor, Windsurf, Claude Code, Antigravity)
-Activez les 13 outils d'optimisation directement dans votre agent IA :
+### Mode 2 : Dans le Terminal de Votre IDE avec un Agent IA (Cursor, Windsurf, Claude Code, Antigravity)
+Activez les outils d'optimisation directement dans votre agent IA :
 ```bash
 npx seo-partner init --with-mcp
 ```
-Votre agent IA comprend desormais la structure SEO de votre site. Demandez-lui simplement : *"Verifie le SEO de ma page d'accueil et corrige les balises manquantes"*.
+Votre agent IA comprend desormais la structure SEO de votre site via les outils MCP dedies (dont `generate_semantic_copy`). Demandez-lui simplement : *"Verifie le SEO de ma page d'accueil et propose les balises manquantes"*. L'agent vous proposera le diff exact et attendra votre confirmation avant d'appliquer le code.
 
 ### Mode 3 : En Ligne de Commande et dans Vos Pipelines CI/CD (GitHub Actions, GitLab)
 Pour les habitues du terminal ou l'automatisation en continu :
@@ -118,6 +126,28 @@ npx seo-partner audit
 npx seo-partner ci --max-blockers=0
 ```
 Le terminal affiche un rapport precis en quelques secondes et retourne un code de sortie strict pour empecher la mise en production de pages mal referencees.
+
+#### Integration GitHub Actions (GitHub Marketplace)
+Vous pouvez utiliser directement l'action officielle SEO Partner dans vos workflows GitHub :
+```yaml
+name: SEO Quality Gate
+on: [push, pull_request]
+
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Executer l'Audit SEO
+        uses: firinze/seo-partner@v1
+        with:
+          fail-on-blockers: 'true'
+          format: 'sarif'
+```
+Cette action invoque automatiquement la derniere version publiee de `seo-partner ci`, televerse le rapport au format SARIF dans GitHub Code Scanning et bloque toute regression d'indexabilite avant fusion de branche.
 
 ---
 

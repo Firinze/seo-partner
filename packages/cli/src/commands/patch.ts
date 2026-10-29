@@ -49,14 +49,14 @@ export async function runPatchCommand(
   if (batch.applied) {
     const summary =
       lang === 'fr'
-        ? `Appliqué. Sauvegarde : ${batch.backupDir}. ${batch.todoMarkersRemaining} marqueur(s) TODO-SEO à compléter.`
-        : `Applied. Backup: ${batch.backupDir}. ${batch.todoMarkersRemaining} TODO-SEO marker(s) remaining to review.`;
+        ? `Applique. Sauvegarde : ${batch.backupDir}.`
+        : `Applied. Backup: ${batch.backupDir}.`;
     lines.push(summary);
   } else {
     const summary =
       lang === 'fr'
-        ? `Lot ${batch.batchId} : ${batch.proposals.length} correctif(s), ${batch.skipped.length} ignoré(s), ${batch.todoMarkersRemaining} marqueur(s) TODO-SEO. Aucun fichier modifié.`
-        : `Batch ${batch.batchId}: ${batch.proposals.length} patch(es), ${batch.skipped.length} skipped, ${batch.todoMarkersRemaining} TODO-SEO marker(s). Zero files modified.`;
+        ? `Lot ${batch.batchId} : ${batch.proposals.length} proposition(s) de correctif, ${batch.skipped.length} ignore(s). Aucun fichier modifie sur le disque.\nPour appliquer directement sur le disque : seo-partner patch --apply\nOu transmettez les propositions a votre Agent IDE.`
+        : `Batch ${batch.batchId}: ${batch.proposals.length} patch proposal(s), ${batch.skipped.length} skipped. Zero files modified on disk.\nTo apply directly to disk: seo-partner patch --apply\nOr provide the proposals to your IDE Agent.`;
     lines.push(summary);
   }
 

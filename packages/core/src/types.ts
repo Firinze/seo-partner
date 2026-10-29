@@ -391,6 +391,7 @@ export type ToolName =
   | 'get_cwv_metrics'
   | 'get_bing_performance'
   | 'inspect_bing_url'
+  | 'generate_semantic_copy'
   | 'run_agent_step';
 
 export interface ToolContext {
@@ -584,6 +585,10 @@ export interface WatchEvent {
 export type SseEventType =
   | 'audit:started'
   | 'audit:completed'
+  | 'crawl:progress'
+  | 'proposal:created'
+  | 'proposal:applied'
+  | 'gsc:synced'
   | 'route:updated'
   | 'finding:blocking'
   | 'ping'

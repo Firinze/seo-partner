@@ -363,7 +363,7 @@ export function writeHtmlReport(options: GenerateReportOptions): {
   readonly html: string;
 } {
   const today = new Date().toISOString().slice(0, 10);
-  const defaultRelPath = path.join('docs', 'seo', `${today}-${options.reportType}.html`);
+  const defaultRelPath = path.join('.seo', 'reports', `${today}-${options.reportType}.html`);
   const targetPath = options.customOutputPath
     ? path.resolve(options.projectRoot, options.customOutputPath)
     : path.resolve(options.projectRoot, defaultRelPath);

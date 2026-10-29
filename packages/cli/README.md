@@ -4,7 +4,7 @@
 
 <br />
 
-[![Version](https://img.shields.io/badge/version-1.0.0_GA-10b981?style=for-the-badge&logoColor=white)](./package.json)
+[![Version](https://img.shields.io/badge/version-1.0.2-10b981?style=for-the-badge&logoColor=white)](./package.json)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-059669?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7_Strict-047857?style=for-the-badge&logo=typescript&logoColor=white)](./tsconfig.base.json)
 [![Workspaces](https://img.shields.io/badge/Architecture-12_Packages-34d399?style=for-the-badge)](./package.json)
@@ -32,7 +32,7 @@
 ---
 
 > [!NOTE]
-> **Version 1.0.0 GA Available**: SEO Partner is now production-ready and fully stabilized. Installs in seconds with `npx seo-partner init`, runs 100% locally on your machine without transmitting files to remote servers, and requires zero mandatory cloud subscriptions.
+> **Version 1.0.2 Available**: SEO Partner is now production-ready and fully stabilized. Installs in seconds with `npx seo-partner init`, runs 100% locally on your machine without transmitting files to remote servers, and requires zero mandatory cloud subscriptions.
 
 ---
 
@@ -95,6 +95,14 @@ Whether you are a newcomer launching your first project or a seasoned lead devel
 
 ## 3. The 3 Simple Ways to Use SEO Partner
 
+> [!TIP]
+> **Primary Recommendation: Run Directly in Your IDE Integrated Terminal**  
+> For the best developer experience, run SEO Partner directly from your code editor's integrated terminal (Cursor, VS Code, Windsurf, Claude Code, Antigravity):
+> - **With IDE Agent (MCP Server - Recommended)**: Zero API key or token cost required. Your IDE's built-in AI agent uses the Model Context Protocol to generate and verify metadata without consuming token quotas.
+> - **In Standalone Mode (External API)**: If launched outside an MCP IDE environment, SEO Partner interactively prompts you to **select your AI provider first** (OpenAI, Anthropic Claude, Google Gemini, or local OpenCode / Ollama), and then enter your corresponding API key.
+> - **Without AI Available**: SEO Partner applies a pedagogical refusal with helpful setup guidance, never inserting broken code or temporary `TODO-SEO` placeholder markers.
+> - **Absolute Code Sovereignty**: Never blindly mutates your files. SEO Partner writes formal diff proposals into `.seo/proposals/`. Source code is only updated upon your explicit review (`seo-partner patch --apply` or via the interactive dashboard).
+
 Pick the workflow that best fits your style:
 
 ### Option 1: The Visual Dashboard in Your Browser (Recommended for Beginners)
@@ -102,14 +110,14 @@ Run one command:
 ```bash
 npx seo-partner serve
 ```
-Your browser opens immediately with visual health gauges, page inspection trees, and an interactive AI streaming assistant to guide your next steps.
+Your browser opens immediately with visual health gauges, page inspection trees, an interactive Before/After Diff Viewer, and an AI streaming assistant.
 
-### Option 2: Inside Your IDE with an AI Coding Agent (Cursor, Windsurf, Claude Code, Antigravity)
-Integrate all 13 SEO tools into your assistant in one step:
+### Option 2: Inside Your IDE Terminal with an AI Coding Agent (Cursor, Windsurf, Claude Code, Antigravity)
+Integrate the tools into your assistant in one step:
 ```bash
 npx seo-partner init --with-mcp
 ```
-Your AI coding agent now understands your website's SEO architecture natively. Just ask: *"Check my homepage SEO and fix missing metadata"*.
+Your AI coding agent now understands your website's SEO architecture natively via MCP tools (including `generate_semantic_copy`). Just ask: *"Check my homepage SEO and propose missing metadata"*. The agent reviews the diff and waits for your confirmation before writing changes to disk.
 
 ### Option 3: Terminal CLI and CI/CD Automation (GitHub Actions, GitLab)
 For command-line veterans and release pipelines:
@@ -118,6 +126,28 @@ npx seo-partner audit
 npx seo-partner ci --max-blockers=0
 ```
 Fast audits in under 5 seconds with strict non-zero exit codes to prevent broken SEO releases.
+
+#### Official GitHub Action (GitHub Marketplace)
+You can directly integrate the official SEO Partner Action into your GitHub repository:
+```yaml
+name: SEO Quality Gate
+on: [push, pull_request]
+
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run SEO Quality Gate
+        uses: firinze/seo-partner@v1
+        with:
+          fail-on-blockers: 'true'
+          format: 'sarif'
+```
+This action automatically invokes the latest published `seo-partner ci`, uploads SARIF reports to GitHub Code Scanning, and prevents search indexation blockers before PR merge.
 
 ---
 

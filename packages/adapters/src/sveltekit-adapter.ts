@@ -117,3 +117,44 @@ export class SvelteKitAdapter implements FrameworkAdapter {
   }
 }
 
+
+export interface SvelteKitMetaFields {
+  title?: string;
+  description?: string;
+  canonical?: string;
+}
+
+export function patchSvelteKitTemplate(
+  sourceCode: string,
+  meta: SvelteKitMetaFields,
+): string {
+  let result = sourceCode;
+
+  if (/<svelte:head>/i.test(result)) {
+    if (meta.title && !/<title>/i.test(result)) {
+      result = result.replace(/(<svelte:head>\s*\n)/i, `$1  <title>${meta.title}</title>\n`);
+    }
+    if (meta.description && !/<meta\s+name=["']description["']/i.test(result)) {
+      result = result.replace(
+        /(<svelte:head>\s*\n)/i,
+        `$1  <meta name="description" content="${meta.description.replace(/"/g, '&quot;')}" />\n`,
+      );
+    }
+  } else {
+    const headLines: string[] = ['<svelte:head>'];
+    if (meta.title) {
+      headLines.push(`  <title>${meta.title}</title>`);
+    }
+    if (meta.description) {
+      headLines.push(`  <meta name="description" content="${meta.description.replace(/"/g, '&quot;')}" />`);
+    }
+    if (meta.canonical) {
+      headLines.push(`  <link rel="canonical" href="${meta.canonical}" />`);
+    }
+    headLines.push('</svelte:head>\n\n');
+
+    result = headLines.join('\n') + result;
+  }
+
+  return result;
+}
